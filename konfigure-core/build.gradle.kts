@@ -42,8 +42,7 @@ kotlin {
 mavenPublishing {
     publishToMavenCentral()
 
-    // If you have created signing for publishing, enable the next line
-    //signAllPublications()
+    signAllPublications()
 
     coordinates(
         groupId = group.toString(),
@@ -64,8 +63,8 @@ mavenPublishing {
         }
         developers {
             developer {
-                id = "fioldev"
-                name = "Nikita Balobanov"
+                id = "fiol-dev"
+                name = "fiol-dev"
                 url = "https://github.com/fiol-dev"
                 email = "fiolmailosu@gmail.com"
             }
