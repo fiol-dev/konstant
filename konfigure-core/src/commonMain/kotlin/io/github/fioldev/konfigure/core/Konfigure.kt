@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
  * ```
  */
 object Konfigure {
-    val configs = mutableMapOf<KClass<*>, Any>()
+    private val configs = mutableMapOf<KClass<*>, Any>()
     private var _loader: ConfigLoader? = null
 
     @Suppress("unused")
@@ -64,7 +64,7 @@ object Konfigure {
     /**
      * Check if a config type has been registered.
      */
-    inline fun <reified T : Any> has(): Boolean = configs.containsKey(T::class)
+    fun <T : Any> has(config: T): Boolean = configs.containsKey(config::class)
 
     /**
      * Clear all registered configs and the loader. Useful for testing.

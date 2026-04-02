@@ -144,6 +144,7 @@ class ConfigSpecProcessor(
             appendLine("    val $propName = FieldDescriptor<$typeStr>(")
             appendLine("        propertyName = \"$propName\",")
             appendLine("        envKey = \"$envKey\",")
+            appendLine("        typeName = \"$typeStr\",")
             appendLine("        required = $required,")
             appendLine("        secret = $isSecret,")
             if (defaultExpr != null) {

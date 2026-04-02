@@ -29,7 +29,7 @@ class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
                             ConfigError.ConversionFailed(
                                 key = key,
                                 rawValue = displayValue,
-                                targetType = field.envKey,
+                                targetType = field.typeName,
                                 cause = e.message ?: "unknown"
                             )
                         )

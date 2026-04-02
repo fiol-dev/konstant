@@ -1,10 +1,7 @@
 plugins {
-    alias(libs.plugins.kotlinJvm)
-    alias(libs.plugins.vanniktech.mavenPublish)
+    id("konfigure.jvm-library")
+    id("konfigure.publishing")
 }
-
-group = libs.versions.libGroup.get()
-version = libs.versions.libVersion.get()
 
 dependencies {
     implementation(project(":konfigure-annotations"))
@@ -13,42 +10,4 @@ dependencies {
     implementation(libs.kotlinpoet)
     implementation(libs.kotlinpoet.ksp)
     testImplementation(libs.kotlin.test)
-}
-
-mavenPublishing {
-    publishToMavenCentral()
-
-    signAllPublications()
-
-    coordinates(
-        groupId = group.toString(),
-        artifactId = "konfigure-ksp",
-        version = version.toString()
-    )
-
-    pom {
-        name = "Konfigure Library"
-        description = "Pydantic Settings but for KMP"
-        inceptionYear = "2026"
-        url = "https://github.com/fiol-dev/kotlin-multiplatform-settings"
-        licenses {
-            license {
-                name = "MIT"
-                url = "https://opensource.org/licenses/MIT"
-            }
-        }
-        developers {
-            developer {
-                id = "fiol-dev"
-                name = "fiol-dev"
-                url = "https://github.com/fiol-dev"
-                email = "fiolmailosu@gmail.com"
-            }
-        }
-        scm {
-            url = "https://github.com/fiol-dev/kotlin-multiplatform-settings"
-            connection = "scm:git:https://github.com/fiol-dev/kotlin-multiplatform-settings.git"
-            developerConnection = "scm:git:ssh://git@github.com/fiol-dev/kotlin-multiplatform-settings.git"
-        }
-    }
 }

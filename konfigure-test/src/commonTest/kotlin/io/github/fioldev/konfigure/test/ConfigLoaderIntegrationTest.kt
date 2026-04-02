@@ -40,6 +40,7 @@ object DatabaseConfigSchema {
     val url = FieldDescriptor(
         propertyName = "url",
         envKey = "URL",
+        typeName = "String",
         required = true,
         secret = false,
         default = null,
@@ -49,6 +50,7 @@ object DatabaseConfigSchema {
     val port = FieldDescriptor(
         propertyName = "port",
         envKey = "PORT",
+        typeName = "Int",
         required = false,
         secret = false,
         default = 5432,
@@ -58,6 +60,7 @@ object DatabaseConfigSchema {
     val maxPoolSize = FieldDescriptor(
         propertyName = "maxPoolSize",
         envKey = "MAX_POOL_SIZE",
+        typeName = "Int",
         required = false,
         secret = false,
         default = 10,
@@ -67,6 +70,7 @@ object DatabaseConfigSchema {
     val password = FieldDescriptor(
         propertyName = "password",
         envKey = "PASSWORD",
+        typeName = "String",
         required = true,
         secret = true,
         default = null,
@@ -76,6 +80,7 @@ object DatabaseConfigSchema {
     val apiKey = FieldDescriptor(
         propertyName = "apiKey",
         envKey = "API_KEY",
+        typeName = "String",
         required = false,
         secret = false,
         default = "",
@@ -89,6 +94,7 @@ object ServerConfigSchema {
     val host = FieldDescriptor(
         propertyName = "host",
         envKey = "HOST",
+        typeName = "String",
         required = false,
         secret = false,
         default = "0.0.0.0",
@@ -98,6 +104,7 @@ object ServerConfigSchema {
     val port = FieldDescriptor(
         propertyName = "port",
         envKey = "PORT",
+        typeName = "Int",
         required = false,
         secret = false,
         default = 8080,
@@ -107,6 +114,7 @@ object ServerConfigSchema {
     val debug = FieldDescriptor(
         propertyName = "debug",
         envKey = "DEBUG",
+        typeName = "Boolean",
         required = false,
         secret = false,
         default = false,
@@ -119,6 +127,7 @@ object AppConfigSchema {
     val appName = FieldDescriptor(
         propertyName = "appName",
         envKey = "APP_NAME",
+        typeName = "String",
         required = false,
         secret = false,
         default = "MyApp",
@@ -369,6 +378,7 @@ class ConfigLoaderIntegrationTest {
         val secretField = FieldDescriptor(
             propertyName = "password",
             envKey = "PASSWORD",
+            typeName = "Int",
             required = true,
             secret = true,
             default = null,

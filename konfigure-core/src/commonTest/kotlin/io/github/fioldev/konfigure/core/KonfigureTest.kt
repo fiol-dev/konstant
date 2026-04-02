@@ -70,19 +70,21 @@ class KonfigureTest {
 
     @Test
     fun has_returnsCorrectly() {
+        val testDbConfig = TestDbConfig("jdbc:test", 3306)
         Konfigure.reset()
-        assertFalse(Konfigure.has<TestDbConfig>())
-        Konfigure.register(TestDbConfig("test", 5432))
-        assertTrue(Konfigure.has<TestDbConfig>())
+        assertFalse(Konfigure.has(testDbConfig))
+        Konfigure.register(testDbConfig)
+        assertTrue(Konfigure.has(testDbConfig))
     }
 
     @Test
     fun reset_clearsAll() {
+        val sampleConfig = sampleConfig()
         Konfigure.reset()
-        Konfigure.register(sampleConfig())
-        assertTrue(Konfigure.has<TestAppConfig>())
+        Konfigure.register(sampleConfig)
+        assertTrue(Konfigure.has(sampleConfig))
 
         Konfigure.reset()
-        assertFalse(Konfigure.has<TestAppConfig>())
+        assertFalse(Konfigure.has(sampleConfig))
     }
 }
