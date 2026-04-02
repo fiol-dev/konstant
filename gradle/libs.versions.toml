@@ -7,7 +7,7 @@ android-compileSdk = "36"
 kotlin = "2.3.20"
 ksp = "2.3.6"
 kotlinpoet = "2.1.0"
-mavenPublish = "0.34.0"
+mavenPublish = "0.36.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
