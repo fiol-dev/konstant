@@ -1,9 +1,21 @@
 plugins {
     id("com.vanniktech.maven.publish")
+    signing
+}
+
+signing {
+    val signingKey: String? by project
+    val signingKeyId: String? by project
+    val signingKeyPassword: String? by project
+    useInMemoryPgpKeys(
+        signingKeyId,
+        signingKey,
+        signingKeyPassword,
+    )
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(false)
     signAllPublications()
 
     coordinates(

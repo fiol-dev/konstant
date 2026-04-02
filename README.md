@@ -20,9 +20,9 @@ Define your config as annotated data classes. A KSP processor generates all sche
 ### 1. Define your config
 
 ```kotlin
-import io.github.fioldev.konfigure.annotations.ConfigSpec
-import io.github.fioldev.konfigure.annotations.Key
-import io.github.fioldev.konfigure.annotations.Secret
+import io.github.fiol_dev.konfigure.annotations.ConfigSpec
+import io.github.fiol_dev.konfigure.annotations.Key
+import io.github.fiol_dev.konfigure.annotations.Secret
 
 @ConfigSpec
 data class DatabaseConfig(
@@ -51,8 +51,8 @@ data class AppConfig(
 ### 2. Load your config
 
 ```kotlin
-import io.github.fioldev.konfigure.core.ConfigLoader
-import io.github.fioldev.konfigure.sources.*
+import io.github.fiol_dev.konfigure.core.ConfigLoader
+import io.github.fiol_dev.konfigure.sources.*
 
 val loader = ConfigLoader {
     sources {
@@ -75,7 +75,7 @@ println(config.server.port)     // 8080
 **Option A: Global registry** -- initialize once at startup, access anywhere.
 
 ```kotlin
-import io.github.fioldev.konfigure.core.Konfigure
+import io.github.fiol_dev.konfigure.core.Konfigure
 
 // At application startup (main, DI init, etc.)
 fun main() {
@@ -109,7 +109,7 @@ class HttpServer {
 **Option B: Property delegates** -- lazy, cached field extraction.
 
 ```kotlin
-import io.github.fioldev.konfigure.core.configField
+import io.github.fiol_dev.konfigure.core.configField
 
 // From the global registry (requires Konfigure.register() at startup)
 class UserRepository {
@@ -118,7 +118,7 @@ class UserRepository {
 }
 
 // From a specific config instance (no global registry needed)
-import io.github.fioldev.konfigure.core.field
+import io.github.fiol_dev.konfigure.core.field
 
 val appConfig: AppConfig = loader.loadAppConfig().getOrThrow()
 
@@ -167,18 +167,18 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.fioldev.konfigure:konfigure-annotations:1.0.0")
-            implementation("io.github.fioldev.konfigure:konfigure-core:1.0.0")
-            implementation("io.github.fioldev.konfigure:konfigure-sources:1.0.0")
+            implementation("io.github.fiol_dev.konfigure:konfigure-annotations:1.0.0")
+            implementation("io.github.fiol_dev.konfigure:konfigure-core:1.0.0")
+            implementation("io.github.fiol_dev.konfigure:konfigure-sources:1.0.0")
         }
         commonTest.dependencies {
-            implementation("io.github.fioldev.konfigure:konfigure-test:1.0.0")
+            implementation("io.github.fiol_dev.konfigure:konfigure-test:1.0.0")
         }
     }
 }
 
 dependencies {
-    add("kspCommonMainMetadata", "io.github.fioldev.konfigure:konfigure-ksp:1.0.0")
+    add("kspCommonMainMetadata", "io.github.fiol_dev.konfigure:konfigure-ksp:1.0.0")
 }
 ```
 
@@ -261,7 +261,7 @@ server.host=0.0.0.0
 On JVM, you can also load from the classpath:
 
 ```kotlin
-import io.github.fioldev.konfigure.sources.loadPropertiesResource
+import io.github.fiol_dev.konfigure.sources.loadPropertiesResource
 
 +loadPropertiesResource("application.properties")
 ```
@@ -289,7 +289,7 @@ debug = false
 ```
 
 ```kotlin
-import io.github.fioldev.konfigure.sources.loadTomlFile
+import io.github.fiol_dev.konfigure.sources.loadTomlFile
 
 +loadTomlFile("config.toml")
 ```
@@ -318,7 +318,7 @@ server:
 ```
 
 ```kotlin
-import io.github.fioldev.konfigure.sources.loadYamlFile
+import io.github.fiol_dev.konfigure.sources.loadYamlFile
 
 +loadYamlFile("config.yaml")
 +loadYamlFile("config.yml")
@@ -335,7 +335,7 @@ The built-in YAML parser is pure Kotlin (zero dependencies):
 For unit tests, use `MapSource` from `konfigure-test`:
 
 ```kotlin
-import io.github.fioldev.konfigure.test.MapSource
+import io.github.fiol_dev.konfigure.test.MapSource
 
 val loader = ConfigLoader {
     sources {
