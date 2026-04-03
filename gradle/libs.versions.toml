@@ -1,6 +1,5 @@
 [versions]
-libGroup = "io.github.fiol-dev"
-libPackage = "io.github.fiol_dev.konfigure"
+libGroup = "io.github.fiol-dev.konfigure"
 libVersion = "0.0.1-alpha1"
 agp = "9.1.0"
 android-minSdk = "24"
