@@ -1,7 +1,7 @@
 [versions]
 libGroup = "io.github.fiol-dev.konfigure"
 libVersion = "0.0.1-alpha1"
-agp = "9.1.0"
+agp = "9.2.1"
 android-minSdk = "24"
 android-compileSdk = "36"
 kotlin = "2.3.20"
