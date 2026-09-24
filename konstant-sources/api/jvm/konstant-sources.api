@@ -3,7 +3,6 @@ public final class io/github/fiol_dev/konstant/sources/PlatformEnv_jvmKt {
 }
 
 public final class io/github/fiol_dev/konstant/sources/PlatformFile_jvmKt {
-	public static final fun loadPropertiesResource (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/PropertiesSource;
 	public static final fun readFileText (Ljava/lang/String;)Ljava/lang/String;
 }
 
