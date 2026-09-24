@@ -1,4 +1,4 @@
-// Full YAML support backed by kaml, as an alternative to the lightweight parser in konstant-sources
+// Full YAML 1.2 support backed by kaml
 plugins {
     id("konstant.kmp-library")
     id("konstant.publishing")

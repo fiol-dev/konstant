@@ -182,6 +182,8 @@ kotlin {
             implementation("io.github.fiol-dev.konstant:konstant-annotations:0.0.1-alpha1")
             implementation("io.github.fiol-dev.konstant:konstant-core:0.0.1-alpha1")
             implementation("io.github.fiol-dev.konstant:konstant-sources:0.0.1-alpha1")
+            // Optional formats: konstant-toml, konstant-yaml, konstant-json
+            implementation("io.github.fiol-dev.konstant:konstant-toml:0.0.1-alpha1")
         }
         commonTest.dependencies {
             implementation("io.github.fiol-dev.konstant:konstant-test:0.0.1-alpha1")
@@ -365,7 +367,7 @@ val loader = ConfigLoader {
 println(KonstantBaked.ENVIRONMENT) // "prod"
 ```
 
-The module using the baked sources needs `konstant-sources` as a dependency.
+The module using the baked sources needs `konstant-sources` as a dependency, plus `konstant-toml` or `konstant-yaml` when it bakes `.toml` or `.yaml` files. `konstant-toml` has no wasmJs build yet, so projects with a wasmJs target should bake `.yaml`, `.properties` or `.env` files instead of `.toml`.
 
 ### `MapSource` (testing)
 

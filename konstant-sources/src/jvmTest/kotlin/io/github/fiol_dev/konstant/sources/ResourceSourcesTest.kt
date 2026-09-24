@@ -9,7 +9,7 @@ import kotlin.test.assertNull
 class ResourceSourcesTest {
 
     @Test
-    fun readsTomlFromClasspath() {
+    fun readsPropertiesFromClasspath() {
         assertEquals("9090", loadPropertiesResource("konstant-test.properties").get("server.port"))
     }
 
