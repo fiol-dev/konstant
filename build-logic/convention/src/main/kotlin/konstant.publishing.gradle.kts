@@ -28,7 +28,7 @@ mavenPublishing {
         name.set("Konstant")
         description.set("Pydantic Settings but for KMP")
         inceptionYear.set("2026")
-        url.set("https://github.com/fiol-dev/kotlin-multiplatform-settings")
+        url.set("https://github.com/fiol-dev/konstant")
         licenses {
             license {
                 name.set("MIT")
@@ -46,9 +46,9 @@ mavenPublishing {
             }
         }
         scm {
-            url.set("https://github.com/fiol-dev/kotlin-multiplatform-settings")
-            connection.set("scm:git:https://github.com/fiol-dev/kotlin-multiplatform-settings.git")
-            developerConnection.set("scm:git:ssh://git@github.com/fiol-dev/kotlin-multiplatform-settings.git")
+            url.set("https://github.com/fiol-dev/konstant")
+            connection.set("scm:git:https://github.com/fiol-dev/konstant.git")
+            developerConnection.set("scm:git:ssh://git@github.com/fiol-dev/konstant.git")
         }
     }
 }
