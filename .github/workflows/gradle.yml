@@ -73,6 +73,6 @@ jobs:
     - name: List ABI tasks
       run: ./gradlew :konstant-core:tasks --all | grep -i abi || true
     - name: Generate ABI dumps
-      run: ./gradlew updateKotlinAbi
+      run: ./gradlew updateLegacyAbi
     - name: Print ABI dumps
       run: find . -path ./build -prune -o -type f -path '*/api/*' -print | sort | while read f; do echo "=====FILE $f"; cat "$f"; echo "=====END"; done

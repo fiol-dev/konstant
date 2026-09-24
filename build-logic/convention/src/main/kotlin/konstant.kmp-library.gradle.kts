@@ -14,9 +14,12 @@ version = libs.version("libVersion")
 kotlin {
     explicitApi()
 
-    // Public API dumps live in each module's api/ folder; checkKotlinAbi fails on unreviewed changes
+    // Public API dumps live in each module's api/ folder; checkLegacyAbi fails on unreviewed changes
     @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
-    abiValidation()
+    abiValidation {
+        enabled.set(true)
+        klib { enabled.set(true) }
+    }
 
     android {
         namespace = "$group.${project.name.removePrefix("konstant-")}"
