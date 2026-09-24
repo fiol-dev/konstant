@@ -4,6 +4,7 @@ import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.core.MapBackedSource
 import io.github.fiol_dev.konstant.sources.readFileText
 import io.github.fiol_dev.konstant.sources.readResourceText
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -41,10 +42,20 @@ public class JsonSource(entries: Map<String, String>) : MapBackedSource(entries)
             allowTrailingComma = true
         }
 
+        private val COMMENTS = Regex("""//[^\n]*|/\*[\s\S]*?\*/""")
+
         internal fun flatten(content: String): Map<String, String> {
-            if (content.isBlank()) return emptyMap()
+            // Editors on Windows often save JSON with a byte order mark
+            val text = content.removePrefix("\uFEFF")
+            if (text.isBlank()) return emptyMap()
+            val root = try {
+                json.parseToJsonElement(text)
+            } catch (e: SerializationException) {
+                if (text.replace(COMMENTS, "").isBlank()) return emptyMap() // only comments
+                throw e
+            }
             val out = linkedMapOf<String, String>()
-            collect(json.parseToJsonElement(content), "", out)
+            collect(root, "", out)
             return out
         }
 

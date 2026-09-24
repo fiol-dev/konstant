@@ -72,6 +72,12 @@ class JsonSourceTest {
     fun emptyInputGivesNoEntries() {
         assertTrue(JsonSource.flatten("").isEmpty())
         assertTrue(JsonSource.flatten("{}").isEmpty())
+        assertTrue(JsonSource.flatten("// only a comment\n/* and another */").isEmpty())
+    }
+
+    @Test
+    fun ignoresByteOrderMark() {
+        assertEquals("1", JsonSource.flatten("\uFEFF{\"a\": 1}")["a"])
     }
 
     @Test
