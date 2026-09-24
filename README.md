@@ -338,7 +338,7 @@ The built-in YAML parser is pure Kotlin (zero dependencies):
 
 ### Full TOML and YAML (`konstant-toml`, `konstant-yaml`)
 
-The built-in parsers above cover common config files. For the full TOML 1.0 and YAML 1.2 specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections), add the optional modules. They are backed by [ktoml](https://github.com/orchestr7/ktoml) and [kaml](https://github.com/charleskorn/kaml) and work on every Konstant target:
+The built-in parsers above cover common config files. For the full TOML 1.0 and YAML 1.2 specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections), add the optional modules. They are backed by [ktoml](https://github.com/orchestr7/ktoml) and [kaml](https://github.com/charleskorn/kaml) and work on every Konstant target, except that `konstant-toml` has no wasmJs build yet (ktoml's wasm artifact is broken with Kotlin 2.3):
 
 ```kotlin
 // build.gradle.kts
