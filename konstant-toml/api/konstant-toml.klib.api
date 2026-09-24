@@ -1,0 +1,22 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.fiol-dev.konstant:konstant-toml>
+final class io.github.fiol_dev.konstant.toml/TomlSource : io.github.fiol_dev.konstant.core/MapBackedSource { // io.github.fiol_dev.konstant.toml/TomlSource|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.toml/TomlSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+
+    final val fallbackKeyFormats // io.github.fiol_dev.konstant.toml/TomlSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
+        final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.toml/TomlSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
+    final val keyFormat // io.github.fiol_dev.konstant.toml/TomlSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.toml/TomlSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.toml/TomlSource.Companion|null[0]
+        final fun fromFile(kotlin/String): io.github.fiol_dev.konstant.toml/TomlSource // io.github.fiol_dev.konstant.toml/TomlSource.Companion.fromFile|fromFile(kotlin.String){}[0]
+        final fun fromResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.toml/TomlSource // io.github.fiol_dev.konstant.toml/TomlSource.Companion.fromResource|fromResource(kotlin.String;kotlin.Boolean){}[0]
+        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.toml/TomlSource // io.github.fiol_dev.konstant.toml/TomlSource.Companion.fromString|fromString(kotlin.String){}[0]
+    }
+}

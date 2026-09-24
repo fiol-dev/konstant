@@ -1,0 +1,22 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.fiol-dev.konstant:konstant-test>
+final class io.github.fiol_dev.konstant.test/MapSource : io.github.fiol_dev.konstant.core/ConfigSource { // io.github.fiol_dev.konstant.test/MapSource|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>, io.github.fiol_dev.konstant.core/KeyFormat = ...) // io.github.fiol_dev.konstant.test/MapSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>;io.github.fiol_dev.konstant.core.KeyFormat){}[0]
+
+    final val keyFormat // io.github.fiol_dev.konstant.test/MapSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.test/MapSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.test/MapSource.get|get(kotlin.String){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.test/MapSource.Companion|null[0]
+        final fun dotNotation(kotlin/Array<out kotlin/Pair<kotlin/String, kotlin/String>>...): io.github.fiol_dev.konstant.test/MapSource // io.github.fiol_dev.konstant.test/MapSource.Companion.dotNotation|dotNotation(kotlin.Array<out|kotlin.Pair<kotlin.String,kotlin.String>>...){}[0]
+        final fun of(kotlin/Array<out kotlin/Pair<kotlin/String, kotlin/String>>...): io.github.fiol_dev.konstant.test/MapSource // io.github.fiol_dev.konstant.test/MapSource.Companion.of|of(kotlin.Array<out|kotlin.Pair<kotlin.String,kotlin.String>>...){}[0]
+        final fun screamingSnake(kotlin/Array<out kotlin/Pair<kotlin/String, kotlin/String>>...): io.github.fiol_dev.konstant.test/MapSource // io.github.fiol_dev.konstant.test/MapSource.Companion.screamingSnake|screamingSnake(kotlin.Array<out|kotlin.Pair<kotlin.String,kotlin.String>>...){}[0]
+    }
+}

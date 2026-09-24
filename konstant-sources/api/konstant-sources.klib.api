@@ -1,0 +1,97 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.fiol-dev.konstant:konstant-sources>
+final class io.github.fiol_dev.konstant.sources.source/DotEnvSource : io.github.fiol_dev.konstant.core/ConfigSource { // io.github.fiol_dev.konstant.sources.source/DotEnvSource|null[0]
+    final val keyFormat // io.github.fiol_dev.konstant.sources.source/DotEnvSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.sources.source/DotEnvSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources.source/DotEnvSource.get|get(kotlin.String){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.sources.source/DotEnvSource.Companion|null[0]
+        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.sources.source/DotEnvSource // io.github.fiol_dev.konstant.sources.source/DotEnvSource.Companion.fromString|fromString(kotlin.String){}[0]
+        final fun invoke(kotlin/String = ...): io.github.fiol_dev.konstant.sources.source/DotEnvSource // io.github.fiol_dev.konstant.sources.source/DotEnvSource.Companion.invoke|invoke(kotlin.String){}[0]
+    }
+}
+
+final class io.github.fiol_dev.konstant.sources.source/EnvSource : io.github.fiol_dev.konstant.core/ConfigSource { // io.github.fiol_dev.konstant.sources.source/EnvSource|null[0]
+    constructor <init>() // io.github.fiol_dev.konstant.sources.source/EnvSource.<init>|<init>(){}[0]
+
+    final val keyFormat // io.github.fiol_dev.konstant.sources.source/EnvSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.sources.source/EnvSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources.source/EnvSource.get|get(kotlin.String){}[0]
+}
+
+final class io.github.fiol_dev.konstant.sources.source/PropertiesSource : io.github.fiol_dev.konstant.core/MapBackedSource { // io.github.fiol_dev.konstant.sources.source/PropertiesSource|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.sources.source/PropertiesSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+
+    final val fallbackKeyFormats // io.github.fiol_dev.konstant.sources.source/PropertiesSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
+        final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.sources.source/PropertiesSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
+    final val keyFormat // io.github.fiol_dev.konstant.sources.source/PropertiesSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.sources.source/PropertiesSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.sources.source/PropertiesSource.Companion|null[0]
+        final fun fromFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/PropertiesSource // io.github.fiol_dev.konstant.sources.source/PropertiesSource.Companion.fromFile|fromFile(kotlin.String){}[0]
+        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.sources.source/PropertiesSource // io.github.fiol_dev.konstant.sources.source/PropertiesSource.Companion.fromString|fromString(kotlin.String){}[0]
+    }
+}
+
+final class io.github.fiol_dev.konstant.sources.source/TomlSource : io.github.fiol_dev.konstant.core/MapBackedSource { // io.github.fiol_dev.konstant.sources.source/TomlSource|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.sources.source/TomlSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+
+    final val fallbackKeyFormats // io.github.fiol_dev.konstant.sources.source/TomlSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
+        final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.sources.source/TomlSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
+    final val keyFormat // io.github.fiol_dev.konstant.sources.source/TomlSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.sources.source/TomlSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.sources.source/TomlSource.Companion|null[0]
+        final fun fromFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/TomlSource // io.github.fiol_dev.konstant.sources.source/TomlSource.Companion.fromFile|fromFile(kotlin.String){}[0]
+        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.sources.source/TomlSource // io.github.fiol_dev.konstant.sources.source/TomlSource.Companion.fromString|fromString(kotlin.String){}[0]
+    }
+}
+
+final class io.github.fiol_dev.konstant.sources.source/YamlSource : io.github.fiol_dev.konstant.core/MapBackedSource { // io.github.fiol_dev.konstant.sources.source/YamlSource|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.sources.source/YamlSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+
+    final val fallbackKeyFormats // io.github.fiol_dev.konstant.sources.source/YamlSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
+        final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.sources.source/YamlSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
+    final val keyFormat // io.github.fiol_dev.konstant.sources.source/YamlSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.sources.source/YamlSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.sources.source/YamlSource.Companion|null[0]
+        final fun fromFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/YamlSource // io.github.fiol_dev.konstant.sources.source/YamlSource.Companion.fromFile|fromFile(kotlin.String){}[0]
+        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.sources.source/YamlSource // io.github.fiol_dev.konstant.sources.source/YamlSource.Companion.fromString|fromString(kotlin.String){}[0]
+    }
+}
+
+final object io.github.fiol_dev.konstant.sources.parser/DotEnvParser { // io.github.fiol_dev.konstant.sources.parser/DotEnvParser|null[0]
+    final fun parse(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.sources.parser/DotEnvParser.parse|parse(kotlin.String){}[0]
+}
+
+final object io.github.fiol_dev.konstant.sources.parser/PropertiesParser { // io.github.fiol_dev.konstant.sources.parser/PropertiesParser|null[0]
+    final fun parse(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.sources.parser/PropertiesParser.parse|parse(kotlin.String){}[0]
+}
+
+final object io.github.fiol_dev.konstant.sources.parser/TomlParser { // io.github.fiol_dev.konstant.sources.parser/TomlParser|null[0]
+    final fun parse(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.sources.parser/TomlParser.parse|parse(kotlin.String){}[0]
+}
+
+final object io.github.fiol_dev.konstant.sources.parser/YamlParser { // io.github.fiol_dev.konstant.sources.parser/YamlParser|null[0]
+    final fun parse(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.sources.parser/YamlParser.parse|parse(kotlin.String){}[0]
+}
+
+final fun io.github.fiol_dev.konstant.sources.source/loadDotEnvResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources.source/DotEnvSource // io.github.fiol_dev.konstant.sources.source/loadDotEnvResource|loadDotEnvResource(kotlin.String;kotlin.Boolean){}[0]
+final fun io.github.fiol_dev.konstant.sources.source/loadPropertiesFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/PropertiesSource // io.github.fiol_dev.konstant.sources.source/loadPropertiesFile|loadPropertiesFile(kotlin.String){}[0]
+final fun io.github.fiol_dev.konstant.sources.source/loadPropertiesResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources.source/PropertiesSource // io.github.fiol_dev.konstant.sources.source/loadPropertiesResource|loadPropertiesResource(kotlin.String;kotlin.Boolean){}[0]
+final fun io.github.fiol_dev.konstant.sources.source/loadTomlFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/TomlSource // io.github.fiol_dev.konstant.sources.source/loadTomlFile|loadTomlFile(kotlin.String){}[0]
+final fun io.github.fiol_dev.konstant.sources.source/loadTomlResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources.source/TomlSource // io.github.fiol_dev.konstant.sources.source/loadTomlResource|loadTomlResource(kotlin.String;kotlin.Boolean){}[0]
+final fun io.github.fiol_dev.konstant.sources.source/loadYamlFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/YamlSource // io.github.fiol_dev.konstant.sources.source/loadYamlFile|loadYamlFile(kotlin.String){}[0]
+final fun io.github.fiol_dev.konstant.sources.source/loadYamlResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources.source/YamlSource // io.github.fiol_dev.konstant.sources.source/loadYamlResource|loadYamlResource(kotlin.String;kotlin.Boolean){}[0]
+final fun io.github.fiol_dev.konstant.sources/getEnvironmentVariable(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources/getEnvironmentVariable|getEnvironmentVariable(kotlin.String){}[0]
+final fun io.github.fiol_dev.konstant.sources/readFileText(kotlin/String): kotlin/String // io.github.fiol_dev.konstant.sources/readFileText|readFileText(kotlin.String){}[0]
+final fun io.github.fiol_dev.konstant.sources/readResourceText(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources/readResourceText|readResourceText(kotlin.String){}[0]

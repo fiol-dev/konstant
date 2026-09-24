@@ -1,0 +1,9 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.fiol-dev.konstant:konstant-koin>
+final inline fun <#A: reified kotlin/Any> (org.koin.core.module/Module).io.github.fiol_dev.konstant.koin/config(): org.koin.core.definition/KoinDefinition<#A> // io.github.fiol_dev.konstant.koin/config|config@org.koin.core.module.Module(){0§<kotlin.Any>}[0]
