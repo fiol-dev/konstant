@@ -593,9 +593,35 @@ val port = appConfig.current.server.port
 
 The first load throws a `ConfigException` if it fails, since there is no good config to fall back on yet. After that, reloads never throw: `reload()` is a suspend function that returns `Updated`, `Unchanged` or `Failed`, and reloads run one at a time so a slow one never overwrites a newer result. `context` is where reloads read their sources; pass `Dispatchers.IO` (or `Dispatchers.Default` where there is no IO dispatcher) when reloads start from the main thread.
 
-Remote sources implement `ReloadableSource`, whose `changes` flow emits when their values change. Create the source outside the `sources` block, add it with `+remote`, and pass the same instance to `appConfig.watch(scope, remote)`.
-
 `Konstant.get` still returns the config installed at startup, so read reloadable values through `appConfig`.
+
+### Remote config
+
+`RemoteSource` holds values that the app pushes in from any remote config service. Put it first so remote values override the bundled defaults, and `watch` it so each `update` reloads the config. Keys the service stops sending fall back to the next source:
+
+```kotlin
+// Firebase Remote Config through the GitLive KMP SDK (dev.gitlive:firebase-config).
+// Start from the values activated in an earlier session, then fetch fresh ones.
+val remote = RemoteSource(Firebase.remoteConfig.all.mapValues { it.value.asString() }, name = "Firebase")
+val appConfig = ReloadableConfig.load(load = { loadAppConfig() }) {
+    sources {
+        +remote
+        +TomlSource.fromResource("config.toml")
+    }
+}
+appConfig.watch(scope, remote)
+
+scope.launch {
+    try {
+        Firebase.remoteConfig.fetchAndActivate()
+        remote.update(Firebase.remoteConfig.all.mapValues { it.value.asString() })
+    } catch (e: Exception) {
+        log.warn("Remote config fetch failed, keeping current values", e)
+    }
+}
+```
+
+Keys are matched in dot notation (`server.port`) and, as a fallback, in SCREAMING_SNAKE case, ignoring case. Firebase parameter keys cannot contain dots, so name them in snake case (`server_port`, `database_pool_size`); `Map` fields cannot come from Firebase for the same reason. Any other source whose values change can implement `ReloadableSource` and report changes on its `changes` flow; `watch` it the same way, with the instance that the `sources` block adds.
 
 ## KSP Compile-Time Validations
 
@@ -667,7 +693,7 @@ konstant/
 +-- konstant-toml/           # Full TOML 1.0 source (ktoml)
 +-- konstant-yaml/           # Full YAML 1.2 source (kaml)
 +-- konstant-json/           # JSON source (kotlinx-serialization-json)
-+-- konstant-reload/         # ReloadableConfig: StateFlow of validated reloads
++-- konstant-reload/         # ReloadableConfig (StateFlow of validated reloads), RemoteSource
 +-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
