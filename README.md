@@ -8,12 +8,13 @@ Define your config as annotated data classes. A KSP processor generates all sche
 
 - **Type-safe**: Config fields are fully typed with compile-time validation
 - **Multiplatform**: JVM, JS (Node.js), Linux, macOS, iOS
-- **Multiple sources**: Environment variables, `.env` files, `.properties`, TOML, YAML, maps (for testing)
+- **Multiple sources**: Environment variables, `.env` files, `.properties`, TOML, YAML, JSON, maps (for testing)
 - **Source priority**: Stack multiple sources; first non-null value wins
 - **Nested configs**: Compose config classes with automatic prefix resolution
 - **Error aggregation**: All errors collected before throwing -- never fail-fast on the first missing field
 - **Secret masking**: `@Secret` fields are masked as `***` in error messages and logs
 - **Zero runtime reflection**: KSP generates everything at compile time
+- **Live reload**: Optional `StateFlow` of validated updates that keeps the last good config on errors
 
 ## Quick Start
 
@@ -562,6 +563,40 @@ The report also carries the load `result`, so it works for failed loads too (mis
 | `ValidationFailed`  | A value broke a validation annotation, or the class's `init` rejected it |
 | `NestedFailure`     | A nested `@ConfigSpec` config had errors                             |
 
+## Reloading at Runtime
+
+`konstant-reload` keeps a config up to date while the app runs. Every reload reads the sources again and validates the result. A valid config is published to a `StateFlow`; an invalid one is skipped, the last good config stays, and the error goes to `failures`:
+
+```kotlin
+// build.gradle.kts
+commonMain.dependencies {
+    implementation("io.github.fiol-dev.konstant:konstant-reload:<version>")
+}
+```
+
+```kotlin
+val appConfig = ReloadableConfig.load(load = { loadAppConfig() }, context = Dispatchers.IO) {
+    sources {
+        +EnvSource()
+        +TomlSource.fromFile("config.toml")   // read again on every reload
+    }
+}
+
+// Collect failures before starting reloads: they are not replayed
+scope.launch { appConfig.failures.collect { log.warn("Config reload skipped", it) } }
+scope.launch { appConfig.config.collect { applyLogLevel(it.logLevel) } }
+
+appConfig.reloadEvery(scope, 30.seconds)        // poll
+appConfig.reloadOn(scope, fileChangedEvents)    // or reload on your own trigger
+val port = appConfig.current.server.port
+```
+
+The first load throws a `ConfigException` if it fails, since there is no good config to fall back on yet. After that, reloads never throw: `reload()` is a suspend function that returns `Updated`, `Unchanged` or `Failed`, and reloads run one at a time so a slow one never overwrites a newer result. `context` is where reloads read their sources; pass `Dispatchers.IO` (or `Dispatchers.Default` where there is no IO dispatcher) when reloads start from the main thread.
+
+Remote sources implement `ReloadableSource`, whose `changes` flow emits when their values change. Create the source outside the `sources` block, add it with `+remote`, and pass the same instance to `appConfig.watch(scope, remote)`.
+
+`Konstant.get` still returns the config installed at startup, so read reloadable values through `appConfig`.
+
 ## KSP Compile-Time Validations
 
 The KSP processor emits a **compilation error** (not a warning) for:
@@ -632,6 +667,7 @@ konstant/
 +-- konstant-toml/           # Full TOML 1.0 source (ktoml)
 +-- konstant-yaml/           # Full YAML 1.2 source (kaml)
 +-- konstant-json/           # JSON source (kotlinx-serialization-json)
++-- konstant-reload/         # ReloadableConfig: StateFlow of validated reloads
 +-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
