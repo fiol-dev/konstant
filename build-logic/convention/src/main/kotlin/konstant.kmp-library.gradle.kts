@@ -9,6 +9,8 @@ group = libs.version("libGroup")
 version = libs.version("libVersion")
 
 kotlin {
+    explicitApi()
+
     android {
         namespace = "$group.${project.name.removePrefix("konstant-")}"
         compileSdk = libs.version("android-compileSdk").toInt()

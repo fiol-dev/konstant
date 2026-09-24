@@ -20,5 +20,6 @@ rootProject.name = "konstant"
 include(":konstant-annotations")
 include(":konstant-core")
 include(":konstant-ksp")
+include(":konstant-ksp-tests")
 include(":konstant-sources")
 include(":konstant-test")

@@ -1,8 +1,8 @@
 package io.github.fiol_dev.konstant.sources.parser
 
-object DotEnvParser {
+public object DotEnvParser {
 
-    fun parse(content: String): Map<String, String> {
+    public fun parse(content: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
         for (line in content.lines()) {
             val trimmed = line.trim()

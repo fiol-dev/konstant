@@ -1,16 +1,16 @@
 package io.github.fiol_dev.konstant.core
 
-sealed class ConfigError {
-    abstract val key: String
-    abstract val message: String
+public sealed class ConfigError {
+    public abstract val key: String
+    public abstract val message: String
 
-    data class MissingRequired(
+    public data class MissingRequired(
         override val key: String,
     ) : ConfigError() {
         override val message: String get() = "Required configuration key '$key' is missing"
     }
 
-    data class ConversionFailed(
+    public data class ConversionFailed(
         override val key: String,
         val rawValue: String,
         val targetType: String,
@@ -20,7 +20,7 @@ sealed class ConfigError {
             get() = "Failed to convert '$key' value '$rawValue' to $targetType: $cause"
     }
 
-    data class NestedFailure(
+    public data class NestedFailure(
         override val key: String,
         val errors: List<ConfigError>,
     ) : ConfigError() {
@@ -29,7 +29,7 @@ sealed class ConfigError {
     }
 }
 
-class ConfigException(val errors: List<ConfigError>) : RuntimeException(
+public class ConfigException(public val errors: List<ConfigError>) : RuntimeException(
     buildString {
         appendLine("Configuration loading failed with ${errors.size} error(s):")
         errors.forEach { appendLine("  - ${it.message}") }

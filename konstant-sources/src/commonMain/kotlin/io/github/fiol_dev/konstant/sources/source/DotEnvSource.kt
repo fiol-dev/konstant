@@ -5,19 +5,19 @@ import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.sources.parser.DotEnvParser
 import io.github.fiol_dev.konstant.sources.readFileText
 
-class DotEnvSource private constructor(
+public class DotEnvSource private constructor(
     private val entries: Map<String, String>,
 ) : ConfigSource {
     override val keyFormat: KeyFormat = KeyFormat.SCREAMING_SNAKE
 
     override fun get(key: String): String? = entries[key]
 
-    companion object {
+    public companion object {
         /**
          * Load from a .env file. If the file does not exist, returns an empty source.
          * Parse errors in a successfully read file are propagated as exceptions.
          */
-        operator fun invoke(path: String = ".env"): DotEnvSource {
+        public operator fun invoke(path: String = ".env"): DotEnvSource {
             val content = try {
                 readFileText(path)
             } catch (_: Exception) {
@@ -30,7 +30,7 @@ class DotEnvSource private constructor(
         /**
          * Create from an already-read string content.
          */
-        fun fromString(content: String): DotEnvSource =
+        public fun fromString(content: String): DotEnvSource =
             DotEnvSource(DotEnvParser.parse(content))
     }
 }
