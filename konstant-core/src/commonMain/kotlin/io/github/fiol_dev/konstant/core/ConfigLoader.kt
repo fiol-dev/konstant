@@ -49,7 +49,15 @@ public class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
         raw: String,
         block: () -> T,
     ): ResolveResult<T> = try {
-        ResolveResult.Success(block())
+        val value = block()
+        val problem = field.validate?.invoke(value)
+        if (problem == null) {
+            ResolveResult.Success(value)
+        } else {
+            ResolveResult.Error(
+                ConfigError.ValidationFailed(key, if (field.secret) "***" else raw, problem)
+            )
+        }
     } catch (e: Exception) {
         // Parser messages often echo the input, so a secret's cause is redacted too
         ResolveResult.Error(

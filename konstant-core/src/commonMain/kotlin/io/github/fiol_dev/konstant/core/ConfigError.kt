@@ -20,6 +20,23 @@ public sealed class ConfigError {
             get() = "Failed to convert '$key' value '$rawValue' to $targetType: $cause"
     }
 
+    /**
+     * A value converted fine but broke a validation rule, or the config class's `init` block
+     * rejected the loaded values. [rawValue] is null in the second case and `***` for secrets.
+     */
+    public data class ValidationFailed(
+        override val key: String,
+        val rawValue: String?,
+        val reason: String,
+    ) : ConfigError() {
+        override val message: String
+            get() = if (rawValue == null) {
+                "Invalid configuration '$key': $reason"
+            } else {
+                "Invalid value for '$key' ('$rawValue'): $reason"
+            }
+    }
+
     public data class NestedFailure(
         override val key: String,
         val errors: List<ConfigError>,

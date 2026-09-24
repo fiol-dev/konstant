@@ -377,6 +377,52 @@ Available factory methods:
 
 `T` in collections is any of the scalar types above. Other types trigger a **compile-time error**.
 
+## Custom Converters
+
+For a type Konstant doesn't know, write an `object` implementing `ValueConverter<T>` and point the field at it with `@Convert`:
+
+```kotlin
+object HostPortConverter : ValueConverter<HostPort> {
+    override fun convert(raw: String): HostPort {
+        val (host, port) = raw.split(':').also { require(it.size == 2) { "expected host:port" } }
+        return HostPort(host, port.toInt())
+    }
+}
+
+@ConfigSpec
+data class ProxyConfig(
+    @Convert(HostPortConverter::class) val upstream: HostPort,
+    @Convert(HostPortConverter::class) val backup: HostPort? = null,
+)
+```
+
+Throw `IllegalArgumentException` for bad input; its message becomes the error's cause.
+
+## Validation
+
+Annotate fields to check values after conversion. Failures are reported together with every other error as `ConfigError.ValidationFailed`.
+
+| Annotation                 | Applies to                         | Rule                                  |
+|----------------------------|------------------------------------|---------------------------------------|
+| `@Range(min, max)`         | `Int`, `Long`, `Double`, `Float`   | `min <= value <= max` (either bound optional) |
+| `@Size(min, max)`          | `String` length, `List`/`Set`/`Map` size | `min <= size <= max`            |
+| `@NotBlank`                | `String`                           | contains a non-whitespace character   |
+| `@Pattern(regex)`          | `String`                           | the whole value matches `regex`       |
+
+Rules that span several fields go in the class's `init` block. A failing `require` becomes a `ValidationFailed` error for the whole config instead of an exception:
+
+```kotlin
+@ConfigSpec
+data class WorkerConfig(
+    @Range(min = 1.0) val minWorkers: Int = 1,
+    @Range(min = 1.0, max = 64.0) val maxWorkers: Int = 4,
+) {
+    init {
+        require(minWorkers <= maxWorkers) { "minWorkers must not exceed maxWorkers" }
+    }
+}
+```
+
 ## Error Handling
 
 Konstant collects **all** errors before throwing. You never get a single missing-field error only to discover more after fixing it.
@@ -405,6 +451,7 @@ val config = loader.loadAppConfig().getOrThrow()
 |---------------------|----------------------------------------------------------------------|
 | `MissingRequired`   | A required field (no default) is not found in any source             |
 | `ConversionFailed`  | A value was found but couldn't be converted to the target type       |
+| `ValidationFailed`  | A value broke a validation annotation, or the class's `init` rejected it |
 | `NestedFailure`     | A nested `@ConfigSpec` config had errors                             |
 
 ## KSP Compile-Time Validations
@@ -415,6 +462,8 @@ The KSP processor emits a **compilation error** (not a warning) for:
 - A field type that is another `@ConfigSpec` class but is not itself annotated with `@ConfigSpec`
 - A field type that is unsupported (e.g. arbitrary classes, `Map` with non-`String` keys, nullable collection elements)
 - A nullable nested `@ConfigSpec` field
+- `@Convert` naming something other than an object implementing `ValueConverter` of the field's type
+- A validation annotation on a type it doesn't apply to, or an invalid `@Pattern` regex
 
 ## What KSP Generates
 
