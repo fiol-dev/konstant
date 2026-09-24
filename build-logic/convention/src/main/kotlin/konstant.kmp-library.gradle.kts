@@ -15,6 +15,7 @@ kotlin {
         namespace = "$group.${project.name.removePrefix("konstant-")}"
         compileSdk = libs.version("android-compileSdk").toInt()
         minSdk = libs.version("android-minSdk").toInt()
+        withHostTest {}
     }
     jvm()
     js { nodejs() }
