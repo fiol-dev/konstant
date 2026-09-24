@@ -1,4 +1,4 @@
-# Konfigure
+# Konstant
 
 A compile-time, type-safe configuration library for Kotlin Multiplatform inspired by [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/).
 
@@ -20,9 +20,9 @@ Define your config as annotated data classes. A KSP processor generates all sche
 ### 1. Define your config
 
 ```kotlin
-import io.github.fiol_dev.konfigure.annotations.ConfigSpec
-import io.github.fiol_dev.konfigure.annotations.Key
-import io.github.fiol_dev.konfigure.annotations.Secret
+import io.github.fiol_dev.konstant.annotations.ConfigSpec
+import io.github.fiol_dev.konstant.annotations.Key
+import io.github.fiol_dev.konstant.annotations.Secret
 
 @ConfigSpec
 data class DatabaseConfig(
@@ -51,8 +51,8 @@ data class AppConfig(
 ### 2. Load your config
 
 ```kotlin
-import io.github.fiol_dev.konfigure.core.ConfigLoader
-import io.github.fiol_dev.konfigure.sources.*
+import io.github.fiol_dev.konstant.core.ConfigLoader
+import io.github.fiol_dev.konstant.sources.*
 
 val loader = ConfigLoader {
     sources {
@@ -75,50 +75,50 @@ println(config.server.port)     // 8080
 **Option A: Global registry** -- initialize once at startup, access anywhere.
 
 ```kotlin
-import io.github.fiol_dev.konfigure.core.Konfigure
+import io.github.fiol_dev.konstant.core.Konstant
 
 // At application startup (main, DI init, etc.)
 fun main() {
-    Konfigure.init {
+    Konstant.init {
         sources {
             +EnvSource()
             +loadTomlFile("config.toml")
         }
     }
 
-    val config = Konfigure.loader.loadAppConfig().getOrThrow()
-    Konfigure.register(config)            // register the root config
-    Konfigure.register(config.database)   // also register nested configs individually
-    Konfigure.register(config.server)
+    val config = Konstant.loader.loadAppConfig().getOrThrow()
+    Konstant.register(config)            // register the root config
+    Konstant.register(config.database)   // also register nested configs individually
+    Konstant.register(config.server)
 
     startApp()
 }
 
 // Anywhere else in your codebase
 class UserRepository {
-    private val dbUrl = Konfigure.get<DatabaseConfig>().url
-    private val maxPool = Konfigure.get<DatabaseConfig>().maxPoolSize
+    private val dbUrl = Konstant.get<DatabaseConfig>().url
+    private val maxPool = Konstant.get<DatabaseConfig>().maxPoolSize
 }
 
 class HttpServer {
-    private val port = Konfigure.get<ServerConfig>().port
-    private val debug = Konfigure.get<ServerConfig>().debug
+    private val port = Konstant.get<ServerConfig>().port
+    private val debug = Konstant.get<ServerConfig>().debug
 }
 ```
 
 **Option B: Property delegates** -- lazy, cached field extraction.
 
 ```kotlin
-import io.github.fiol_dev.konfigure.core.configField
+import io.github.fiol_dev.konstant.core.configField
 
-// From the global registry (requires Konfigure.register() at startup)
+// From the global registry (requires Konstant.register() at startup)
 class UserRepository {
     private val dbUrl: String by configField<AppConfig, String> { it.database.url }
     private val maxPool: Int by configField<AppConfig, Int> { it.database.maxPoolSize }
 }
 
 // From a specific config instance (no global registry needed)
-import io.github.fiol_dev.konfigure.core.field
+import io.github.fiol_dev.konstant.core.field
 
 val appConfig: AppConfig = loader.loadAppConfig().getOrThrow()
 
@@ -167,18 +167,18 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.fiol_dev.konfigure:konfigure-annotations:1.0.0")
-            implementation("io.github.fiol_dev.konfigure:konfigure-core:1.0.0")
-            implementation("io.github.fiol_dev.konfigure:konfigure-sources:1.0.0")
+            implementation("io.github.fiol-dev.konstant:konstant-annotations:0.0.1-alpha1")
+            implementation("io.github.fiol-dev.konstant:konstant-core:0.0.1-alpha1")
+            implementation("io.github.fiol-dev.konstant:konstant-sources:0.0.1-alpha1")
         }
         commonTest.dependencies {
-            implementation("io.github.fiol_dev.konfigure:konfigure-test:1.0.0")
+            implementation("io.github.fiol-dev.konstant:konstant-test:0.0.1-alpha1")
         }
     }
 }
 
 dependencies {
-    add("kspCommonMainMetadata", "io.github.fiol_dev.konfigure:konfigure-ksp:1.0.0")
+    add("kspCommonMainMetadata", "io.github.fiol-dev.konstant:konstant-ksp:0.0.1-alpha1")
 }
 ```
 
@@ -261,7 +261,7 @@ server.host=0.0.0.0
 On JVM, you can also load from the classpath:
 
 ```kotlin
-import io.github.fiol_dev.konfigure.sources.loadPropertiesResource
+import io.github.fiol_dev.konstant.sources.loadPropertiesResource
 
 +loadPropertiesResource("application.properties")
 ```
@@ -289,7 +289,7 @@ debug = false
 ```
 
 ```kotlin
-import io.github.fiol_dev.konfigure.sources.loadTomlFile
+import io.github.fiol_dev.konstant.sources.loadTomlFile
 
 +loadTomlFile("config.toml")
 ```
@@ -318,7 +318,7 @@ server:
 ```
 
 ```kotlin
-import io.github.fiol_dev.konfigure.sources.loadYamlFile
+import io.github.fiol_dev.konstant.sources.loadYamlFile
 
 +loadYamlFile("config.yaml")
 +loadYamlFile("config.yml")
@@ -332,10 +332,10 @@ The built-in YAML parser is pure Kotlin (zero dependencies):
 
 ### `MapSource` (testing)
 
-For unit tests, use `MapSource` from `konfigure-test`:
+For unit tests, use `MapSource` from `konstant-test`:
 
 ```kotlin
-import io.github.fiol_dev.konfigure.test.MapSource
+import io.github.fiol_dev.konstant.test.MapSource
 
 val loader = ConfigLoader {
     sources {
@@ -376,7 +376,7 @@ Unsupported types (e.g. `List<T>`, `Map<K,V>`, arbitrary classes) trigger a **co
 
 ## Error Handling
 
-Konfigure collects **all** errors before throwing. You never get a single missing-field error only to discover more after fixing it.
+Konstant collects **all** errors before throwing. You never get a single missing-field error only to discover more after fixing it.
 
 ```kotlin
 val result = loader.loadAppConfig()
@@ -451,14 +451,14 @@ Nested `@ConfigSpec` types recursively call their own generated loader, passing 
 ## Module Structure
 
 ```
-konfigure/
-+-- konfigure-annotations/    # @ConfigSpec, @Secret, @Key -- zero deps, commonMain
-+-- konfigure-core/           # FieldDescriptor, ConfigSource, ConfigLoader,
+konstant/
++-- konstant-annotations/    # @ConfigSpec, @Secret, @Key -- zero deps, commonMain
++-- konstant-core/           # FieldDescriptor, ConfigSource, ConfigLoader,
 |                             # ConfigResult, key resolution utils -- commonMain
-+-- konfigure-ksp/            # KSP processor -- JVM only, runs at build time
-+-- konfigure-sources/        # EnvSource, DotEnvSource, PropertiesSource
++-- konstant-ksp/            # KSP processor -- JVM only, runs at build time
++-- konstant-sources/        # EnvSource, DotEnvSource, PropertiesSource
 |                             # with expect/actual per platform
-+-- konfigure-test/           # MapSource for unit testing configs
++-- konstant-test/           # MapSource for unit testing configs
 ```
 
 ## Platform Support

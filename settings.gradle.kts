@@ -16,9 +16,9 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "konfigure"
-include(":konfigure-annotations")
-include(":konfigure-core")
-include(":konfigure-ksp")
-include(":konfigure-sources")
-include(":konfigure-test")
+rootProject.name = "konstant"
+include(":konstant-annotations")
+include(":konstant-core")
+include(":konstant-ksp")
+include(":konstant-sources")
+include(":konstant-test")
