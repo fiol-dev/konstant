@@ -8,6 +8,7 @@ import io.github.fiol_dev.konstant.ksptests.other.CacheConfig
 import io.github.fiol_dev.konstant.ksptests.other.Mode
 import io.github.fiol_dev.konstant.sources.source.PropertiesSource
 import io.github.fiol_dev.konstant.sources.source.TomlSource
+import io.github.fiol_dev.konstant.sources.source.YamlSource
 import io.github.fiol_dev.konstant.test.MapSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -151,5 +152,65 @@ class TypesLoaderTest {
         assertEquals(false, TypesConfigSchema.nickname.required)
         assertNull(TypesConfigSchema.nickname.default)
         assertEquals("Map<String, Double>", TypesConfigSchema.weights.typeName)
+    }
+
+    @Test
+    fun readsMapFieldsFromTomlTables() {
+        val source = TomlSource.fromString(
+            """
+            level = "info"
+            timeout = "10s"
+            hosts = ["x"]
+            ports = [1, 2,]
+
+            [weights]
+            a = 0.5
+            b = 2
+            """.trimIndent()
+        )
+
+        val config = loader(source).loadTypesConfig().getOrThrow()
+
+        assertEquals(mapOf("a" to 0.5, "b" to 2.0), config.weights)
+        assertEquals(setOf(1, 2), config.ports)
+    }
+
+    @Test
+    fun readsMapFieldsFromYamlMappings() {
+        val source = YamlSource.fromString(
+            """
+            level: debug
+            timeout: 1s
+            hosts: x
+            ports: 1
+            weights:
+              a: 0.5
+              b: 2
+            """.trimIndent()
+        )
+
+        val config = loader(source).loadTypesConfig().getOrThrow()
+
+        assertEquals(mapOf("a" to 0.5, "b" to 2.0), config.weights)
+    }
+
+    @Test
+    fun reportsBadValueInsideTable() {
+        val source = TomlSource.fromString(
+            """
+            level = "info"
+            timeout = "10s"
+            hosts = "x"
+            ports = "1"
+
+            [weights]
+            a = "heavy"
+            """.trimIndent()
+        )
+
+        val errors = assertIs<ConfigResult.Failure>(loader(source).loadTypesConfig()).errors
+        val error = assertIs<ConfigError.ConversionFailed>(errors.single())
+        assertEquals("weights", error.key)
+        assertEquals("{a=heavy}", error.rawValue)
     }
 }

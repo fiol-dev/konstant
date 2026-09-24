@@ -42,12 +42,15 @@ public object Converters {
             value = value.substring(1, value.length - 1).trim()
         }
         if (value.isEmpty()) return emptyList()
-        return splitTopLevel(value, ',').map { element(unquote(it.trim())) }
+        // A trailing comma (`[1, 2,]`) is allowed, as in TOML
+        val items = splitTopLevel(value, ',').let { if (it.last().isBlank()) it.dropLast(1) else it }
+        return items.map { element(unquote(it.trim())) }
     }
 
     /**
      * Parses `key=value` pairs separated by commas: `a=1, b=2`. Surrounding braces are accepted,
-     * and `:` works as a separator too, so inline tables such as `{ a = 1, b = 2 }` parse.
+     * and `:` works as a separator too. For TOML tables and YAML mappings, which sources flatten
+     * into `name.key` entries, the loader uses [mapEntries] instead.
      */
     public fun <T> map(raw: String, value: (String) -> T): Map<String, T> {
         var text = raw.trim()
@@ -66,6 +69,10 @@ public object Converters {
         }
         return result
     }
+
+    /** Converts the child entries of a table or mapping, see [ConfigSource.children]. */
+    public fun <T> mapEntries(entries: Map<String, String>, value: (String) -> T): Map<String, T> =
+        entries.mapValues { value(it.value) }
 
     private fun unquote(s: String): String =
         if (s.length >= 2 && (s[0] == '"' || s[0] == '\'') && s.last() == s[0]) {
@@ -87,22 +94,32 @@ public object Converters {
         return parts
     }
 
-    /** Index of [target] outside quotes and brackets, or -1. */
+    /**
+     * Index of [target] outside quotes and brackets, or -1. A quote only opens a quoted section at
+     * the start of a value, so apostrophes inside words (`O'Brien`) are plain characters.
+     */
     private fun indexOfTopLevel(text: String, target: Char, from: Int = 0): Int {
         var depth = 0
         var quote: Char? = null
+        var atValueStart = true
         var i = from
         while (i < text.length) {
             val ch = text[i]
             when {
                 quote != null -> if (ch == '\\') i++ else if (ch == quote) quote = null
-                ch == '"' || ch == '\'' -> quote = ch
+                ch == target && depth == 0 -> return i
+                (ch == '"' || ch == '\'') && atValueStart -> quote = ch
                 ch == '[' || ch == '{' -> depth++
                 ch == ']' || ch == '}' -> depth--
-                ch == target && depth == 0 -> return i
+            }
+            if (quote == null && !ch.isWhitespace()) {
+                atValueStart = ch in VALUE_STARTERS
             }
             i++
         }
         return -1
     }
+
+    private const val VALUE_STARTERS = ",=:[{"
+
 }

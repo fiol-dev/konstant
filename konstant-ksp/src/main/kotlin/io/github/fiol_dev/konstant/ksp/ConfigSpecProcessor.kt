@@ -42,6 +42,8 @@ class ConfigSpecProcessor(
         val display: String,
         /** Expression of type `(String) -> T`. */
         val converter: String,
+        /** Expression of type `(Map<String, String>) -> T` for values read from nested entries. */
+        val childrenConverter: String? = null,
     )
 
     private sealed interface FieldKind {
@@ -147,6 +149,7 @@ class ConfigSpecProcessor(
                     code = "kotlin.collections.Map<kotlin.String, ${element.code}>",
                     display = "Map<String, ${element.display}>",
                     converter = "{ $CONVERTERS.map(it, ${element.converter}) }",
+                    childrenConverter = "{ $CONVERTERS.mapEntries(it, ${element.converter}) }",
                 )
             }
             else -> null
@@ -256,6 +259,7 @@ class ConfigSpecProcessor(
                 appendLine("        customKey = \"$customKey\",")
             }
             appendLine("        convert = ${kind.type.converter},")
+            kind.type.childrenConverter?.let { appendLine("        convertChildren = $it,") }
             appendLine("    )")
         }
         appendLine("}")

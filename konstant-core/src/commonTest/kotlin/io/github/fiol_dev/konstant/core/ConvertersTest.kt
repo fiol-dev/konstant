@@ -56,4 +56,21 @@ class ConvertersTest {
         assertEquals(emptyMap(), Converters.map("") { it })
         assertFailsWith<IllegalArgumentException> { Converters.map("novalue") { it } }
     }
+
+    @Test
+    fun apostrophesInsideValuesAreNotQuotes() {
+        assertEquals(listOf("O'Brien", "Smith"), Converters.list("O'Brien, Smith") { it })
+        assertEquals(mapOf("greeting" to "don't", "retries" to "3"), Converters.map("greeting=don't, retries=3") { it })
+        assertEquals(mapOf("a" to "x,y"), Converters.map("a=\"x,y\"") { it })
+    }
+
+    @Test
+    fun listAllowsTrailingComma() {
+        assertEquals(listOf(8080, 8081), Converters.list("[8080, 8081,]") { it.toInt() })
+    }
+
+    @Test
+    fun mapEntriesConvertsValues() {
+        assertEquals(mapOf("a" to 1), Converters.mapEntries(mapOf("a" to "1")) { it.toInt() })
+    }
 }
