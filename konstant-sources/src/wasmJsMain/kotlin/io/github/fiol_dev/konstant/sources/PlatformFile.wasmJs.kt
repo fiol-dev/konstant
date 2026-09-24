@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package io.github.fiol_dev.konstant.sources
 
 private fun hasNodeFs(): Boolean =

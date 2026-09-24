@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package io.github.fiol_dev.konstant.sources
 
 // Browsers have no environment variables, so every lookup there is null
