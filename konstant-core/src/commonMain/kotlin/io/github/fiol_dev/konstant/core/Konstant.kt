@@ -21,19 +21,19 @@ import kotlin.reflect.KClass
  * val port = Konstant[AppConfig::class].server.port
  * ```
  */
-object Konstant {
+public object Konstant {
     private val configs = mutableMapOf<KClass<*>, Any>()
     private var _loader: ConfigLoader? = null
 
     @Suppress("unused")
-    val loader: ConfigLoader
+    public val loader: ConfigLoader
         get() = _loader ?: error("Konstant not initialized. Call Konstant.init { ... } first.")
 
     /**
      * Initialize the global [ConfigLoader] with the given source configuration.
      */
     @Suppress("unused")
-    fun init(block: ConfigLoaderBuilder.() -> Unit): ConfigLoader {
+    public fun init(block: ConfigLoaderBuilder.() -> Unit): ConfigLoader {
         val l = ConfigLoader(block)
         _loader = l
         return l
@@ -42,21 +42,21 @@ object Konstant {
     /**
      * Register a loaded config instance for global access.
      */
-    inline fun <reified T : Any> register(config: T) {
+    public inline fun <reified T : Any> register(config: T) {
         register(T::class, config)
     }
 
-    fun <T : Any> register(type: KClass<T>, config: T) {
+    public fun <T : Any> register(type: KClass<T>, config: T) {
         configs[type] = config
     }
 
     /**
      * Retrieve a previously registered config by type.
      */
-    inline fun <reified T : Any> get(): T = get(T::class)
+    public inline fun <reified T : Any> get(): T = get(T::class)
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <T : Any> get(type: KClass<T>): T {
+    public operator fun <T : Any> get(type: KClass<T>): T {
         return configs[type] as? T
             ?: error("No config registered for ${type.simpleName}. Call Konstant.register(...) first.")
     }
@@ -64,12 +64,12 @@ object Konstant {
     /**
      * Check if a config type has been registered.
      */
-    fun <T : Any> has(config: T): Boolean = configs.containsKey(config::class)
+    public fun <T : Any> has(config: T): Boolean = configs.containsKey(config::class)
 
     /**
      * Clear all registered configs and the loader. Useful for testing.
      */
-    fun reset() {
+    public fun reset() {
         configs.clear()
         _loader = null
     }

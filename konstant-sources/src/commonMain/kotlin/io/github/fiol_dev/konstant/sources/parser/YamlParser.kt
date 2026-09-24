@@ -17,9 +17,9 @@ import kotlin.text.iterator
  * - No flow sequences/mappings beyond simple values
  * - Lists are stored as comma-separated strings
  */
-object YamlParser {
+public object YamlParser {
 
-    fun parse(content: String): Map<String, String> {
+    public fun parse(content: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
         val prefixStack = mutableListOf<Pair<Int, String>>() // (indent, key)
 

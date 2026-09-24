@@ -1,7 +1,7 @@
 package io.github.fiol_dev.konstant.core
 
-class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
-    val sources: List<ConfigSource>
+public class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
+    public val sources: List<ConfigSource>
 
     init {
         val builder = ConfigLoaderBuilder()
@@ -9,7 +9,7 @@ class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
         sources = builder.buildSources()
     }
 
-    fun <T> resolve(field: FieldDescriptor<T>, prefix: String?): ResolveResult<T> {
+    public fun <T> resolve(field: FieldDescriptor<T>, prefix: String?): ResolveResult<T> {
         for (source in sources) {
             val formats = listOf(source.keyFormat) + source.fallbackKeyFormats
             for (format in formats) {
@@ -24,13 +24,13 @@ class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
                     return try {
                         ResolveResult.Success(field.convert(raw))
                     } catch (e: Exception) {
-                        val displayValue = if (field.secret) "***" else raw
+                        // Parser messages often echo the input, so a secret's cause is redacted too
                         ResolveResult.Error(
                             ConfigError.ConversionFailed(
                                 key = key,
-                                rawValue = displayValue,
+                                rawValue = if (field.secret) "***" else raw,
                                 targetType = field.typeName,
-                                cause = e.message ?: "unknown"
+                                cause = if (field.secret) "invalid value" else e.message ?: "unknown",
                             )
                         )
                     }
@@ -52,22 +52,22 @@ class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
     }
 }
 
-class ConfigLoaderBuilder {
+public class ConfigLoaderBuilder {
     private val sourceList = mutableListOf<ConfigSource>()
 
-    fun sources(block: SourcesBuilder.() -> Unit) {
+    public fun sources(block: SourcesBuilder.() -> Unit) {
         val builder = SourcesBuilder()
         builder.block()
         sourceList.addAll(builder.sources)
     }
 
-    fun buildSources(): List<ConfigSource> = sourceList.toList()
+    public fun buildSources(): List<ConfigSource> = sourceList.toList()
 }
 
-class SourcesBuilder {
+public class SourcesBuilder {
     internal val sources = mutableListOf<ConfigSource>()
 
-    operator fun ConfigSource.unaryPlus() {
+    public operator fun ConfigSource.unaryPlus() {
         sources += this
     }
 }

@@ -1,22 +1,22 @@
 package io.github.fiol_dev.konstant.core
 
-object KeyUtils {
+public object KeyUtils {
 
-    fun camelToScreamingSnake(name: String): String = buildString {
+    public fun camelToScreamingSnake(name: String): String = buildString {
         for ((i, ch) in name.withIndex()) {
             if (ch.isUpperCase() && i > 0) append('_')
             append(ch.uppercaseChar())
         }
     }
 
-    fun camelToDotNotation(name: String): String = buildString {
+    public fun camelToDotNotation(name: String): String = buildString {
         for ((i, ch) in name.withIndex()) {
             if (ch.isUpperCase() && i > 0) append('.')
             append(ch.lowercaseChar())
         }
     }
 
-    fun resolveKey(
+    public fun resolveKey(
         propertyName: String,
         prefix: String?,
         format: KeyFormat,
@@ -38,7 +38,7 @@ object KeyUtils {
         }
     }
 
-    fun resolvePrefix(
+    public fun resolvePrefix(
         propertyName: String,
         parentPrefix: String?,
     ): String {

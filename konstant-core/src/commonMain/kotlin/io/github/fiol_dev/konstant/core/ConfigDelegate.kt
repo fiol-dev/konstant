@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
  * }
  * ```
  */
-inline fun <reified T : Any, V> configField(
+public inline fun <reified T : Any, V> configField(
     noinline selector: (T) -> V,
 ): ReadOnlyProperty<Any?, V> = ConfigFieldDelegate(T::class, selector)
 
@@ -29,7 +29,7 @@ inline fun <reified T : Any, V> configField(
  * val port: Int by appConfig.field { it.server.port }
  * ```
  */
-fun <T, V> T.field(selector: (T) -> V): ReadOnlyProperty<Any?, V> =
+public fun <T, V> T.field(selector: (T) -> V): ReadOnlyProperty<Any?, V> =
     InstanceFieldDelegate(this, selector)
 
 @PublishedApi

@@ -1,20 +1,20 @@
 package io.github.fiol_dev.konstant.core
 
-sealed class ResolveResult<out T> {
-    data class Success<T>(val value: T) : ResolveResult<T>()
-    data class Error(val error: ConfigError) : ResolveResult<Nothing>()
+public sealed class ResolveResult<out T> {
+    public data class Success<T>(val value: T) : ResolveResult<T>()
+    public data class Error(val error: ConfigError) : ResolveResult<Nothing>()
 
-    fun onError(action: (ConfigError) -> Unit): ResolveResult<T> {
+    public fun onError(action: (ConfigError) -> Unit): ResolveResult<T> {
         if (this is Error) action(error)
         return this
     }
 
-    fun getOrNull(): T? = when (this) {
+    public fun getOrNull(): T? = when (this) {
         is Success -> value
         is Error -> null
     }
 
-    fun getOrElse(fallback: @UnsafeVariance T): @UnsafeVariance T = when (this) {
+    public fun getOrElse(fallback: @UnsafeVariance T): @UnsafeVariance T = when (this) {
         is Success -> value
         is Error -> fallback
     }

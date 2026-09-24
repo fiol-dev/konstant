@@ -13,9 +13,9 @@ import kotlin.text.iterator
  * - Comments (`#`)
  * - Integer, float, boolean values (stored as strings)
  */
-object TomlParser {
+public object TomlParser {
 
-    fun parse(content: String): Map<String, String> {
+    public fun parse(content: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
         var currentTable = ""
 
