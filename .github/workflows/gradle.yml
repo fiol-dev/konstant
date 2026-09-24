@@ -57,3 +57,22 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
     - name: Build with Gradle
       run: ./gradlew ${{ matrix.target }} --continue
+
+  api:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v4
+    # TEMPORARY: generate the first ABI dumps and print them so they can be committed
+    - name: List ABI tasks
+      run: ./gradlew :konstant-core:tasks --all | grep -i abi || true
+    - name: Generate ABI dumps
+      run: ./gradlew updateKotlinAbi
+    - name: Print ABI dumps
+      run: find . -path ./build -prune -o -type f -path '*/api/*' -print | sort | while read f; do echo "=====FILE $f"; cat "$f"; echo "=====END"; done
