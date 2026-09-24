@@ -19,6 +19,8 @@ public actual fun readFileText(path: String): String {
         "Files can't be read in the browser. Bake config into the app with the Konstant Gradle plugin, " +
             "or pass the text to a source's fromString."
     )
+    // Checked first so a missing file is a Kotlin exception rather than a JsException
+    if (!nodeFileExists(path)) throw IllegalArgumentException("File not found: $path")
     return nodeReadFile(path)
 }
 

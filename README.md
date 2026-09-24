@@ -244,7 +244,7 @@ Reads from system environment variables. Uses `SCREAMING_SNAKE_CASE` keys.
 
 ### `DotEnvSource`
 
-Reads from a `.env` file. Uses `SCREAMING_SNAKE_CASE` keys. Silently ignored if the file doesn't exist.
+Reads from a `.env` file. Uses `SCREAMING_SNAKE_CASE` keys. A missing file gives an empty source unless you pass `optional = false`.
 
 ```env
 # .env
