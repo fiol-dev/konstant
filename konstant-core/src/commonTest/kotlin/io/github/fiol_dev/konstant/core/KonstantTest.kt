@@ -1,6 +1,7 @@
 package io.github.fiol_dev.konstant.core
 
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -37,6 +38,12 @@ class KonstantTest {
         db = TestDbConfig(url = "jdbc:test", port = 5432),
         server = TestServerConfig(host = "localhost", debug = true),
     )
+
+    // Konstant is global, so start clean whatever ran before
+    @BeforeTest
+    fun setup() {
+        Konstant.reset()
+    }
 
     @AfterTest
     fun cleanup() {

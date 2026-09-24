@@ -1,5 +1,6 @@
 package io.github.fiol_dev.konstant.core
 
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,6 +17,11 @@ class ConfigDelegateTest {
     fun setup() {
         Konstant.reset()
         Konstant.install(appConfig, listOf(appConfig.db, appConfig.server))
+    }
+
+    @AfterTest
+    fun cleanup() {
+        Konstant.reset()
     }
 
     // -- configField<T, V> { } delegate (global holder) --
