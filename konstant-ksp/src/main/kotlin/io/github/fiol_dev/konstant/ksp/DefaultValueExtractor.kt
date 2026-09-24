@@ -16,6 +16,17 @@ object DefaultValueExtractor {
         return parseConstructorDefaults(source, className)
     }
 
+    /** Import directives of the file declaring [classDecl], e.g. `com.example.Color` or `a.B as C`. */
+    fun extractImports(classDecl: KSClassDeclaration): List<String> {
+        val filePath = classDecl.containingFile?.filePath ?: return emptyList()
+        return parseImports(File(filePath).readText())
+    }
+
+    internal fun parseImports(source: String): List<String> =
+        IMPORT_PATTERN.findAll(source).map { it.groupValues[1].replace(Regex("\\s+"), " ").trim() }.toList()
+
+    private val IMPORT_PATTERN = Regex("""(?m)^\s*import\s+([\w.`*]+(?:\s+as\s+\w+)?)""")
+
     internal fun parseConstructorDefaults(source: String, className: String): Map<String, String> {
         // Find the class/data class declaration and its constructor
         val classPattern = Regex("""(?:data\s+)?class\s+$className\s*\(""")

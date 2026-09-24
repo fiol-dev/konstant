@@ -203,6 +203,7 @@ The property name in the parent class becomes the prefix for nested config field
 | `AppConfig::database` -> `DatabaseConfig::url`             | `DATABASE_URL`             | `database.url`              |
 | `AppConfig::database` -> `DatabaseConfig::maxPoolSize`     | `DATABASE_MAX_POOL_SIZE`   | `database.max.pool.size`    |
 | `AppConfig::server` -> `ServerConfig::port`                | `SERVER_PORT`              | `server.port`               |
+| `AppConfig::database` -> `DatabaseConfig::pool` -> `PoolConfig::size` | `DATABASE_POOL_SIZE` | `database.pool.size`   |
 
 ### `@Key` Override
 
@@ -362,17 +363,19 @@ Available factory methods:
 
 ## Supported Field Types
 
-| Type      | Converter           |
-|-----------|---------------------|
-| `String`  | identity            |
-| `Int`     | `String::toInt`     |
-| `Long`    | `String::toLong`    |
-| `Double`  | `String::toDouble`  |
-| `Float`   | `String::toFloat`   |
-| `Boolean` | `String::toBoolean` |
-| Nested `@ConfigSpec` | recursive load |
+| Type                        | Accepted values                                                          |
+|-----------------------------|--------------------------------------------------------------------------|
+| `String`                    | any text                                                                 |
+| `Int`, `Long`, `Double`, `Float` | numbers (surrounding whitespace is ignored)                         |
+| `Boolean`                   | `true/false`, `yes/no`, `on/off`, `1/0`, case-insensitive                 |
+| `kotlin.time.Duration`      | `30s`, `1h 30m`, `500ms` or ISO-8601 (`PT30S`)                           |
+| any `enum`                  | constant name, case-insensitive, `-` treated as `_` (`warn-only` → `WARN_ONLY`) |
+| `List<T>`, `Set<T>`         | comma-separated (`a, b`) or an inline array (`["a", "b"]`)               |
+| `Map<String, T>`            | `key=value` pairs (`a=1, b=2`) or an inline table as a string            |
+| `T?` (any of the above)     | optional: `null` when no source has the key and there is no default      |
+| Nested `@ConfigSpec`        | loaded recursively with a key prefix                                     |
 
-Unsupported types (e.g. `List<T>`, `Map<K,V>`, arbitrary classes) trigger a **compile-time error**.
+`T` in collections is any of the scalar types above. Other types trigger a **compile-time error**.
 
 ## Error Handling
 
@@ -410,7 +413,8 @@ The KSP processor emits a **compilation error** (not a warning) for:
 
 - `@ConfigSpec` applied to a non-data class
 - A field type that is another `@ConfigSpec` class but is not itself annotated with `@ConfigSpec`
-- A field type that is unsupported (e.g. `List<T>`, `Map<K,V>`, arbitrary classes)
+- A field type that is unsupported (e.g. arbitrary classes, `Map` with non-`String` keys, nullable collection elements)
+- A nullable nested `@ConfigSpec` field
 
 ## What KSP Generates
 

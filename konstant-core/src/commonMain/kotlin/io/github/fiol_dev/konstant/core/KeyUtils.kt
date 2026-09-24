@@ -32,7 +32,8 @@ public object KeyUtils {
 
         return when {
             prefix.isNullOrEmpty() -> formatted
-            format == KeyFormat.DOT_NOTATION -> "${prefix.lowercase()}.$formatted"
+            // Nested prefixes are SCREAMING_SNAKE ("OUTER_INNER"), so each segment becomes a dot level
+            format == KeyFormat.DOT_NOTATION -> "${prefix.lowercase().replace('_', '.')}.$formatted"
             format == KeyFormat.SCREAMING_SNAKE -> "${prefix}_$formatted"
             else -> "${prefix}_$formatted"
         }
