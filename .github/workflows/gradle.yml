@@ -27,7 +27,7 @@ jobs:
             os: macos-latest
           - target: macosArm64Test
             os: macos-latest
-          - target: jvmTest :konstant-ksp:test :konstant-ksp-tests:test
+          - target: jvmTest :konstant-ksp:test :konstant-ksp-tests:test :konstant-gradle-plugin:test
             os: ubuntu-latest
           - target: jsNodeTest
             os: ubuntu-latest

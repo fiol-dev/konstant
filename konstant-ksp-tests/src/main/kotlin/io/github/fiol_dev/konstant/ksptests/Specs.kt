@@ -48,3 +48,9 @@ data class AppConfig(
     val appName: String = "MyApp",
     val database: DatabaseConfig,
 )
+
+@ConfigSpec
+data class BakedAppConfig(
+    val retries: Int,
+    val apiUrl: String,
+)

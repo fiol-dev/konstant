@@ -1,0 +1,5 @@
+# Values shared by every environment
+retries = 1
+
+[api]
+url = "https://api.example.com"

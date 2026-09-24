@@ -2,6 +2,7 @@
 
 pluginManagement {
     includeBuild("build-logic")
+    includeBuild("konstant-gradle-plugin")
     repositories {
         google()
         mavenCentral()

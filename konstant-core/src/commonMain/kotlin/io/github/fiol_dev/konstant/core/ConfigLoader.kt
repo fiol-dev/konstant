@@ -89,4 +89,9 @@ public class SourcesBuilder {
     public operator fun ConfigSource.unaryPlus() {
         sources += this
     }
+
+    /** Adds several sources in order, e.g. `+KonstantBaked.sources` from the Gradle plugin. */
+    public operator fun List<ConfigSource>.unaryPlus() {
+        sources += this
+    }
 }
