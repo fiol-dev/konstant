@@ -8,4 +8,12 @@ public abstract class MapBackedSource(private val entries: Map<String, String>) 
         entries[key] ?: entries.entries.firstOrNull {
             it.key.equals(key, ignoreCase = true)
         }?.value
+
+    override fun children(key: String): Map<String, String>? {
+        val prefix = "$key."
+        return entries
+            .filterKeys { it.length > prefix.length && it.startsWith(prefix, ignoreCase = true) }
+            .mapKeys { it.key.substring(prefix.length) }
+            .takeIf { it.isNotEmpty() }
+    }
 }

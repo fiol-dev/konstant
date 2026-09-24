@@ -71,4 +71,12 @@ class KeyUtilsTest {
     fun resolvePrefix_withParent() {
         assertEquals("APP_DATABASE", KeyUtils.resolvePrefix("database", "APP"))
     }
+
+    @Test
+    fun resolveKey_dotNotation_withNestedPrefix() {
+        assertEquals(
+            "database.pool.max.size",
+            KeyUtils.resolveKey("maxSize", "DATABASE_POOL", KeyFormat.DOT_NOTATION)
+        )
+    }
 }

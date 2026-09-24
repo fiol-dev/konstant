@@ -32,9 +32,15 @@ data class AnnotatedConfig(
 )
 
 @ConfigSpec
+data class PoolConfig(
+    val size: Int = 1,
+)
+
+@ConfigSpec
 data class DatabaseConfig(
     val url: String,
     val maxPoolSize: Int = 10,
+    val pool: PoolConfig = PoolConfig(),
 )
 
 @ConfigSpec

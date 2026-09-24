@@ -21,20 +21,12 @@ public class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
                 )
                 val raw = source.get(key)
                 if (raw != null) {
-                    return try {
-                        ResolveResult.Success(field.convert(raw))
-                    } catch (e: Exception) {
-                        // Parser messages often echo the input, so a secret's cause is redacted too
-                        ResolveResult.Error(
-                            ConfigError.ConversionFailed(
-                                key = key,
-                                rawValue = if (field.secret) "***" else raw,
-                                targetType = field.typeName,
-                                cause = if (field.secret) "invalid value" else e.message ?: "unknown",
-                            )
-                        )
-                    }
+                    return convert(field, key, raw) { field.convert(raw) }
                 }
+                val convertChildren = field.convertChildren ?: continue
+                val children = source.children(key) ?: continue
+                val shown = children.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }
+                return convert(field, key, shown) { convertChildren(children) }
             }
         }
         // Not found in any source
@@ -49,6 +41,25 @@ public class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
             customKey = field.customKey,
         )
         return ResolveResult.Error(ConfigError.MissingRequired(resolvedKey))
+    }
+
+    private inline fun <T> convert(
+        field: FieldDescriptor<T>,
+        key: String,
+        raw: String,
+        block: () -> T,
+    ): ResolveResult<T> = try {
+        ResolveResult.Success(block())
+    } catch (e: Exception) {
+        // Parser messages often echo the input, so a secret's cause is redacted too
+        ResolveResult.Error(
+            ConfigError.ConversionFailed(
+                key = key,
+                rawValue = if (field.secret) "***" else raw,
+                targetType = field.typeName,
+                cause = if (field.secret) "invalid value" else e.message ?: "unknown",
+            )
+        )
     }
 }
 
