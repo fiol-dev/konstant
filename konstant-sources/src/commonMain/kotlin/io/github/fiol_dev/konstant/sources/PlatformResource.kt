@@ -6,7 +6,8 @@ package io.github.fiol_dev.konstant.sources
  *   is disabled)
  * - iOS/macOS: the main bundle's resources
  * - JVM: the classpath (`src/main/resources/<path>`)
- * - JS (Node) and Linux: a file at [path], relative to the working directory
+ * - JS and Wasm on Node, and Linux: a file at [path], relative to the working directory
+ * - Browsers: nothing, so this returns null. Bake config with the Konstant Gradle plugin instead
  */
 public expect fun readResourceText(path: String): String?
 

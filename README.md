@@ -569,13 +569,16 @@ konstant/
 
 ## Platform Support
 
-| Platform          | EnvSource | DotEnvSource | PropertiesSource |
-|-------------------|-----------|--------------|------------------|
-| JVM               | Yes       | Yes          | Yes              |
-| JS (Node.js)      | Yes       | Yes          | Yes              |
-| Linux (x64)       | Yes       | Yes          | Yes              |
-| macOS (arm64)     | Yes       | Yes          | Yes              |
-| iOS               | Yes       | Yes          | Yes              |
+| Platform                   | Environment variables | Files (`fromFile`) | Bundled resources |
+|----------------------------|-----------------------|--------------------|-------------------|
+| Android                    | Yes                   | Yes                | Yes (assets)      |
+| iOS, macOS (arm64)         | Yes                   | Yes                | Yes (main bundle) |
+| JVM                        | Yes                   | Yes                | Yes (classpath)   |
+| Linux (x64)                | Yes                   | Yes                | Yes (files)       |
+| JS and Wasm on Node.js     | Yes                   | Yes                | Yes (files)       |
+| JS and Wasm in the browser | No (always empty)     | No                 | No                |
+
+In the browser, bake config into the app with the [Gradle plugin](#baked-config-gradle-plugin) or pass text to a source's `fromString`. Parsing, loading and validation work the same on every platform.
 
 ## License
 
