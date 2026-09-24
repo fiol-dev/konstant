@@ -1,0 +1,58 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.fiol-dev.konstant:konstant-annotations>
+open annotation class io.github.fiol_dev.konstant.annotations/ConfigSpec : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/ConfigSpec|null[0]
+    constructor <init>() // io.github.fiol_dev.konstant.annotations/ConfigSpec.<init>|<init>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/Convert : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/Convert|null[0]
+    constructor <init>(kotlin.reflect/KClass<*>) // io.github.fiol_dev.konstant.annotations/Convert.<init>|<init>(kotlin.reflect.KClass<*>){}[0]
+
+    final val with // io.github.fiol_dev.konstant.annotations/Convert.with|{}with[0]
+        final fun <get-with>(): kotlin.reflect/KClass<*> // io.github.fiol_dev.konstant.annotations/Convert.with.<get-with>|<get-with>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/Key : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/Key|null[0]
+    constructor <init>(kotlin/String) // io.github.fiol_dev.konstant.annotations/Key.<init>|<init>(kotlin.String){}[0]
+
+    final val name // io.github.fiol_dev.konstant.annotations/Key.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.fiol_dev.konstant.annotations/Key.name.<get-name>|<get-name>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/NotBlank : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/NotBlank|null[0]
+    constructor <init>() // io.github.fiol_dev.konstant.annotations/NotBlank.<init>|<init>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/Pattern : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/Pattern|null[0]
+    constructor <init>(kotlin/String) // io.github.fiol_dev.konstant.annotations/Pattern.<init>|<init>(kotlin.String){}[0]
+
+    final val regex // io.github.fiol_dev.konstant.annotations/Pattern.regex|{}regex[0]
+        final fun <get-regex>(): kotlin/String // io.github.fiol_dev.konstant.annotations/Pattern.regex.<get-regex>|<get-regex>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/Range : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/Range|null[0]
+    constructor <init>(kotlin/Double = ..., kotlin/Double = ...) // io.github.fiol_dev.konstant.annotations/Range.<init>|<init>(kotlin.Double;kotlin.Double){}[0]
+
+    final val max // io.github.fiol_dev.konstant.annotations/Range.max|{}max[0]
+        final fun <get-max>(): kotlin/Double // io.github.fiol_dev.konstant.annotations/Range.max.<get-max>|<get-max>(){}[0]
+    final val min // io.github.fiol_dev.konstant.annotations/Range.min|{}min[0]
+        final fun <get-min>(): kotlin/Double // io.github.fiol_dev.konstant.annotations/Range.min.<get-min>|<get-min>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/Secret : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/Secret|null[0]
+    constructor <init>() // io.github.fiol_dev.konstant.annotations/Secret.<init>|<init>(){}[0]
+}
+
+open annotation class io.github.fiol_dev.konstant.annotations/Size : kotlin/Annotation { // io.github.fiol_dev.konstant.annotations/Size|null[0]
+    constructor <init>(kotlin/Int = ..., kotlin/Int = ...) // io.github.fiol_dev.konstant.annotations/Size.<init>|<init>(kotlin.Int;kotlin.Int){}[0]
+
+    final val max // io.github.fiol_dev.konstant.annotations/Size.max|{}max[0]
+        final fun <get-max>(): kotlin/Int // io.github.fiol_dev.konstant.annotations/Size.max.<get-max>|<get-max>(){}[0]
+    final val min // io.github.fiol_dev.konstant.annotations/Size.min|{}min[0]
+        final fun <get-min>(): kotlin/Int // io.github.fiol_dev.konstant.annotations/Size.min.<get-min>|<get-min>(){}[0]
+}

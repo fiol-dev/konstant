@@ -710,6 +710,10 @@ konstant/
 
 In the browser, bake config into the app with the [Gradle plugin](#baked-config-gradle-plugin) or pass text to a source's `fromString`. Parsing, loading and validation work the same on every platform.
 
+## Contributing
+
+Each library module keeps a dump of its public API in its `api/` folder, and CI fails when the code no longer matches it. After an intended public API change, run `./gradlew updateLegacyAbi` (on macOS, which builds every target) and commit the updated dumps with the change.
+
 ## License
 
 MIT License -- see [LICENSE](LICENSE) file for details.

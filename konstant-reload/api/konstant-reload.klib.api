@@ -1,0 +1,96 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.fiol-dev.konstant:konstant-reload>
+abstract interface io.github.fiol_dev.konstant.reload/ReloadableSource : io.github.fiol_dev.konstant.core/ConfigSource { // io.github.fiol_dev.konstant.reload/ReloadableSource|null[0]
+    abstract val changes // io.github.fiol_dev.konstant.reload/ReloadableSource.changes|{}changes[0]
+        abstract fun <get-changes>(): kotlinx.coroutines.flow/Flow<kotlin/Unit> // io.github.fiol_dev.konstant.reload/ReloadableSource.changes.<get-changes>|<get-changes>(){}[0]
+}
+
+final class <#A: kotlin/Any> io.github.fiol_dev.konstant.reload/ReloadableConfig { // io.github.fiol_dev.konstant.reload/ReloadableConfig|null[0]
+    final val config // io.github.fiol_dev.konstant.reload/ReloadableConfig.config|{}config[0]
+        final fun <get-config>(): kotlinx.coroutines.flow/StateFlow<#A> // io.github.fiol_dev.konstant.reload/ReloadableConfig.config.<get-config>|<get-config>(){}[0]
+    final val current // io.github.fiol_dev.konstant.reload/ReloadableConfig.current|{}current[0]
+        final fun <get-current>(): #A // io.github.fiol_dev.konstant.reload/ReloadableConfig.current.<get-current>|<get-current>(){}[0]
+    final val failures // io.github.fiol_dev.konstant.reload/ReloadableConfig.failures|{}failures[0]
+        final fun <get-failures>(): kotlinx.coroutines.flow/SharedFlow<kotlin/Throwable> // io.github.fiol_dev.konstant.reload/ReloadableConfig.failures.<get-failures>|<get-failures>(){}[0]
+
+    final fun reloadEvery(kotlinx.coroutines/CoroutineScope, kotlin.time/Duration): kotlinx.coroutines/Job // io.github.fiol_dev.konstant.reload/ReloadableConfig.reloadEvery|reloadEvery(kotlinx.coroutines.CoroutineScope;kotlin.time.Duration){}[0]
+    final fun reloadOn(kotlinx.coroutines/CoroutineScope, kotlinx.coroutines.flow/Flow<*>): kotlinx.coroutines/Job // io.github.fiol_dev.konstant.reload/ReloadableConfig.reloadOn|reloadOn(kotlinx.coroutines.CoroutineScope;kotlinx.coroutines.flow.Flow<*>){}[0]
+    final fun watch(kotlinx.coroutines/CoroutineScope, kotlin/Array<out io.github.fiol_dev.konstant.reload/ReloadableSource>...): kotlinx.coroutines/Job // io.github.fiol_dev.konstant.reload/ReloadableConfig.watch|watch(kotlinx.coroutines.CoroutineScope;kotlin.Array<out|io.github.fiol_dev.konstant.reload.ReloadableSource>...){}[0]
+    final suspend fun reload(): io.github.fiol_dev.konstant.reload/ReloadResult<#A> // io.github.fiol_dev.konstant.reload/ReloadableConfig.reload|reload(){}[0]
+
+    final object Companion { // io.github.fiol_dev.konstant.reload/ReloadableConfig.Companion|null[0]
+        final fun <#A2: kotlin/Any> load(kotlin/Function1<io.github.fiol_dev.konstant.core/ConfigLoader, io.github.fiol_dev.konstant.core/ConfigResult<#A2>>, kotlin.coroutines/CoroutineContext = ..., kotlin/Function1<io.github.fiol_dev.konstant.core/ConfigLoaderBuilder, kotlin/Unit>): io.github.fiol_dev.konstant.reload/ReloadableConfig<#A2> // io.github.fiol_dev.konstant.reload/ReloadableConfig.Companion.load|load(kotlin.Function1<io.github.fiol_dev.konstant.core.ConfigLoader,io.github.fiol_dev.konstant.core.ConfigResult<0:0>>;kotlin.coroutines.CoroutineContext;kotlin.Function1<io.github.fiol_dev.konstant.core.ConfigLoaderBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    }
+}
+
+final class io.github.fiol_dev.konstant.reload/RemoteSource : io.github.fiol_dev.konstant.reload/ReloadableSource { // io.github.fiol_dev.konstant.reload/RemoteSource|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String> = ..., io.github.fiol_dev.konstant.core/KeyFormat = ..., kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> = ..., kotlin/String = ...) // io.github.fiol_dev.konstant.reload/RemoteSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>;io.github.fiol_dev.konstant.core.KeyFormat;kotlin.collections.List<io.github.fiol_dev.konstant.core.KeyFormat>;kotlin.String){}[0]
+
+    final val changes // io.github.fiol_dev.konstant.reload/RemoteSource.changes|{}changes[0]
+        final fun <get-changes>(): kotlinx.coroutines.flow/Flow<kotlin/Unit> // io.github.fiol_dev.konstant.reload/RemoteSource.changes.<get-changes>|<get-changes>(){}[0]
+    final val fallbackKeyFormats // io.github.fiol_dev.konstant.reload/RemoteSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
+        final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.reload/RemoteSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
+    final val keyFormat // io.github.fiol_dev.konstant.reload/RemoteSource.keyFormat|{}keyFormat[0]
+        final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.reload/RemoteSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+    final val name // io.github.fiol_dev.konstant.reload/RemoteSource.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.fiol_dev.konstant.reload/RemoteSource.name.<get-name>|<get-name>(){}[0]
+    final val values // io.github.fiol_dev.konstant.reload/RemoteSource.values|{}values[0]
+        final fun <get-values>(): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.reload/RemoteSource.values.<get-values>|<get-values>(){}[0]
+
+    final fun children(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String>? // io.github.fiol_dev.konstant.reload/RemoteSource.children|children(kotlin.String){}[0]
+    final fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.reload/RemoteSource.get|get(kotlin.String){}[0]
+    final fun update(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.reload/RemoteSource.update|update(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+}
+
+sealed class <#A: out kotlin/Any> io.github.fiol_dev.konstant.reload/ReloadResult { // io.github.fiol_dev.konstant.reload/ReloadResult|null[0]
+    abstract val config // io.github.fiol_dev.konstant.reload/ReloadResult.config|{}config[0]
+        abstract fun <get-config>(): #A // io.github.fiol_dev.konstant.reload/ReloadResult.config.<get-config>|<get-config>(){}[0]
+
+    final class <#A1: kotlin/Any> Failed : io.github.fiol_dev.konstant.reload/ReloadResult<#A1> { // io.github.fiol_dev.konstant.reload/ReloadResult.Failed|null[0]
+        constructor <init>(#A1, kotlin/Throwable) // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.<init>|<init>(1:0;kotlin.Throwable){}[0]
+
+        final val config // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.config|{}config[0]
+            final fun <get-config>(): #A1 // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.config.<get-config>|<get-config>(){}[0]
+        final val error // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.error|{}error[0]
+            final fun <get-error>(): kotlin/Throwable // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.error.<get-error>|<get-error>(){}[0]
+
+        final fun component1(): #A1 // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.component1|component1(){}[0]
+        final fun component2(): kotlin/Throwable // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.component2|component2(){}[0]
+        final fun copy(#A1 = ..., kotlin/Throwable = ...): io.github.fiol_dev.konstant.reload/ReloadResult.Failed<#A1> // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.copy|copy(1:0;kotlin.Throwable){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.reload/ReloadResult.Failed.toString|toString(){}[0]
+    }
+
+    final class <#A1: kotlin/Any> Unchanged : io.github.fiol_dev.konstant.reload/ReloadResult<#A1> { // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged|null[0]
+        constructor <init>(#A1) // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.<init>|<init>(1:0){}[0]
+
+        final val config // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.config|{}config[0]
+            final fun <get-config>(): #A1 // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.config.<get-config>|<get-config>(){}[0]
+
+        final fun component1(): #A1 // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.component1|component1(){}[0]
+        final fun copy(#A1 = ...): io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged<#A1> // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.copy|copy(1:0){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.reload/ReloadResult.Unchanged.toString|toString(){}[0]
+    }
+
+    final class <#A1: kotlin/Any> Updated : io.github.fiol_dev.konstant.reload/ReloadResult<#A1> { // io.github.fiol_dev.konstant.reload/ReloadResult.Updated|null[0]
+        constructor <init>(#A1) // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.<init>|<init>(1:0){}[0]
+
+        final val config // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.config|{}config[0]
+            final fun <get-config>(): #A1 // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.config.<get-config>|<get-config>(){}[0]
+
+        final fun component1(): #A1 // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.component1|component1(){}[0]
+        final fun copy(#A1 = ...): io.github.fiol_dev.konstant.reload/ReloadResult.Updated<#A1> // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.copy|copy(1:0){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.reload/ReloadResult.Updated.toString|toString(){}[0]
+    }
+}

@@ -1,0 +1,80 @@
+public abstract class io/github/fiol_dev/konstant/reload/ReloadResult {
+	public abstract fun getConfig ()Ljava/lang/Object;
+}
+
+public final class io/github/fiol_dev/konstant/reload/ReloadResult$Failed : io/github/fiol_dev/konstant/reload/ReloadResult {
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Throwable;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Object;Ljava/lang/Throwable;)Lio/github/fiol_dev/konstant/reload/ReloadResult$Failed;
+	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/reload/ReloadResult$Failed;Ljava/lang/Object;Ljava/lang/Throwable;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/reload/ReloadResult$Failed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getConfig ()Ljava/lang/Object;
+	public final fun getError ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/reload/ReloadResult$Unchanged : io/github/fiol_dev/konstant/reload/ReloadResult {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Lio/github/fiol_dev/konstant/reload/ReloadResult$Unchanged;
+	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/reload/ReloadResult$Unchanged;Ljava/lang/Object;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/reload/ReloadResult$Unchanged;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getConfig ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/reload/ReloadResult$Updated : io/github/fiol_dev/konstant/reload/ReloadResult {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Lio/github/fiol_dev/konstant/reload/ReloadResult$Updated;
+	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/reload/ReloadResult$Updated;Ljava/lang/Object;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/reload/ReloadResult$Updated;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getConfig ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/reload/ReloadableConfig {
+	public static final field Companion Lio/github/fiol_dev/konstant/reload/ReloadableConfig$Companion;
+	public synthetic fun <init> (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getConfig ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun getCurrent ()Ljava/lang/Object;
+	public final fun getFailures ()Lkotlinx/coroutines/flow/SharedFlow;
+	public final fun reload (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun reloadEvery-HG0u8IE (Lkotlinx/coroutines/CoroutineScope;J)Lkotlinx/coroutines/Job;
+	public final fun reloadOn (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/Job;
+	public final fun watch (Lkotlinx/coroutines/CoroutineScope;[Lio/github/fiol_dev/konstant/reload/ReloadableSource;)Lkotlinx/coroutines/Job;
+}
+
+public final class io/github/fiol_dev/konstant/reload/ReloadableConfig$Companion {
+	public final fun load (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Lio/github/fiol_dev/konstant/reload/ReloadableConfig;
+	public static synthetic fun load$default (Lio/github/fiol_dev/konstant/reload/ReloadableConfig$Companion;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/reload/ReloadableConfig;
+}
+
+public abstract interface class io/github/fiol_dev/konstant/reload/ReloadableSource : io/github/fiol_dev/konstant/core/ConfigSource {
+	public abstract fun getChanges ()Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/fiol_dev/konstant/reload/ReloadableSource$DefaultImpls {
+	public static fun children (Lio/github/fiol_dev/konstant/reload/ReloadableSource;Ljava/lang/String;)Ljava/util/Map;
+	public static fun getFallbackKeyFormats (Lio/github/fiol_dev/konstant/reload/ReloadableSource;)Ljava/util/List;
+	public static fun getName (Lio/github/fiol_dev/konstant/reload/ReloadableSource;)Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/reload/RemoteSource : io/github/fiol_dev/konstant/reload/ReloadableSource {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;Lio/github/fiol_dev/konstant/core/KeyFormat;Ljava/util/List;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/util/Map;Lio/github/fiol_dev/konstant/core/KeyFormat;Ljava/util/List;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun children (Ljava/lang/String;)Ljava/util/Map;
+	public fun get (Ljava/lang/String;)Ljava/lang/String;
+	public fun getChanges ()Lkotlinx/coroutines/flow/Flow;
+	public fun getFallbackKeyFormats ()Ljava/util/List;
+	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
+	public fun getName ()Ljava/lang/String;
+	public final fun getValues ()Ljava/util/Map;
+	public final fun update (Ljava/util/Map;)V
+}
+
