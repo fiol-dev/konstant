@@ -3,7 +3,7 @@ package io.github.fiol_dev.konstant.reload
 import io.github.fiol_dev.konstant.core.KeyFormat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.map
 
 /**
@@ -34,29 +34,42 @@ public class RemoteSource(
     override val fallbackKeyFormats: List<KeyFormat> = listOf(KeyFormat.SCREAMING_SNAKE),
     override val name: String = "RemoteSource",
 ) : ReloadableSource {
-    private val state = MutableStateFlow(initial.toMap())
+    // The version makes every real change a new StateFlow value, so a change back to earlier
+    // values (A to B to A) during a reload is still delivered
+    private val state = MutableStateFlow(Snapshot(0, initial.toMap()))
 
     /** The current values. */
-    public val values: Map<String, String> get() = state.value
+    public val values: Map<String, String> get() = state.value.entries
 
-    /** Emits after [update] changed the values; updating to equal values emits nothing. */
-    override val changes: Flow<Unit> = state.drop(1).map { }
+    /**
+     * Emits once when collection starts and again after each [update] that changed the values,
+     * so updates made before [ReloadableConfig.watch] starts collecting are not missed.
+     * Updating to equal values emits nothing.
+     */
+    override val changes: Flow<Unit> = state.map { }
 
-    /** Replaces all values. Keys missing from [values] fall through to the next source. */
+    /**
+     * Replaces all values. Keys missing from [values] fall through to the next source. A reload
+     * that runs during an update may read some keys before it and some after; the reload the
+     * update triggers then reads the new values.
+     */
     public fun update(values: Map<String, String>) {
-        state.value = values.toMap()
+        val copy = values.toMap()
+        state.update { current -> if (current.entries == copy) current else Snapshot(current.version + 1, copy) }
     }
 
     override fun get(key: String): String? {
-        val entries = state.value
+        val entries = state.value.entries
         return entries[key] ?: entries.entries.firstOrNull { it.key.equals(key, ignoreCase = true) }?.value
     }
 
     override fun children(key: String): Map<String, String>? {
         val prefix = "$key."
-        return state.value
+        return state.value.entries
             .filterKeys { it.length > prefix.length && it.startsWith(prefix, ignoreCase = true) }
             .mapKeys { it.key.substring(prefix.length) }
             .takeIf { it.isNotEmpty() }
     }
+
+    private data class Snapshot(val version: Long, val entries: Map<String, String>)
 }

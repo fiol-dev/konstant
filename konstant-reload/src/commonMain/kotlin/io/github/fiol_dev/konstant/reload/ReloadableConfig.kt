@@ -110,7 +110,7 @@ public class ReloadableConfig<T : Any> private constructor(
      * `sources` block adds, so the watched source is the one that is read:
      *
      * ```kotlin
-     * val remote = FirebaseSource(remoteConfig)
+     * val remote = RemoteSource()
      * val appConfig = ReloadableConfig.load(load = { loadAppConfig() }) { sources { +remote } }
      * appConfig.watch(scope, remote)
      * ```

@@ -600,7 +600,9 @@ The first load throws a `ConfigException` if it fails, since there is no good co
 `RemoteSource` holds values that the app pushes in from any remote config service. Put it first so remote values override the bundled defaults, and `watch` it so each `update` reloads the config. Keys the service stops sending fall back to the next source:
 
 ```kotlin
-val remote = RemoteSource(name = "Firebase")
+// Firebase Remote Config through the GitLive KMP SDK (dev.gitlive:firebase-config).
+// Start from the values activated in an earlier session, then fetch fresh ones.
+val remote = RemoteSource(Firebase.remoteConfig.all.mapValues { it.value.asString() }, name = "Firebase")
 val appConfig = ReloadableConfig.load(load = { loadAppConfig() }) {
     sources {
         +remote
@@ -609,14 +611,17 @@ val appConfig = ReloadableConfig.load(load = { loadAppConfig() }) {
 }
 appConfig.watch(scope, remote)
 
-// Firebase Remote Config through the GitLive KMP SDK (dev.gitlive:firebase-config)
 scope.launch {
-    Firebase.remoteConfig.fetchAndActivate()
-    remote.update(Firebase.remoteConfig.all.mapValues { it.value.asString() })
+    try {
+        Firebase.remoteConfig.fetchAndActivate()
+        remote.update(Firebase.remoteConfig.all.mapValues { it.value.asString() })
+    } catch (e: Exception) {
+        log.warn("Remote config fetch failed, keeping current values", e)
+    }
 }
 ```
 
-Remote keys use dot notation by default (`server.port`); pass `keyFormat = KeyFormat.SCREAMING_SNAKE` for keys like `SERVER_PORT`. Any other source whose values change can implement `ReloadableSource` and report changes on its `changes` flow; `watch` it the same way, with the instance that the `sources` block adds.
+Keys are matched in dot notation (`server.port`) and, as a fallback, in SCREAMING_SNAKE case, ignoring case. Firebase parameter keys cannot contain dots, so name them in snake case (`server_port`, `database_pool_size`); `Map` fields cannot come from Firebase for the same reason. Any other source whose values change can implement `ReloadableSource` and report changes on its `changes` flow; `watch` it the same way, with the instance that the `sources` block adds.
 
 ## KSP Compile-Time Validations
 

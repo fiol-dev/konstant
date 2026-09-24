@@ -38,17 +38,42 @@ class RemoteSourceTest {
     }
 
     @Test
-    fun reportsOnlyRealChanges() = runTest {
+    fun reportsOnStartAndOnlyRealChanges() = runTest {
         val remote = RemoteSource(mapOf("a" to "1"))
         val seen = mutableListOf<Unit>()
         backgroundScope.launch { remote.changes.toList(seen) }
         runCurrent()
+        assertEquals(1, seen.size)
         remote.update(mapOf("a" to "1"))
         runCurrent()
-        assertEquals(0, seen.size)
+        assertEquals(1, seen.size)
         remote.update(mapOf("a" to "2"))
         runCurrent()
-        assertEquals(1, seen.size)
+        assertEquals(2, seen.size)
+    }
+
+    @Test
+    fun updatesBeforeTheWatcherSubscribesAreNotLost() = runTest {
+        val remote = RemoteSource()
+        val config = ReloadableConfig.load(load = { loadPort() }) {
+            sources {
+                +remote
+                +Defaults()
+            }
+        }
+        remote.update(mapOf("server.port" to "7070"))
+        config.watch(backgroundScope, remote)
+        remote.update(mapOf("server.port" to "9090"))
+        runCurrent()
+        assertEquals(9090, config.current)
+    }
+
+    @Test
+    fun snakeCaseKeysMatchTheScreamingSnakeFallback() {
+        // Firebase keys cannot contain dots, so `server_port` is found as SERVER_PORT
+        val remote = RemoteSource(mapOf("server_port" to "9090"))
+        assertEquals(listOf(KeyFormat.SCREAMING_SNAKE), remote.fallbackKeyFormats)
+        assertEquals("9090", remote.get("SERVER_PORT"))
     }
 
     @Test
