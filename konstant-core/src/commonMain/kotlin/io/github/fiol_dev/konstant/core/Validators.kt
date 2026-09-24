@@ -7,6 +7,7 @@ package io.github.fiol_dev.konstant.core
 public object Validators {
 
     public fun range(value: Double, min: Double, max: Double): String? = when {
+        value.isNaN() -> "must be a number"
         value < min && max == Double.POSITIVE_INFINITY -> "must be at least ${format(min)}"
         value > max && min == Double.NEGATIVE_INFINITY -> "must be at most ${format(max)}"
         value < min || value > max -> "must be between ${format(min)} and ${format(max)}"

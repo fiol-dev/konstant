@@ -12,6 +12,7 @@ class ValidatorsTest {
         assertEquals("must be between 1 and 10", Validators.range(11.0, 1.0, 10.0))
         assertEquals("must be at least 0.5", Validators.range(0.1, 0.5, Double.POSITIVE_INFINITY))
         assertEquals("must be at most 3", Validators.range(4.0, Double.NEGATIVE_INFINITY, 3.0))
+        assertEquals("must be a number", Validators.range(Double.NaN, 0.0, 1.0))
     }
 
     @Test

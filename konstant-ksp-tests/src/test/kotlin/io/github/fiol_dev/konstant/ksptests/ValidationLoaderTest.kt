@@ -86,4 +86,21 @@ class ValidationLoaderTest {
 
         assertEquals(listOf("PORT", "NAME", "HOSTS", "BACKUP"), errors.map { it.key })
     }
+
+    @Test
+    fun floatRangeIncludesItsExactBound() {
+        assertEquals(0.1f, load("JITTER" to "0.1").getOrThrow().jitter)
+        assertEquals("must be at most 0.1", failure("JITTER" to "0.11").reason)
+    }
+
+    @Test
+    fun rangeRejectsNaN() {
+        assertEquals("must be a number", failure("RATIO" to "NaN").reason)
+    }
+
+    @Test
+    fun validationAppliesToConvertedFields() {
+        assertEquals(75, load("SHARE" to "75%").getOrThrow().share)
+        assertEquals("must be at most 100", failure("SHARE" to "120%").reason)
+    }
 }

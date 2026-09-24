@@ -19,6 +19,11 @@ object HostPortConverter : ValueConverter<HostPort> {
     }
 }
 
+/** Accepts `75%` as well as `75`. */
+object PercentConverter : ValueConverter<Int> {
+    override fun convert(raw: String): Int = raw.trim().removeSuffix("%").toInt()
+}
+
 @ConfigSpec
 data class ValidatedConfig(
     @Range(min = 1.0, max = 65535.0) val port: Int = 8080,
@@ -29,6 +34,8 @@ data class ValidatedConfig(
     @Secret @Size(min = 8) val token: String? = null,
     @Convert(HostPortConverter::class) val upstream: HostPort = HostPort("localhost", 80),
     @Convert(HostPortConverter::class) val backup: HostPort? = null,
+    @Range(max = 0.1) val jitter: Float = 0.05f,
+    @Convert(PercentConverter::class) @Range(max = 100.0) val share: Int = 50,
     val minWorkers: Int = 1,
     val maxWorkers: Int = 4,
 ) {

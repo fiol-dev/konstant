@@ -172,7 +172,8 @@ class ConfigSpecProcessor(
             return null
         }
         val fieldType = type.makeNotNullable()
-        if (target.declaration.qualifiedName?.asString() != fieldType.declaration.qualifiedName?.asString()) {
+        val nullabilityOk = !target.isMarkedNullable || type.isMarkedNullable
+        if (renderType(target.makeNotNullable()) != renderType(fieldType) || !nullabilityOk) {
             logger.error(
                 "${converter.simpleName.asString()} converts to ${renderType(target)}, " +
                     "but '$name' is ${renderType(fieldType)}",
@@ -184,6 +185,8 @@ class ConfigSpecProcessor(
             code = renderType(fieldType),
             display = fieldType.declaration.simpleName.asString(),
             converter = "{ ${converter.qualifiedName!!.asString()}.convert(it) }",
+            // Validation annotations work as for the built-in type, e.g. @Range on a converted Int
+            shape = valueType(fieldType)?.shape ?: Shape.OTHER,
         )
         return FieldKind.Value(value, type.isMarkedNullable)
     }
@@ -212,7 +215,9 @@ class ConfigSpecProcessor(
             if (shape != Shape.NUMBER) return@let misuse("Range", "an Int, Long, Double or Float")
             val min = (it.argument("min") as? Double) ?: Double.NEGATIVE_INFINITY
             val max = (it.argument("max") as? Double) ?: Double.POSITIVE_INFINITY
-            checks += "$VALIDATORS.range(v.toDouble(), ${doubleLiteral(min)}, ${doubleLiteral(max)})"
+            // Via toString so a Float like 0.1f compares as 0.1, not 0.10000000149
+            val asDouble = if (kind.type.code == "kotlin.Float") "v.toString().toDouble()" else "v.toDouble()"
+            checks += "$VALIDATORS.range($asDouble, ${doubleLiteral(min)}, ${doubleLiteral(max)})"
         }
         findAnnotation(prop, Size::class.qualifiedName!!)?.let {
             if (shape != Shape.STRING && shape != Shape.COLLECTION) {
