@@ -1,76 +1,138 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package io.github.fiol_dev.konstant.core
 
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.reflect.KClass
 
 /**
- * Global config registry. Initialize once at startup, then access typed configs
- * anywhere in your codebase.
+ * Global access to the loaded config. Load it once at startup with the generated
+ * `init<Spec>` function, then read any spec, root or nested, from anywhere:
  *
  * ```kotlin
  * // At startup
- * Konstant.init {
+ * Konstant.initAppConfig {
  *     sources {
  *         +EnvSource()
- *         +loadTomlFile("config.toml")
+ *         +loadTomlResource("config.toml")
  *     }
  * }
- * Konstant.register(loader.loadAppConfig().getOrThrow())
  *
- * // Anywhere else
+ * // Anywhere else, no register() calls needed for nested specs
  * val db = Konstant.get<DatabaseConfig>()
  * val port = Konstant[AppConfig::class].server.port
  * ```
+ *
+ * The configs are published once as an immutable snapshot, so reads are safe from any
+ * thread on every platform. Initializing twice fails; call [reset] between tests.
  */
 public object Konstant {
-    private val configs = mutableMapOf<KClass<*>, Any>()
-    private var _loader: ConfigLoader? = null
+    private val snapshot = AtomicReference(Snapshot.EMPTY)
 
-    @Suppress("unused")
-    public val loader: ConfigLoader
-        get() = _loader ?: error("Konstant not initialized. Call Konstant.init { ... } first.")
+    /** True once a config has been installed. */
+    public val isInitialized: Boolean
+        get() = snapshot.load().configs.isNotEmpty()
 
     /**
-     * Initialize the global [ConfigLoader] with the given source configuration.
+     * Publishes [root] and its [nested] specs. Called by the generated `Konstant.init<Spec>`
+     * functions, which pass every nested spec; prefer those.
+     *
+     * @throws IllegalStateException if a config was already installed.
      */
-    @Suppress("unused")
+    public fun install(root: Any, nested: List<Any> = emptyList()) {
+        val configs = mutableMapOf<KClass<*>, Any>()
+        val ambiguous = mutableSetOf<KClass<*>>()
+        for (part in nested) {
+            val type = part::class
+            if (type in configs && configs[type] !== part) ambiguous += type
+            configs[type] = part
+        }
+        configs[root::class] = root
+        ambiguous -= root::class
+        val installed = configs - ambiguous
+        while (true) {
+            val current = snapshot.load()
+            check(!current.installed) {
+                "Konstant is already initialized. Call Konstant.reset() first (for example between tests)."
+            }
+            // Keep configs added with the deprecated register(), so both styles can be mixed while migrating
+            val next = Snapshot(current.configs + installed, ambiguous, installed = true)
+            if (snapshot.compareAndSet(current, next)) return
+        }
+    }
+
+    /** The loaded config of type [T], root or nested. */
+    public inline fun <reified T : Any> get(): T = get(T::class)
+
+    public operator fun <T : Any> get(type: KClass<T>): T =
+        getOrNull(type) ?: error(missingMessage(type))
+
+    /** The loaded config of type [T], or null if there is none. */
+    public inline fun <reified T : Any> getOrNull(): T? = getOrNull(T::class)
+
+    @Suppress("UNCHECKED_CAST")
+    public fun <T : Any> getOrNull(type: KClass<T>): T? = snapshot.load().configs[type] as T?
+
+    /** Clears the loaded config. Meant for tests. */
+    public fun reset() {
+        snapshot.store(Snapshot.EMPTY)
+        legacyLoader.store(null)
+    }
+
+    private fun missingMessage(type: KClass<*>): String {
+        val current = snapshot.load()
+        return when {
+            type in current.ambiguous ->
+                "${type.simpleName} appears more than once in the loaded config. " +
+                    "Read it through its parent, e.g. Konstant.get<Root>().field."
+            current.configs.isEmpty() ->
+                "Konstant is not initialized. Call the generated Konstant.init${type.simpleName} { ... } " +
+                    "(or init for your root spec) at startup."
+            else -> "No config of type ${type.simpleName} was loaded."
+        }
+    }
+
+    // ---- Deprecated manual registry ----
+
+    @Deprecated("Use the generated Konstant.init<Spec> { ... }, which loads and installs the config.")
+    public val loader: ConfigLoader
+        get() = legacyLoader.load() ?: error("Konstant not initialized. Call Konstant.init { ... } first.")
+
+    private val legacyLoader = AtomicReference<ConfigLoader?>(null)
+
+    @Deprecated("Use the generated Konstant.init<Spec> { ... }, which loads and installs the config.")
     public fun init(block: ConfigLoaderBuilder.() -> Unit): ConfigLoader {
         val l = ConfigLoader(block)
-        _loader = l
+        legacyLoader.store(l)
         return l
     }
 
-    /**
-     * Register a loaded config instance for global access.
-     */
+    @Deprecated("Nested specs are installed automatically by the generated Konstant.init<Spec> { ... }.")
     public inline fun <reified T : Any> register(config: T) {
+        @Suppress("DEPRECATION")
         register(T::class, config)
     }
 
+    @Deprecated("Nested specs are installed automatically by the generated Konstant.init<Spec> { ... }.")
     public fun <T : Any> register(type: KClass<T>, config: T) {
-        configs[type] = config
+        while (true) {
+            val current = snapshot.load()
+            val next = Snapshot(current.configs + (type to config), current.ambiguous - type, current.installed)
+            if (snapshot.compareAndSet(current, next)) return
+        }
     }
 
-    /**
-     * Retrieve a previously registered config by type.
-     */
-    public inline fun <reified T : Any> get(): T = get(T::class)
+    @Deprecated("Use getOrNull<T>() != null.")
+    public fun <T : Any> has(config: T): Boolean = snapshot.load().configs.containsKey(config::class)
 
-    @Suppress("UNCHECKED_CAST")
-    public operator fun <T : Any> get(type: KClass<T>): T {
-        return configs[type] as? T
-            ?: error("No config registered for ${type.simpleName}. Call Konstant.register(...) first.")
-    }
-
-    /**
-     * Check if a config type has been registered.
-     */
-    public fun <T : Any> has(config: T): Boolean = configs.containsKey(config::class)
-
-    /**
-     * Clear all registered configs and the loader. Useful for testing.
-     */
-    public fun reset() {
-        configs.clear()
-        _loader = null
+    private class Snapshot(
+        val configs: Map<KClass<*>, Any>,
+        val ambiguous: Set<KClass<*>>,
+        val installed: Boolean,
+    ) {
+        companion object {
+            val EMPTY = Snapshot(emptyMap(), emptySet(), installed = false)
+        }
     }
 }
