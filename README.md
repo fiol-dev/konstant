@@ -493,6 +493,20 @@ when (result) {
 val config = loader.loadAppConfig().getOrThrow()
 ```
 
+### Which source won?
+
+`explain` runs a load and lists every field's key, the value used (secrets as `***`) and where it came from, with sources numbered in priority order:
+
+```kotlin
+println(loader.explain { loadAppConfig() })
+// APP_NAME         Demo                     #1 EnvSource
+// DATABASE_URL     jdbc:postgresql://db/app #3 TomlSource
+// DATABASE_PASSWORD ***                     #2 DotEnvSource
+// SERVER_PORT      8080                     default
+```
+
+The report also carries the load `result`, so it works for failed loads too (missing fields show as `missing`).
+
 ### Error Types
 
 | Error               | When                                                                 |

@@ -1,16 +1,29 @@
 package io.github.fiol_dev.konstant.core
 
-public class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
-    public val sources: List<ConfigSource>
+public class ConfigLoader private constructor(
+    public val sources: List<ConfigSource>,
+    // Set only on the copy made by explain, so ordinary loads record nothing
+    private val recorder: MutableList<ConfigReport.Entry>?,
+) {
+    public constructor(block: ConfigLoaderBuilder.() -> Unit) :
+        this(ConfigLoaderBuilder().apply(block).buildSources(), null)
 
-    init {
-        val builder = ConfigLoaderBuilder()
-        builder.block()
-        sources = builder.buildSources()
+    /**
+     * Runs [load] and reports, for every field, the value used and which source it came from.
+     * Secrets are shown as `***`. Useful for debugging which file or variable won:
+     *
+     * ```kotlin
+     * println(loader.explain { loadAppConfig() })
+     * ```
+     */
+    public fun <T> explain(load: ConfigLoader.() -> ConfigResult<T>): ConfigReport<T> {
+        val entries = mutableListOf<ConfigReport.Entry>()
+        val result = ConfigLoader(sources, entries).load()
+        return ConfigReport(result, entries)
     }
 
     public fun <T> resolve(field: FieldDescriptor<T>, prefix: String?): ResolveResult<T> {
-        for (source in sources) {
+        for ((index, source) in sources.withIndex()) {
             val formats = listOf(source.keyFormat) + source.fallbackKeyFormats
             for (format in formats) {
                 val key = KeyUtils.resolveKey(
@@ -21,26 +34,34 @@ public class ConfigLoader(block: ConfigLoaderBuilder.() -> Unit) {
                 )
                 val raw = source.get(key)
                 if (raw != null) {
+                    record(field, key, raw, "#${index + 1} ${source.name}")
                     return convert(field, key, raw) { field.convert(raw) }
                 }
                 val convertChildren = field.convertChildren ?: continue
                 val children = source.children(key) ?: continue
                 val shown = children.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }
+                record(field, key, shown, "#${index + 1} ${source.name}")
                 return convert(field, key, shown) { convertChildren(children) }
             }
         }
         // Not found in any source
-        if (field.hasDefault) {
-            @Suppress("UNCHECKED_CAST")
-            return ResolveResult.Success(field.default as T)
-        }
         val resolvedKey = KeyUtils.resolveKey(
             propertyName = field.propertyName,
             prefix = prefix,
             format = KeyFormat.SCREAMING_SNAKE,
             customKey = field.customKey,
         )
+        if (field.hasDefault) {
+            record(field, resolvedKey, field.default.toString(), ConfigReport.DEFAULT)
+            @Suppress("UNCHECKED_CAST")
+            return ResolveResult.Success(field.default as T)
+        }
+        record(field, resolvedKey, null, ConfigReport.MISSING)
         return ResolveResult.Error(ConfigError.MissingRequired(resolvedKey))
+    }
+
+    private fun record(field: FieldDescriptor<*>, key: String, value: String?, origin: String) {
+        recorder?.add(ConfigReport.Entry(key, if (field.secret && value != null) "***" else value, origin))
     }
 
     private inline fun <T> convert(
