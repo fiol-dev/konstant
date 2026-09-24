@@ -4,6 +4,7 @@ import io.github.fiol_dev.konstant.core.ConfigException
 import io.github.fiol_dev.konstant.core.Konstant
 import io.github.fiol_dev.konstant.test.MapSource
 import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -11,6 +12,11 @@ import kotlin.test.assertFalse
 import kotlin.test.assertSame
 
 class KonstantHolderTest {
+
+    @BeforeTest
+    fun setup() {
+        Konstant.reset()
+    }
 
     @AfterTest
     fun cleanup() {

@@ -50,9 +50,15 @@ public object Konstant {
         }
         configs[root::class] = root
         ambiguous -= root::class
-        val next = Snapshot(configs - ambiguous, ambiguous)
-        check(snapshot.compareAndSet(Snapshot.EMPTY, next)) {
-            "Konstant is already initialized. Call Konstant.reset() first (for example between tests)."
+        val installed = configs - ambiguous
+        while (true) {
+            val current = snapshot.load()
+            check(!current.installed) {
+                "Konstant is already initialized. Call Konstant.reset() first (for example between tests)."
+            }
+            // Keep configs added with the deprecated register(), so both styles can be mixed while migrating
+            val next = Snapshot(current.configs + installed, ambiguous, installed = true)
+            if (snapshot.compareAndSet(current, next)) return
         }
     }
 
@@ -71,6 +77,7 @@ public object Konstant {
     /** Clears the loaded config. Meant for tests. */
     public fun reset() {
         snapshot.store(Snapshot.EMPTY)
+        legacyLoader.store(null)
     }
 
     private fun missingMessage(type: KClass<*>): String {
@@ -111,7 +118,7 @@ public object Konstant {
     public fun <T : Any> register(type: KClass<T>, config: T) {
         while (true) {
             val current = snapshot.load()
-            val next = Snapshot(current.configs + (type to config), current.ambiguous - type)
+            val next = Snapshot(current.configs + (type to config), current.ambiguous - type, current.installed)
             if (snapshot.compareAndSet(current, next)) return
         }
     }
@@ -119,9 +126,13 @@ public object Konstant {
     @Deprecated("Use getOrNull<T>() != null.")
     public fun <T : Any> has(config: T): Boolean = snapshot.load().configs.containsKey(config::class)
 
-    private class Snapshot(val configs: Map<KClass<*>, Any>, val ambiguous: Set<KClass<*>>) {
+    private class Snapshot(
+        val configs: Map<KClass<*>, Any>,
+        val ambiguous: Set<KClass<*>>,
+        val installed: Boolean,
+    ) {
         companion object {
-            val EMPTY = Snapshot(emptyMap(), emptySet())
+            val EMPTY = Snapshot(emptyMap(), emptySet(), installed = false)
         }
     }
 }

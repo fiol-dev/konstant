@@ -495,8 +495,10 @@ class ConfigSpecProcessor(
         appendLine("fun $className.konstantNestedConfigs(): List<Any> = buildList {")
         for (field in fields) {
             if (field.kind !is FieldKind.Nested) continue
-            appendLine("    add(${field.name})")
-            appendLine("    addAll(${field.name}.konstantNestedConfigs())")
+            // Qualified, so a field named like a list member (size, indices) still means the config's
+            val ref = "this@konstantNestedConfigs.${field.name}"
+            appendLine("    add($ref)")
+            appendLine("    addAll($ref.konstantNestedConfigs())")
         }
         appendLine("}")
         appendLine()
