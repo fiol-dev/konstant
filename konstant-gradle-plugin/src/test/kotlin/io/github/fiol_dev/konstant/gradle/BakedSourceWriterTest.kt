@@ -31,7 +31,7 @@ class BakedSourceWriterTest {
     @Test
     fun escapesContentIntoValidKotlinStrings() {
         assertEquals(
-            "\"a \\\"quoted\\\" \\$HOME \\\\n\\nnext\"",
+            "\"a \\\"quoted\\\" \\\$HOME \\\\n\\nnext\"",
             BakedSourceWriter.kotlinString("a \"quoted\" \$HOME \\n\nnext"),
         )
     }
@@ -41,6 +41,13 @@ class BakedSourceWriterTest {
         val big = "x".repeat(20_000)
         val source = BakedSourceWriter.render("p", "B", "dev", listOf(BakedSourceWriter.Input("big.properties", big)))
         assertEquals(3, Regex("\"x+\"").findAll(source).count())
+    }
+
+    @Test
+    fun neverSplitsASurrogatePair() {
+        val text = "x".repeat(7_999) + "\uD83D\uDE00" + "y"
+        val chunks = BakedSourceWriter.chunks(text)
+        assertEquals(listOf("x".repeat(7_999), "\uD83D\uDE00y"), chunks)
     }
 
     @Test

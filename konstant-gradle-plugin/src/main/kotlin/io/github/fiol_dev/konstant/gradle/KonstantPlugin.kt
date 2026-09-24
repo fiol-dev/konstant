@@ -24,8 +24,8 @@ class KonstantPlugin : Plugin<Project> {
             val projectDir = project.layout.projectDirectory
             inputFiles.from(
                 extension.bakedFiles.zip(extension.environment) { files, env ->
+                    // Missing optional files stay listed, so creating one later re-runs the task
                     files.map { projectDir.file(BakedFile.decode(it).path.replace("{env}", env)).asFile }
-                        .filter { it.exists() }
                 }
             )
             outputDirectory.set(project.layout.buildDirectory.dir("generated/konstant/kotlin"))

@@ -33,7 +33,7 @@ internal object BakedSourceWriter {
             for ((file, factory) in files.zip(factories).asReversed()) {
                 appendLine("            // ${file.path.replace("\n", " ")}")
                 // Split long files: a JVM string constant can't exceed 64 KB
-                val literal = file.content.chunked(CHUNK).ifEmpty { listOf("") }
+                val literal = chunks(file.content)
                     .joinToString(" +\n                ") { kotlinString(it) }
                 appendLine("            $factory.fromString($literal),")
             }
@@ -54,6 +54,20 @@ internal object BakedSourceWriter {
                 "Can't bake '$path': use a .toml, .yaml, .yml, .properties or .env file"
             )
         }
+    }
+
+    /** Splits [s] into pieces of at most [CHUNK] chars without cutting a surrogate pair. */
+    fun chunks(s: String): List<String> {
+        if (s.isEmpty()) return listOf("")
+        val result = mutableListOf<String>()
+        var start = 0
+        while (start < s.length) {
+            var end = minOf(start + CHUNK, s.length)
+            if (end < s.length && Character.isHighSurrogate(s[end - 1])) end--
+            result += s.substring(start, end)
+            start = end
+        }
+        return result
     }
 
     fun kotlinString(s: String): String = buildString {
