@@ -9,7 +9,7 @@ import io.github.fiol_dev.konstant.core.KeyFormat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -41,7 +41,7 @@ class ReloadableConfigTest {
     }
 
     private fun reloadable(source: FakeSource) =
-        ReloadableConfig(load = { loadSettings() }) { sources { +source } }
+        ReloadableConfig.load(load = { loadSettings() }) { sources { +source } }
 
     @Test
     fun loadsOnCreation() {
@@ -54,11 +54,12 @@ class ReloadableConfigTest {
     }
 
     @Test
-    fun reloadPublishesValidChanges() {
+    fun reloadPublishesValidChanges() = runTest {
         val source = FakeSource("8080")
         val config = reloadable(source)
+        assertEquals(ReloadResult.Unchanged(Settings(8080)), config.reload())
         source.port = "9090"
-        assertEquals(Settings(9090), config.reload().getOrThrow())
+        assertEquals(ReloadResult.Updated(Settings(9090)), config.reload())
         assertEquals(Settings(9090), config.config.value)
     }
 
@@ -66,23 +67,41 @@ class ReloadableConfigTest {
     fun invalidReloadKeepsLastGoodConfigAndReportsIt() = runTest {
         val source = FakeSource("8080")
         val config = reloadable(source)
-        val failure = launch { assertIs<ConfigException>(config.failures.first()) }
+        val failure = backgroundScope.async { config.failures.first() }
         runCurrent()
         source.port = "oops"
-        assertTrue(config.reload().isFailure)
+        val result = assertIs<ReloadResult.Failed<Settings>>(config.reload())
+        assertIs<ConfigException>(result.error)
         assertEquals(Settings(8080), config.current)
-        failure.join()
+        assertIs<ConfigException>(failure.await())
     }
 
     @Test
-    fun sourceThatThrowsIsReportedNotPropagated() {
+    fun sourceThatThrowsIsReportedNotPropagated() = runTest {
         var fail = false
-        val config = ReloadableConfig(load = { loadSettings() }) {
+        val config = ReloadableConfig.load(load = { loadSettings() }) {
             if (fail) throw IllegalArgumentException("config.toml not found")
             sources { +FakeSource("8080") }
         }
         fail = true
-        assertIs<IllegalArgumentException>(config.reload().exceptionOrNull())
+        assertIs<IllegalArgumentException>(assertIs<ReloadResult.Failed<Settings>>(config.reload()).error)
+        assertEquals(Settings(8080), config.current)
+    }
+
+    @Test
+    fun errorsInTriggeredReloadsDoNotCancelTheScope() = runTest {
+        var fail = false
+        val config = ReloadableConfig.load(load = { loadSettings() }) {
+            if (fail) TODO("not implemented yet")
+            sources { +FakeSource("8080") }
+        }
+        val triggers = MutableSharedFlow<Unit>()
+        val job = config.reloadOn(backgroundScope, triggers)
+        runCurrent()
+        fail = true
+        triggers.emit(Unit)
+        runCurrent()
+        assertTrue(job.isActive)
         assertEquals(Settings(8080), config.current)
     }
 
@@ -90,31 +109,35 @@ class ReloadableConfigTest {
     fun reloadEveryPollsOnSchedule() = runTest {
         val source = FakeSource("8080")
         val config = reloadable(source)
-        val job = config.reloadEvery(this, 10.seconds)
+        config.reloadEvery(backgroundScope, 10.seconds)
         source.port = "9090"
         advanceTimeBy(5.seconds)
         assertEquals(8080, config.current.port)
         advanceTimeBy(6.seconds)
         assertEquals(9090, config.current.port)
-        job.cancel()
     }
 
     @Test
-    fun watchReloadsWhenAReloadableSourceChanges() = runTest {
+    fun watchReloadsWhenAWatchedSourceChanges() = runTest {
         val source = FakeSource("8080")
         val config = reloadable(source)
-        val job = config.watch(this)
+        config.watch(backgroundScope, source)
         runCurrent()
         source.port = "7070"
         source.changes.emit(Unit)
         runCurrent()
         assertEquals(7070, config.current.port)
-        job.cancel()
+    }
+
+    @Test
+    fun watchNeedsASource() = runTest {
+        val config = reloadable(FakeSource("8080"))
+        assertFailsWith<IllegalArgumentException> { config.watch(backgroundScope) }
     }
 
     @Test
     fun reloadEveryRejectsNonPositivePeriod() = runTest {
         val config = reloadable(FakeSource("8080"))
-        assertFailsWith<IllegalArgumentException> { config.reloadEvery(this, 0.seconds) }
+        assertFailsWith<IllegalArgumentException> { config.reloadEvery(backgroundScope, 0.seconds) }
     }
 }

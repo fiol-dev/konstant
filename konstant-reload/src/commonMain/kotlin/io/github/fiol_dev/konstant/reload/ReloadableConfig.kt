@@ -4,6 +4,7 @@ import io.github.fiol_dev.konstant.core.ConfigException
 import io.github.fiol_dev.konstant.core.ConfigLoader
 import io.github.fiol_dev.konstant.core.ConfigLoaderBuilder
 import io.github.fiol_dev.konstant.core.ConfigResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -18,22 +19,29 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 
 /**
  * A config that can be reloaded while the app runs. Every reload builds the sources again (so
  * files are read again), loads and validates the config, and publishes it to [config] only if it
  * is valid. A failed reload keeps the last good config and emits the error to [failures].
+ * Reloads run one at a time, so a slow reload never overwrites a newer one.
  *
  * ```kotlin
- * val appConfig = ReloadableConfig(load = { loadAppConfig() }) {
+ * val appConfig = ReloadableConfig.load(load = { loadAppConfig() }) {
  *     sources {
  *         +EnvSource()
  *         +TomlSource.fromFile("config.toml")
  *     }
  * }
  *
- * appConfig.reloadEvery(scope, 30.seconds)   // or reloadOn(scope, fileChanges), or watch(scope)
+ * scope.launch { appConfig.failures.collect { log.warn("Config reload skipped", it) } }
+ * appConfig.reloadEvery(scope, 30.seconds)
  * appConfig.config.collect { config -> applyLogLevel(config.logLevel) }
  * ```
  */
@@ -41,9 +49,10 @@ public class ReloadableConfig<T : Any> private constructor(
     initial: T,
     private val sources: ConfigLoaderBuilder.() -> Unit,
     private val load: ConfigLoader.() -> ConfigResult<T>,
-    private val initialLoader: ConfigLoader,
+    private val context: CoroutineContext,
 ) {
     private val state = MutableStateFlow(initial)
+    private val mutex = Mutex()
     private val failureEvents = MutableSharedFlow<Throwable>(
         extraBufferCapacity = 16,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -56,25 +65,28 @@ public class ReloadableConfig<T : Any> private constructor(
     public val current: T get() = state.value
 
     /**
-     * Errors from reloads that failed and were skipped: a [ConfigException] listing the
-     * [ConfigException.errors] for invalid values, or whatever a source threw (a missing file,
-     * say). Nothing is replayed to late collectors.
+     * Errors from reloads that failed and were skipped, see [ReloadResult.Failed.error].
+     * Nothing is replayed, so start collecting before starting reloads.
      */
     public val failures: SharedFlow<Throwable> = failureEvents.asSharedFlow()
 
     /**
-     * Loads the config again. Publishes it and returns success if it is valid; otherwise keeps
-     * the current config, emits the error to [failures] and returns it as a failure.
+     * Loads the config again and publishes it if it is valid and different. Never throws
+     * except for cancellation: a failure keeps the current config and is emitted to [failures].
      */
-    public fun reload(): Result<T> {
-        val config = try {
-            ConfigLoader(sources).load().getOrThrow()
-        } catch (e: Exception) {
+    public suspend fun reload(): ReloadResult<T> = mutex.withLock {
+        val next = try {
+            withContext(context) { ConfigLoader(sources).load().getOrThrow() }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            // Throwable, not Exception: JavaScript errors from Node's fs are not Kotlin Exceptions
             failureEvents.tryEmit(e)
-            return Result.failure(e)
+            return ReloadResult.Failed(state.value, e)
         }
-        state.value = config
-        return Result.success(config)
+        if (next == state.value) return ReloadResult.Unchanged(next)
+        state.value = next
+        ReloadResult.Updated(next)
     }
 
     /** Reloads each time [triggers] emits, until [scope] or the returned job is cancelled. */
@@ -94,27 +106,35 @@ public class ReloadableConfig<T : Any> private constructor(
     }
 
     /**
-     * Reloads each time one of the [ReloadableSource]s used for the first load reports a change.
-     * Keep such sources in a variable and add that same instance in the `sources` block, so the
-     * watched source is the one that is read.
+     * Reloads each time one of [sources] reports a change. Pass the same instances that the
+     * `sources` block adds, so the watched source is the one that is read:
+     *
+     * ```kotlin
+     * val remote = FirebaseSource(remoteConfig)
+     * val appConfig = ReloadableConfig.load(load = { loadAppConfig() }) { sources { +remote } }
+     * appConfig.watch(scope, remote)
+     * ```
      */
-    public fun watch(scope: CoroutineScope): Job =
-        reloadOn(scope, initialLoader.sources.filterIsInstance<ReloadableSource>().map { it.changes }.merge())
+    public fun watch(scope: CoroutineScope, vararg sources: ReloadableSource): Job {
+        require(sources.isNotEmpty()) { "watch needs at least one ReloadableSource" }
+        return reloadOn(scope, sources.map { it.changes }.merge())
+    }
 
     public companion object {
         /**
          * Loads the config for the first time.
          *
          * @param load reads the config from a loader, usually the generated `load<Spec>()`.
+         * @param context where later reloads read their sources, e.g. `Dispatchers.IO` so a
+         *   reload started from the main thread does not read files on it.
          * @param sources declares the sources, and runs again on every reload.
          * @throws ConfigException if the first load fails, since there is no last good config yet.
          */
-        public operator fun <T : Any> invoke(
+        public fun <T : Any> load(
             load: ConfigLoader.() -> ConfigResult<T>,
+            context: CoroutineContext = EmptyCoroutineContext,
             sources: ConfigLoaderBuilder.() -> Unit,
-        ): ReloadableConfig<T> {
-            val loader = ConfigLoader(sources)
-            return ReloadableConfig(loader.load().getOrThrow(), sources, load, loader)
-        }
+        ): ReloadableConfig<T> =
+            ReloadableConfig(ConfigLoader(sources).load().getOrThrow(), sources, load, context)
     }
 }

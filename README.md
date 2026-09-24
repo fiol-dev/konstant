@@ -575,23 +575,27 @@ commonMain.dependencies {
 ```
 
 ```kotlin
-val appConfig = ReloadableConfig(load = { loadAppConfig() }) {
+val appConfig = ReloadableConfig.load(load = { loadAppConfig() }, context = Dispatchers.IO) {
     sources {
         +EnvSource()
         +TomlSource.fromFile("config.toml")   // read again on every reload
     }
 }
 
+// Collect failures before starting reloads: they are not replayed
+scope.launch { appConfig.failures.collect { log.warn("Config reload skipped", it) } }
+scope.launch { appConfig.config.collect { applyLogLevel(it.logLevel) } }
+
 appConfig.reloadEvery(scope, 30.seconds)        // poll
 appConfig.reloadOn(scope, fileChangedEvents)    // or reload on your own trigger
-appConfig.watch(scope)                          // or when a ReloadableSource reports a change
-
-scope.launch { appConfig.config.collect { applyLogLevel(it.logLevel) } }
-scope.launch { appConfig.failures.collect { log.warn("Config reload skipped", it) } }
 val port = appConfig.current.server.port
 ```
 
-The first load throws a `ConfigException` if it fails, since there is no good config to fall back on yet. `reload()` can also be called directly and returns a `Result`. Remote sources implement `ReloadableSource`, whose `changes` flow tells `watch` when to reload; create them outside the `sources` block so the same instance is watched and read. `Konstant.get` still returns the config installed at startup, so read reloadable values through `appConfig`.
+The first load throws a `ConfigException` if it fails, since there is no good config to fall back on yet. After that, reloads never throw: `reload()` is a suspend function that returns `Updated`, `Unchanged` or `Failed`, and reloads run one at a time so a slow one never overwrites a newer result. `context` is where reloads read their sources; pass `Dispatchers.IO` (or `Dispatchers.Default` where there is no IO dispatcher) when reloads start from the main thread.
+
+Remote sources implement `ReloadableSource`, whose `changes` flow emits when their values change. Create the source outside the `sources` block, add it with `+remote`, and pass the same instance to `appConfig.watch(scope, remote)`.
+
+`Konstant.get` still returns the config installed at startup, so read reloadable values through `appConfig`.
 
 ## KSP Compile-Time Validations
 
