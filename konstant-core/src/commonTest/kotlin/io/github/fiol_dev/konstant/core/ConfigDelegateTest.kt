@@ -1,3 +1,5 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.core
 
 import kotlin.test.AfterTest

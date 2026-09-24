@@ -1,13 +1,16 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.koin
 
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.Konstant
-import org.koin.dsl.koinApplication
-import org.koin.dsl.module
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFails
 import kotlin.test.assertSame
+import org.koin.dsl.koinApplication
+import org.koin.dsl.module
 
 data class DbConfig(val url: String)
 data class AppConfig(val name: String, val db: DbConfig)

@@ -7,6 +7,7 @@ import kotlin.time.Duration
  * [IllegalArgumentException] (or a subclass) on invalid input, which the loader turns into
  * [ConfigError.ConversionFailed].
  */
+@InternalKonstantApi
 public object Converters {
 
     private val TRUE_VALUES = setOf("true", "yes", "on", "1")
