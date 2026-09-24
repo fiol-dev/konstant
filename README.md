@@ -371,7 +371,7 @@ Available factory methods:
 | `kotlin.time.Duration`      | `30s`, `1h 30m`, `500ms` or ISO-8601 (`PT30S`)                           |
 | any `enum`                  | constant name, case-insensitive, `-` treated as `_` (`warn-only` → `WARN_ONLY`) |
 | `List<T>`, `Set<T>`         | comma-separated (`a, b`) or an inline array (`["a", "b"]`)               |
-| `Map<String, T>`            | `key=value` pairs (`a=1, b=2`) or an inline table as a string            |
+| `Map<String, T>`            | `key=value` pairs (`a=1, b=2`), a TOML table or a YAML mapping           |
 | `T?` (any of the above)     | optional: `null` when no source has the key and there is no default      |
 | Nested `@ConfigSpec`        | loaded recursively with a key prefix                                     |
 
