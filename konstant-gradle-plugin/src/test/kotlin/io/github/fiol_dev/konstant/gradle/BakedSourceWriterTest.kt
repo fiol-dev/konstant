@@ -27,8 +27,8 @@ class BakedSourceWriterTest {
         assertTrue(env in 0 until yaml && yaml < toml, source)
         assertTrue("import io.github.fiol_dev.konstant.toml.TomlSource" in source, source)
         assertTrue("import io.github.fiol_dev.konstant.yaml.YamlSource" in source, source)
-        assertTrue("import io.github.fiol_dev.konstant.sources.source.DotEnvSource" in source, source)
-        assertTrue("import io.github.fiol_dev.konstant.sources.source.PropertiesSource" !in source)
+        assertTrue("import io.github.fiol_dev.konstant.sources.DotEnvSource" in source, source)
+        assertTrue("import io.github.fiol_dev.konstant.sources.PropertiesSource" !in source)
     }
 
     @Test

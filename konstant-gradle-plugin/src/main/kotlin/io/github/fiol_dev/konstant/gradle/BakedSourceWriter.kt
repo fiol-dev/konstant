@@ -48,9 +48,9 @@ internal object BakedSourceWriter {
         return when {
             name.endsWith(".toml") -> "io.github.fiol_dev.konstant.toml.TomlSource"
             name.endsWith(".yaml") || name.endsWith(".yml") -> "io.github.fiol_dev.konstant.yaml.YamlSource"
-            name.endsWith(".properties") -> "io.github.fiol_dev.konstant.sources.source.PropertiesSource"
+            name.endsWith(".properties") -> "io.github.fiol_dev.konstant.sources.PropertiesSource"
             name == ".env" || name.startsWith(".env.") || name.endsWith(".env") ->
-                "io.github.fiol_dev.konstant.sources.source.DotEnvSource"
+                "io.github.fiol_dev.konstant.sources.DotEnvSource"
             else -> throw GradleException(
                 "Can't bake '$path': use a .toml, .yaml, .yml, .properties or .env file"
             )

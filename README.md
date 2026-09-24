@@ -53,15 +53,15 @@ data class AppConfig(
 
 ```kotlin
 import io.github.fiol_dev.konstant.core.ConfigLoader
-import io.github.fiol_dev.konstant.sources.source.*
+import io.github.fiol_dev.konstant.sources.*
 import io.github.fiol_dev.konstant.toml.TomlSource // konstant-toml module
 
 val loader = ConfigLoader {
     sources {
         +EnvSource()                             // highest priority
-        +DotEnvSource(".env")
+        +DotEnvSource.fromFile(".env")
         +TomlSource.fromFile("config.toml")
-        +loadPropertiesFile("config.properties") // lowest
+        +PropertiesSource.fromFile("config.properties") // lowest
     }
 }
 
@@ -254,8 +254,8 @@ SERVER_PORT=9090
 ```
 
 ```kotlin
-+DotEnvSource()           // defaults to ".env"
-+DotEnvSource("app.env")  // custom path
++DotEnvSource.fromFile()           // defaults to ".env"
++DotEnvSource.fromFile("app.env")  // custom path
 ```
 
 ### `PropertiesSource`
@@ -270,7 +270,7 @@ server.host=0.0.0.0
 ```
 
 ```kotlin
-+loadPropertiesFile("config.properties")
++PropertiesSource.fromFile("config.properties")
 ```
 
 To load a file bundled with the app instead, see [Bundled resources](#bundled-resources-mobile).
@@ -312,7 +312,7 @@ Nested tables and mappings become `dot.notation` keys, arrays become lists, and 
 
 ### Bundled resources (mobile)
 
-Apps usually ship config inside the package rather than as files on disk. `fromResource` in the format modules and the `load*Resource` functions in `konstant-sources` read it from wherever each platform bundles files:
+Apps usually ship config inside the package rather than as files on disk. Every file-based source has `fromResource`, which reads it from wherever each platform bundles files:
 
 | Platform      | Location                                               |
 |---------------|--------------------------------------------------------|
@@ -322,7 +322,7 @@ Apps usually ship config inside the package rather than as files on disk. `fromR
 | JS (Node), Linux | a file at `<path>` relative to the working directory |
 
 ```kotlin
-import io.github.fiol_dev.konstant.sources.source.*
+import io.github.fiol_dev.konstant.sources.*
 import io.github.fiol_dev.konstant.toml.TomlSource
 
 val loader = ConfigLoader {
@@ -334,7 +334,7 @@ val loader = ConfigLoader {
 }
 ```
 
-`YamlSource.fromResource`, `JsonSource.fromResource`, `loadPropertiesResource` and `loadDotEnvResource` work the same way. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
+`YamlSource`, `JsonSource`, `PropertiesSource` and `DotEnvSource` have the same `fromResource`. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
 
 ### Baked config (Gradle plugin)
 

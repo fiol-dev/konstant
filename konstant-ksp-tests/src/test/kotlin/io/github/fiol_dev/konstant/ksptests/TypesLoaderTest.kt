@@ -7,7 +7,7 @@ import io.github.fiol_dev.konstant.core.ConfigSource
 import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.ksptests.other.CacheConfig
 import io.github.fiol_dev.konstant.ksptests.other.Mode
-import io.github.fiol_dev.konstant.sources.source.PropertiesSource
+import io.github.fiol_dev.konstant.sources.PropertiesSource
 import io.github.fiol_dev.konstant.test.MapSource
 import io.github.fiol_dev.konstant.toml.TomlSource
 import io.github.fiol_dev.konstant.yaml.YamlSource

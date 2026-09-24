@@ -3,7 +3,7 @@
 package io.github.fiol_dev.konstant.test
 
 import io.github.fiol_dev.konstant.core.*
-import io.github.fiol_dev.konstant.sources.source.PropertiesSource
+import io.github.fiol_dev.konstant.sources.PropertiesSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
