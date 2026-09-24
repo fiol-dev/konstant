@@ -41,17 +41,8 @@ final class io.github.fiol_dev.konstant.sources.source/PropertiesSource : io.git
     }
 }
 
-final object io.github.fiol_dev.konstant.sources.parser/DotEnvParser { // io.github.fiol_dev.konstant.sources.parser/DotEnvParser|null[0]
-    final fun parse(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.sources.parser/DotEnvParser.parse|parse(kotlin.String){}[0]
-}
-
-final object io.github.fiol_dev.konstant.sources.parser/PropertiesParser { // io.github.fiol_dev.konstant.sources.parser/PropertiesParser|null[0]
-    final fun parse(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String> // io.github.fiol_dev.konstant.sources.parser/PropertiesParser.parse|parse(kotlin.String){}[0]
-}
-
 final fun io.github.fiol_dev.konstant.sources.source/loadDotEnvResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources.source/DotEnvSource // io.github.fiol_dev.konstant.sources.source/loadDotEnvResource|loadDotEnvResource(kotlin.String;kotlin.Boolean){}[0]
 final fun io.github.fiol_dev.konstant.sources.source/loadPropertiesFile(kotlin/String): io.github.fiol_dev.konstant.sources.source/PropertiesSource // io.github.fiol_dev.konstant.sources.source/loadPropertiesFile|loadPropertiesFile(kotlin.String){}[0]
 final fun io.github.fiol_dev.konstant.sources.source/loadPropertiesResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources.source/PropertiesSource // io.github.fiol_dev.konstant.sources.source/loadPropertiesResource|loadPropertiesResource(kotlin.String;kotlin.Boolean){}[0]
-final fun io.github.fiol_dev.konstant.sources/getEnvironmentVariable(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources/getEnvironmentVariable|getEnvironmentVariable(kotlin.String){}[0]
 final fun io.github.fiol_dev.konstant.sources/readFileText(kotlin/String): kotlin/String // io.github.fiol_dev.konstant.sources/readFileText|readFileText(kotlin.String){}[0]
 final fun io.github.fiol_dev.konstant.sources/readResourceText(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources/readResourceText|readResourceText(kotlin.String){}[0]
