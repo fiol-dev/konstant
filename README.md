@@ -259,13 +259,7 @@ server.host=0.0.0.0
 +loadPropertiesFile("config.properties")
 ```
 
-On JVM, you can also load from the classpath:
-
-```kotlin
-import io.github.fiol_dev.konstant.sources.loadPropertiesResource
-
-+loadPropertiesResource("application.properties")
-```
+To load a file bundled with the app instead, see [Bundled resources](#bundled-resources-mobile).
 
 The built-in `.properties` parser is pure Kotlin (no `java.util.Properties`):
 - Skips blank lines and lines starting with `#` or `!`
@@ -330,6 +324,31 @@ The built-in YAML parser is pure Kotlin (zero dependencies):
 - Indentation-based nesting (spaces)
 - Quoted strings (`"..."` and `'...'`)
 - Comments (`#`)
+
+### Bundled resources (mobile)
+
+Apps usually ship config inside the package rather than as files on disk. The `load*Resource` functions read it from wherever each platform bundles files:
+
+| Platform      | Location                                               |
+|---------------|--------------------------------------------------------|
+| Android       | `src/main/assets/<path>`                               |
+| iOS / macOS   | the main bundle's resources (add the file to the app target) |
+| JVM           | the classpath, e.g. `src/main/resources/<path>`        |
+| JS (Node), Linux | a file at `<path>` relative to the working directory |
+
+```kotlin
+import io.github.fiol_dev.konstant.sources.source.*
+
+val loader = ConfigLoader {
+    sources {
+        +EnvSource()
+        +loadTomlResource("config.local.toml", optional = true) // missing file = empty source
+        +loadTomlResource("config.toml")
+    }
+}
+```
+
+`loadYamlResource`, `loadPropertiesResource` and `loadDotEnvResource` work the same way. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
 
 ### `MapSource` (testing)
 
