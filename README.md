@@ -336,32 +336,35 @@ The built-in YAML parser is pure Kotlin (zero dependencies):
 - Quoted strings (`"..."` and `'...'`)
 - Comments (`#`)
 
-### Full TOML and YAML (`konstant-toml`, `konstant-yaml`)
+### Full TOML, YAML and JSON (`konstant-toml`, `konstant-yaml`, `konstant-json`)
 
-The built-in parsers above cover common config files. For the full TOML 1.0 and YAML 1.2 specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections), add the optional modules. They are backed by [ktoml](https://github.com/orchestr7/ktoml) and [kaml](https://github.com/charleskorn/kaml) and work on every Konstant target, except that `konstant-toml` has no wasmJs build yet (ktoml's wasm artifact is broken with Kotlin 2.3):
+The built-in parsers above cover common config files. For the full TOML 1.0 and YAML 1.2 specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections), add the optional modules. For JSON config files, add `konstant-json`. They are backed by [ktoml](https://github.com/orchestr7/ktoml), [kaml](https://github.com/charleskorn/kaml) and [kotlinx-serialization-json](https://github.com/Kotlin/kotlinx.serialization) and work on every Konstant target, except that `konstant-toml` has no wasmJs build yet (ktoml's wasm artifact is broken with Kotlin 2.3):
 
 ```kotlin
 // build.gradle.kts
 commonMain.dependencies {
     implementation("io.github.fiol-dev.konstant:konstant-toml:<version>")
     implementation("io.github.fiol-dev.konstant:konstant-yaml:<version>")
+    implementation("io.github.fiol-dev.konstant:konstant-json:<version>")
 }
 ```
 
 ```kotlin
 import io.github.fiol_dev.konstant.toml.TomlSource
+import io.github.fiol_dev.konstant.json.JsonSource
 import io.github.fiol_dev.konstant.yaml.YamlSource
 
 val loader = ConfigLoader {
     sources {
         +EnvSource()
-        +YamlSource.fromResource("config.local.yaml", optional = true)
+        +JsonSource.fromResource("config.local.json", optional = true)
+        +YamlSource.fromResource("config.yaml", optional = true)
         +TomlSource.fromResource("config.toml")   // or fromFile / fromString
     }
 }
 ```
 
-Keys work the same as with the built-in sources: tables and mappings become `dot.notation` keys, arrays become lists, and entries of an array of tables (or a YAML list of mappings) are numbered, as in `servers.0.name`. Import these classes by name rather than with `*` when you also use `konstant-sources`, which has classes with the same names.
+Keys work the same as with the built-in sources: tables and mappings become `dot.notation` keys, arrays become lists, and entries of an array of tables (or a YAML list of mappings, or a JSON array of objects) are numbered, as in `servers.0.name`. JSON files may contain comments and trailing commas, and `null` values are skipped so the spec's default applies. Import these classes by name rather than with `*` when you also use `konstant-sources`, which has classes with the same names.
 
 ### Bundled resources (mobile)
 
@@ -628,6 +631,7 @@ konstant/
 +-- konstant-koin/           # Koin integration: config<T>() definitions
 +-- konstant-toml/           # Full TOML 1.0 source (ktoml)
 +-- konstant-yaml/           # Full YAML 1.2 source (kaml)
++-- konstant-json/           # JSON source (kotlinx-serialization-json)
 +-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
