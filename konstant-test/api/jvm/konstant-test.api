@@ -1,12 +1,8 @@
-public final class io/github/fiol_dev/konstant/test/MapSource : io/github/fiol_dev/konstant/core/ConfigSource {
+public final class io/github/fiol_dev/konstant/test/MapSource : io/github/fiol_dev/konstant/core/MapBackedSource {
 	public static final field Companion Lio/github/fiol_dev/konstant/test/MapSource$Companion;
 	public fun <init> (Ljava/util/Map;Lio/github/fiol_dev/konstant/core/KeyFormat;)V
 	public synthetic fun <init> (Ljava/util/Map;Lio/github/fiol_dev/konstant/core/KeyFormat;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun children (Ljava/lang/String;)Ljava/util/Map;
-	public fun get (Ljava/lang/String;)Ljava/lang/String;
-	public fun getFallbackKeyFormats ()Ljava/util/List;
 	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
-	public fun getName ()Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/test/MapSource$Companion {

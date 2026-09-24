@@ -35,6 +35,12 @@ class ConfigDelegateTest {
     }
 
     @Test
+    fun configField_acceptsKClass() {
+        val appName: String by configField(TestAppConfig::class) { it.appName }
+        assertEquals("DelegateApp", appName)
+    }
+
+    @Test
     fun configField_extractsNestedField() {
         val dbUrl: String by configField<TestAppConfig, String> { it.db.url }
         val dbPort: Int by configField<TestAppConfig, Int> { it.db.port }

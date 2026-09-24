@@ -1,6 +1,8 @@
 package io.github.fiol_dev.konstant.core
 
+import kotlin.concurrent.Volatile
 import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
@@ -17,7 +19,11 @@ import kotlin.reflect.KProperty
  */
 public inline fun <reified T : Any, V> configField(
     noinline selector: (T) -> V,
-): ReadOnlyProperty<Any?, V> = ConfigFieldDelegate(T::class, selector)
+): ReadOnlyProperty<Any?, V> = configField(T::class, selector)
+
+/** [configField] for when the config type is only known as a [KClass]. */
+public fun <T : Any, V> configField(type: KClass<T>, selector: (T) -> V): ReadOnlyProperty<Any?, V> =
+    ConfigFieldDelegate(type, selector)
 
 /**
  * Property delegate backed by a specific config instance (not the global registry).
@@ -32,12 +38,14 @@ public inline fun <reified T : Any, V> configField(
 public fun <T, V> T.field(selector: (T) -> V): ReadOnlyProperty<Any?, V> =
     InstanceFieldDelegate(this, selector)
 
-@PublishedApi
+// The cache is volatile so a value read on one thread is seen by the others. Two threads may
+// both run the selector the first time; that is harmless because it reads the same snapshot.
 internal class ConfigFieldDelegate<T : Any, V>(
-    private val type: kotlin.reflect.KClass<T>,
+    private val type: KClass<T>,
     private val selector: (T) -> V,
 ) : ReadOnlyProperty<Any?, V> {
 
+    @Volatile
     private var cached: Any? = UNINITIALIZED
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): V {
@@ -58,6 +66,7 @@ internal class InstanceFieldDelegate<T, V>(
     private val selector: (T) -> V,
 ) : ReadOnlyProperty<Any?, V> {
 
+    @Volatile
     private var cached: Any? = UNINITIALIZED
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): V {
