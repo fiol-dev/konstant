@@ -31,6 +31,8 @@ jobs:
             os: ubuntu-latest
           - target: jsNodeTest
             os: ubuntu-latest
+          - target: jsBrowserTest wasmJsNodeTest wasmJsBrowserTest
+            os: ubuntu-latest
           - target: linuxX64Test
             os: ubuntu-latest
           - target: testAndroidHostTest
