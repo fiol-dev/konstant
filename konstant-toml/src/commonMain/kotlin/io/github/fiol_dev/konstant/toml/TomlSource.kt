@@ -9,6 +9,7 @@ import com.akuleshov7.ktoml.tree.nodes.TomlNode
 import com.akuleshov7.ktoml.tree.nodes.TomlTable
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlArray
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlBasicString
+import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlDouble
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlLiteralString
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlNull
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlValue
@@ -68,6 +69,7 @@ public class TomlSource(entries: Map<String, String>) : MapBackedSource(entries)
         private fun scalar(value: TomlValue): String? = when (value) {
             is TomlNull -> null
             is TomlArray -> list(value)
+            is TomlDouble -> formatDouble(value.content as Double)
             else -> value.content.toString()
         }
 
@@ -75,11 +77,18 @@ public class TomlSource(entries: Map<String, String>) : MapBackedSource(entries)
             val items = value.content as? List<*> ?: return value.content.toString()
             return items.joinToString(prefix = "[", postfix = "]") { item ->
                 when (item) {
-                    is TomlBasicString, is TomlLiteralString -> "\"${item.content}\""
+                    is TomlBasicString, is TomlLiteralString -> quote(item.content.toString())
                     is TomlValue -> scalar(item) ?: ""
                     else -> item.toString()
                 }
             }
         }
+
+        // Escaped the way Converters.list unquotes it, so items may contain `"`, `,` or a trailing `\`
+        private fun quote(s: String): String = "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+        // Same text on every platform: Kotlin/JS would print 3.0 as "3" and 1e20 as "1e+20"
+        private fun formatDouble(d: Double): String =
+            if (d.isFinite() && d == kotlin.math.floor(d) && kotlin.math.abs(d) < 1e15) "${d.toLong()}.0" else d.toString()
     }
 }

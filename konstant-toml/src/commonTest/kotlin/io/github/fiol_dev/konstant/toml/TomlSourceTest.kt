@@ -1,5 +1,6 @@
 package io.github.fiol_dev.konstant.toml
 
+import io.github.fiol_dev.konstant.core.Converters
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -59,6 +60,20 @@ class TomlSourceTest {
     @Test
     fun rendersArraysAsQuotedLists() {
         assertEquals("[\"a\", \"b,c\", 3]", entries["tags"])
+    }
+
+    @Test
+    fun listItemsWithQuotesCommasAndBackslashesRoundTrip() {
+        val raw = TomlSource.flatten("a = [\"x\\\", \\\"y\", 'C:\\dir\\', 'z']")["a"]!!
+        assertEquals(listOf("x\", \"y", "C:\\dir\\", "z"), Converters.list(raw) { it })
+    }
+
+    @Test
+    fun formatsFloatsTheSameOnEveryPlatform() {
+        val floats = TomlSource.flatten("whole = 3.0\nfrac = 1.5\nbig = 1e20")
+        assertEquals("3.0", floats["whole"])
+        assertEquals("1.5", floats["frac"])
+        assertEquals(1e20, floats["big"]!!.toDouble())
     }
 
     @Test

@@ -1,5 +1,6 @@
 package io.github.fiol_dev.konstant.yaml
 
+import io.github.fiol_dev.konstant.core.Converters
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -53,6 +54,12 @@ class YamlSourceTest {
     fun rendersScalarListsAsQuotedLists() {
         assertEquals("[\"a\", \"b,c\", \"3\"]", entries["tags"])
         assertEquals("[\"one.example.com\", \"two.example.com\"]", entries["hosts"])
+    }
+
+    @Test
+    fun listItemsWithQuotesCommasAndBackslashesRoundTrip() {
+        val raw = YamlSource.flatten("a: ['x\", \"y', 'C:\\dir\\', z, ~]")["a"]!!
+        assertEquals(listOf("x\", \"y", "C:\\dir\\", "z"), Converters.list(raw) { it })
     }
 
     @Test

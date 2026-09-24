@@ -74,12 +74,29 @@ public object Converters {
     public fun <T> mapEntries(entries: Map<String, String>, value: (String) -> T): Map<String, T> =
         entries.mapValues { value(it.value) }
 
-    private fun unquote(s: String): String =
-        if (s.length >= 2 && (s[0] == '"' || s[0] == '\'') && s.last() == s[0]) {
-            s.substring(1, s.length - 1)
-        } else {
-            s
+    // Double-quoted values may escape `"` and `\` (the TOML and YAML modules write list items this way)
+    private fun unquote(s: String): String = when {
+        s.length >= 2 && s[0] == '"' && s.last() == '"' -> unescape(s.substring(1, s.length - 1))
+        s.length >= 2 && s[0] == '\'' && s.last() == '\'' -> s.substring(1, s.length - 1)
+        else -> s
+    }
+
+    private fun unescape(s: String): String {
+        if ('\\' !in s) return s
+        val out = StringBuilder(s.length)
+        var i = 0
+        while (i < s.length) {
+            val ch = s[i]
+            if (ch == '\\' && i + 1 < s.length && (s[i + 1] == '"' || s[i + 1] == '\\')) {
+                out.append(s[i + 1])
+                i += 2
+            } else {
+                out.append(ch)
+                i++
+            }
         }
+        return out.toString()
+    }
 
     private fun splitTopLevel(text: String, delimiter: Char): List<String> {
         val parts = mutableListOf<String>()

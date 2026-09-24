@@ -60,9 +60,9 @@ public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries)
                 is YamlList -> {
                     val items = node.items.map { if (it is YamlTaggedNode) it.innerNode else it }
                     if (items.all { it is YamlScalar || it is YamlNull }) {
-                        if (key.isNotEmpty()) out[key] = items.joinToString(prefix = "[", postfix = "]") {
-                            if (it is YamlScalar) "\"${it.content}\"" else ""
-                        }
+                        // Null items are dropped, the same as null values in a mapping
+                        if (key.isNotEmpty()) out[key] = items.filterIsInstance<YamlScalar>()
+                            .joinToString(prefix = "[", postfix = "]") { quote(it.content) }
                     } else {
                         items.forEachIndexed { i, item -> collect(item, join(key, i.toString()), out) }
                     }
@@ -71,5 +71,8 @@ public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries)
         }
 
         private fun join(prefix: String, key: String) = if (prefix.isEmpty()) key else "$prefix.$key"
+
+        // Escaped the way Converters.list unquotes it, so items may contain `"`, `,` or a trailing `\`
+        private fun quote(s: String): String = "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
     }
 }
