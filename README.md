@@ -350,6 +350,39 @@ val loader = ConfigLoader {
 
 `loadYamlResource`, `loadPropertiesResource` and `loadDotEnvResource` work the same way. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
 
+### Baked config (Gradle plugin)
+
+The `io.github.fiol-dev.konstant` Gradle plugin compiles config files into the app, choosing files per environment at build time. This suits values that differ per flavor or stage but shouldn't be read from disk at runtime.
+
+```kotlin
+// build.gradle.kts
+plugins {
+    id("io.github.fiol-dev.konstant")
+}
+
+konstant {
+    packageName.set("com.example.config")
+    bake("config/app.toml")                          // always baked
+    bake("config/app.{env}.toml", optional = true)   // overrides app.toml when present
+}
+```
+
+`{env}` is the environment: `dev` by default, set with `./gradlew build -Pkonstant.env=prod` or `environment.set(...)`. A missing file fails the build unless it is `optional`. Files can be `.toml`, `.yaml`/`.yml`, `.properties` or `.env`; later files override earlier ones.
+
+The plugin generates `KonstantBaked` (rename it with `objectName`) and adds it to `commonMain` (or `main` on JVM and Android projects):
+
+```kotlin
+val loader = ConfigLoader {
+    sources {
+        +EnvSource()              // runtime values still win
+        +KonstantBaked.sources
+    }
+}
+println(KonstantBaked.ENVIRONMENT) // "prod"
+```
+
+The module using the baked sources needs `konstant-sources` as a dependency.
+
 ### `MapSource` (testing)
 
 For unit tests, use `MapSource` from `konstant-test`:
@@ -531,6 +564,7 @@ konstant/
 +-- konstant-sources/        # EnvSource, DotEnvSource, PropertiesSource
 |                             # with expect/actual per platform
 +-- konstant-test/           # MapSource for unit testing configs
++-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
 ## Platform Support
