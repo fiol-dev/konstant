@@ -336,6 +336,33 @@ The built-in YAML parser is pure Kotlin (zero dependencies):
 - Quoted strings (`"..."` and `'...'`)
 - Comments (`#`)
 
+### Full TOML and YAML (`konstant-toml`, `konstant-yaml`)
+
+The built-in parsers above cover common config files. For the full TOML 1.0 and YAML 1.2 specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections), add the optional modules. They are backed by [ktoml](https://github.com/orchestr7/ktoml) and [kaml](https://github.com/charleskorn/kaml) and work on every Konstant target:
+
+```kotlin
+// build.gradle.kts
+commonMain.dependencies {
+    implementation("io.github.fiol-dev.konstant:konstant-toml:<version>")
+    implementation("io.github.fiol-dev.konstant:konstant-yaml:<version>")
+}
+```
+
+```kotlin
+import io.github.fiol_dev.konstant.toml.TomlSource
+import io.github.fiol_dev.konstant.yaml.YamlSource
+
+val loader = ConfigLoader {
+    sources {
+        +EnvSource()
+        +YamlSource.fromResource("config.local.yaml", optional = true)
+        +TomlSource.fromResource("config.toml")   // or fromFile / fromString
+    }
+}
+```
+
+Keys work the same as with the built-in sources: tables and mappings become `dot.notation` keys, arrays become lists, and entries of an array of tables (or a YAML list of mappings) are numbered, as in `servers.0.name`. Import these classes by name rather than with `*` when you also use `konstant-sources`, which has classes with the same names.
+
 ### Bundled resources (mobile)
 
 Apps usually ship config inside the package rather than as files on disk. The `load*Resource` functions read it from wherever each platform bundles files:
@@ -599,6 +626,8 @@ konstant/
 |                             # with expect/actual per platform
 +-- konstant-test/           # MapSource for unit testing configs
 +-- konstant-koin/           # Koin integration: config<T>() definitions
++-- konstant-toml/           # Full TOML 1.0 source (ktoml)
++-- konstant-yaml/           # Full YAML 1.2 source (kaml)
 +-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
