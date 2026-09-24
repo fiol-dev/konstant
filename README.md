@@ -102,6 +102,21 @@ class HttpServer {
 
 The config is published once as an immutable snapshot, so reads are thread-safe on every platform. Calling `init` a second time fails; tests call `Konstant.reset()` between cases. If one spec type appears twice (say `primary` and `replica` databases), `Konstant.get` refuses to pick one, so read it through its parent instead.
 
+**With Koin** -- add `konstant-koin` and declare the specs you inject:
+
+```kotlin
+import io.github.fiol_dev.konstant.koin.config
+
+val configModule = module {
+    config<AppConfig>()
+    config<DatabaseConfig>()
+}
+
+class UserRepository(private val db: DatabaseConfig)
+```
+
+Each `config<T>()` is a Koin single that reads `Konstant.get<T>()` on first injection, so call `Konstant.initAppConfig { ... }` before anything injects a config.
+
 **Option B: Property delegates** -- lazy, cached field extraction.
 
 ```kotlin
@@ -583,6 +598,7 @@ konstant/
 +-- konstant-sources/        # EnvSource, DotEnvSource, PropertiesSource
 |                             # with expect/actual per platform
 +-- konstant-test/           # MapSource for unit testing configs
++-- konstant-koin/           # Koin integration: config<T>() definitions
 +-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
