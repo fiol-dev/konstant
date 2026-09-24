@@ -1,5 +1,8 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.json
 
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.core.MapBackedSource
 import io.github.fiol_dev.konstant.sources.readFileText

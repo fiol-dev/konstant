@@ -1,3 +1,5 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.yaml
 
 import com.charleskorn.kaml.AnchorsAndAliases
@@ -10,6 +12,7 @@ import com.charleskorn.kaml.YamlNode
 import com.charleskorn.kaml.YamlNull
 import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.YamlTaggedNode
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.core.MapBackedSource
 import io.github.fiol_dev.konstant.sources.readFileText

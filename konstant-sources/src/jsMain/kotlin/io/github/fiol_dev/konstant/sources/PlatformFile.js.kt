@@ -1,4 +1,8 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.sources
+
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 
 // No literal require('fs'): browser bundlers would try to resolve 'fs' and fail the build
 // (webpack also rewrites `typeof require`), so the old-Node fallback is guarded by try instead
@@ -9,6 +13,7 @@ internal fun nodeFs(): dynamic = js(
         " })()"
 )
 
+@InternalKonstantApi
 public actual fun readFileText(path: String): String {
     val fs = nodeFs() ?: throw UnsupportedOperationException(BROWSER_FILES_MESSAGE)
     return fs.readFileSync(path, "utf8") as String

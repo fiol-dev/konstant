@@ -1,5 +1,8 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.sources.source
 
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.sources.readResourceText
 import io.github.fiol_dev.konstant.sources.requireResourceText
 

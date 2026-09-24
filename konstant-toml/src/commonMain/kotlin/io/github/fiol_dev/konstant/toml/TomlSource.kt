@@ -1,3 +1,5 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.toml
 
 import com.akuleshov7.ktoml.TomlInputConfig
@@ -13,6 +15,7 @@ import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlDouble
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlLiteralString
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlNull
 import com.akuleshov7.ktoml.tree.nodes.pairs.values.TomlValue
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.core.MapBackedSource
 import io.github.fiol_dev.konstant.sources.readFileText

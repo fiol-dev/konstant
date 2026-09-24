@@ -1,4 +1,8 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.sources
+
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 
 /**
  * Reads a text file shipped inside the app, or null if there is none at [path]:
@@ -9,6 +13,7 @@ package io.github.fiol_dev.konstant.sources
  * - JS and Wasm on Node, and Linux: a file at [path], relative to the working directory
  * - Browsers: nothing, so this returns null. Bake config with the Konstant Gradle plugin instead
  */
+@InternalKonstantApi
 public expect fun readResourceText(path: String): String?
 
 internal fun requireResourceText(path: String): String =
