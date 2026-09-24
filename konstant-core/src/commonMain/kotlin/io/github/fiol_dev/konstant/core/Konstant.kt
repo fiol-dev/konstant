@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
  *     }
  * }
  *
- * // Anywhere else, no register() calls needed for nested specs
+ * // Anywhere else, including nested specs
  * val db = Konstant.get<DatabaseConfig>()
  * val port = Konstant[AppConfig::class].server.port
  * ```

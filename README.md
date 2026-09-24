@@ -638,24 +638,24 @@ The KSP processor emits a **compilation error** (not a warning) for:
 
 For each `@ConfigSpec` class, the processor generates:
 
-**1. A schema object** with one `FieldDescriptor` per property:
+**1. A schema object** with one `FieldDescriptor` per property. The loader reads it; it is marked `@InternalKonstantApi` and may change between releases, so application code shouldn't depend on it:
 
 ```kotlin
 object DatabaseConfigSchema {
     val url = FieldDescriptor<String>(
         propertyName = "url",
-        envKey = "URL",
-        required = true,
+        typeName = "String",
         secret = false,
         default = null,
+        hasDefault = false,
         convert = { it }
     )
     val port = FieldDescriptor<Int>(
         propertyName = "port",
-        envKey = "PORT",
-        required = false,
+        typeName = "Int",
         secret = false,
         default = 5432,
+        hasDefault = true,
         convert = String::toInt
     )
     // ...
