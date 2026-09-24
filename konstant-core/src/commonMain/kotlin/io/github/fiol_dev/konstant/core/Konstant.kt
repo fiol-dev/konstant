@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
  *     }
  * }
  *
- * // Anywhere else, no register() calls needed for nested specs
+ * // Anywhere else, including nested specs
  * val db = Konstant.get<DatabaseConfig>()
  * val port = Konstant[AppConfig::class].server.port
  * ```
@@ -53,11 +53,10 @@ public object Konstant {
         val installed = configs - ambiguous
         while (true) {
             val current = snapshot.load()
-            check(!current.installed) {
+            check(current.configs.isEmpty()) {
                 "Konstant is already initialized. Call Konstant.reset() first (for example between tests)."
             }
-            // Keep configs added with the deprecated register(), so both styles can be mixed while migrating
-            val next = Snapshot(current.configs + installed, ambiguous, installed = true)
+            val next = Snapshot(installed, ambiguous)
             if (snapshot.compareAndSet(current, next)) return
         }
     }
@@ -77,7 +76,6 @@ public object Konstant {
     /** Clears the loaded config. Meant for tests. */
     public fun reset() {
         snapshot.store(Snapshot.EMPTY)
-        legacyLoader.store(null)
     }
 
     private fun missingMessage(type: KClass<*>): String {
@@ -93,46 +91,12 @@ public object Konstant {
         }
     }
 
-    // ---- Deprecated manual registry ----
-
-    @Deprecated("Use the generated Konstant.init<Spec> { ... }, which loads and installs the config.")
-    public val loader: ConfigLoader
-        get() = legacyLoader.load() ?: error("Konstant not initialized. Call Konstant.init { ... } first.")
-
-    private val legacyLoader = AtomicReference<ConfigLoader?>(null)
-
-    @Deprecated("Use the generated Konstant.init<Spec> { ... }, which loads and installs the config.")
-    public fun init(block: ConfigLoaderBuilder.() -> Unit): ConfigLoader {
-        val l = ConfigLoader(block)
-        legacyLoader.store(l)
-        return l
-    }
-
-    @Deprecated("Nested specs are installed automatically by the generated Konstant.init<Spec> { ... }.")
-    public inline fun <reified T : Any> register(config: T) {
-        @Suppress("DEPRECATION")
-        register(T::class, config)
-    }
-
-    @Deprecated("Nested specs are installed automatically by the generated Konstant.init<Spec> { ... }.")
-    public fun <T : Any> register(type: KClass<T>, config: T) {
-        while (true) {
-            val current = snapshot.load()
-            val next = Snapshot(current.configs + (type to config), current.ambiguous - type, current.installed)
-            if (snapshot.compareAndSet(current, next)) return
-        }
-    }
-
-    @Deprecated("Use getOrNull<T>() != null.")
-    public fun <T : Any> has(config: T): Boolean = snapshot.load().configs.containsKey(config::class)
-
     private class Snapshot(
         val configs: Map<KClass<*>, Any>,
         val ambiguous: Set<KClass<*>>,
-        val installed: Boolean,
     ) {
         companion object {
-            val EMPTY = Snapshot(emptyMap(), emptySet(), installed = false)
+            val EMPTY = Snapshot(emptyMap(), emptySet())
         }
     }
 }

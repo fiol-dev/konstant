@@ -4,6 +4,7 @@ import io.github.fiol_dev.konstant.core.ConfigError
 import io.github.fiol_dev.konstant.core.ConfigLoader
 import io.github.fiol_dev.konstant.core.ConfigResult
 import io.github.fiol_dev.konstant.core.ConfigSource
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.ksptests.other.CacheConfig
 import io.github.fiol_dev.konstant.ksptests.other.Mode
 import io.github.fiol_dev.konstant.sources.source.PropertiesSource
@@ -146,10 +147,10 @@ class TypesLoaderTest {
         assertEquals(6, config.database.pool.size)
     }
 
+    @OptIn(InternalKonstantApi::class)
     @Test
     fun describesOptionalNullableFieldInSchema() {
         assertTrue(TypesConfigSchema.nickname.hasDefault)
-        assertEquals(false, TypesConfigSchema.nickname.required)
         assertNull(TypesConfigSchema.nickname.default)
         assertEquals("Map<String, Double>", TypesConfigSchema.weights.typeName)
     }

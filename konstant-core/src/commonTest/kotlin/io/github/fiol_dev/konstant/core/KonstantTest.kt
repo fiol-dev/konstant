@@ -102,33 +102,4 @@ class KonstantTest {
 
         assertSame(config.db, Konstant.get<TestDbConfig>())
     }
-
-    @Suppress("DEPRECATION")
-    @Test
-    fun registeredConfigsSurviveALaterInstall() {
-        Konstant.register(config.server)
-        Konstant.install(config, listOf(config.db))
-
-        assertSame(config.server, Konstant.get<TestServerConfig>())
-        assertSame(config.db, Konstant.get<TestDbConfig>())
-    }
-
-    @Suppress("DEPRECATION")
-    @Test
-    fun resetClearsTheDeprecatedLoader() {
-        Konstant.init { }
-        Konstant.reset()
-
-        assertFailsWith<IllegalStateException> { Konstant.loader }
-    }
-
-    @Suppress("DEPRECATION")
-    @Test
-    fun deprecatedRegisterStillWorks() {
-        Konstant.register(config)
-        Konstant.register(config.db)
-
-        assertSame(config, Konstant.get<TestAppConfig>())
-        assertTrue(Konstant.has(config.db))
-    }
 }

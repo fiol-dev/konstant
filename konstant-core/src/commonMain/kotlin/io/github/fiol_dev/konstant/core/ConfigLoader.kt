@@ -1,3 +1,5 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.core
 
 public class ConfigLoader private constructor(
@@ -24,6 +26,8 @@ public class ConfigLoader private constructor(
         return ConfigReport(result, entries)
     }
 
+    /** Resolves one field from the sources in priority order. Called by generated code. */
+    @InternalKonstantApi
     public fun <T> resolve(field: FieldDescriptor<T>, prefix: String?): ResolveResult<T> {
         for ((index, source) in sources.withIndex()) {
             val formats = listOf(source.keyFormat) + source.fallbackKeyFormats
@@ -103,7 +107,7 @@ public class ConfigLoaderBuilder {
         sourceList.addAll(builder.sources)
     }
 
-    public fun buildSources(): List<ConfigSource> = sourceList.toList()
+    internal fun buildSources(): List<ConfigSource> = sourceList.toList()
 }
 
 public class SourcesBuilder {

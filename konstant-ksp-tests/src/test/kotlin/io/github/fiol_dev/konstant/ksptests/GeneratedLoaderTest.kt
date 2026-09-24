@@ -4,6 +4,7 @@ import io.github.fiol_dev.konstant.core.ConfigError
 import io.github.fiol_dev.konstant.core.ConfigLoader
 import io.github.fiol_dev.konstant.core.ConfigResult
 import io.github.fiol_dev.konstant.core.ConfigSource
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.sources.source.PropertiesSource
 import io.github.fiol_dev.konstant.test.MapSource
 import kotlin.test.Test
@@ -141,11 +142,11 @@ class GeneratedLoaderTest {
         assertEquals(listOf("DATABASE_URL"), errors.map { it.key })
     }
 
+    @OptIn(InternalKonstantApi::class)
     @Test
     fun generatesSchemaDescriptors() {
-        assertEquals("MAX_POOL_SIZE", DatabaseConfigSchema.maxPoolSize.envKey)
-        assertTrue(DatabaseConfigSchema.url.required)
-        assertFalse(DatabaseConfigSchema.maxPoolSize.required)
+        assertFalse(DatabaseConfigSchema.url.hasDefault)
+        assertTrue(DatabaseConfigSchema.maxPoolSize.hasDefault)
         assertEquals(10, DatabaseConfigSchema.maxPoolSize.default)
         assertTrue(AnnotatedConfigSchema.password.secret)
         assertEquals("CUSTOM_API_KEY", AnnotatedConfigSchema.apiKey.customKey)

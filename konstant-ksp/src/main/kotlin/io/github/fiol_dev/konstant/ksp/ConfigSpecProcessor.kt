@@ -384,6 +384,7 @@ class ConfigSpecProcessor(
 
         val code = buildString {
             appendLine("@file:Suppress(\"UNCHECKED_CAST\", \"RedundantSuppression\", \"UnusedImport\")")
+            appendLine("@file:OptIn(io.github.fiol_dev.konstant.core.InternalKonstantApi::class)")
             appendLine()
             if (packageName.isNotEmpty()) {
                 appendLine("package $packageName")
@@ -421,9 +422,7 @@ class ConfigSpecProcessor(
 
             appendLine("    val $propName = FieldDescriptor<$codeType>(")
             appendLine("        propertyName = \"$propName\",")
-            appendLine("        envKey = \"${camelToScreamingSnake(propName)}\",")
             appendLine("        typeName = \"${kind.type.display}\",")
-            appendLine("        required = ${!hasDefault},")
             appendLine("        secret = $isSecret,")
             appendLine("        default = ${defaultExpr ?: "null"},")
             appendLine("        hasDefault = $hasDefault,")
@@ -523,12 +522,5 @@ class ConfigSpecProcessor(
                 it.annotationType.resolve().declaration.qualifiedName?.asString() == Key::class.qualifiedName
         } ?: return null
         return keyAnnotation.arguments.firstOrNull()?.value as? String
-    }
-
-    private fun camelToScreamingSnake(name: String): String = buildString {
-        for ((i, ch) in name.withIndex()) {
-            if (ch.isUpperCase() && i > 0) append('_')
-            append(ch.uppercaseChar())
-        }
     }
 }
