@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <provider
+            android:name="io.github.fiol_dev.konstant.sources.KonstantInitProvider"
+            android:authorities="${applicationId}.konstant-init"
+            android:exported="false" />
+    </application>
+</manifest>
