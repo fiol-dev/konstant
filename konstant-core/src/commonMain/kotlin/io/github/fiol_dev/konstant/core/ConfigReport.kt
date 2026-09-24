@@ -11,9 +11,17 @@ public class ConfigReport<out T>(
     /**
      * One field. [origin] is the source that supplied it (`#2 TomlSource`, numbered in
      * priority order), [DEFAULT] or [MISSING]. [value] is the raw text, `***` for secrets,
-     * or null when missing.
+     * or null when missing. A plain class rather than a data class, so fields can be added
+     * later; entries still compare by value.
      */
-    public data class Entry(val key: String, val value: String?, val origin: String)
+    public class Entry(public val key: String, public val value: String?, public val origin: String) {
+        override fun equals(other: Any?): Boolean =
+            other is Entry && other.key == key && other.value == value && other.origin == origin
+
+        override fun hashCode(): Int = (key.hashCode() * 31 + value.hashCode()) * 31 + origin.hashCode()
+
+        override fun toString(): String = "Entry(key=$key, value=$value, origin=$origin)"
+    }
 
     override fun toString(): String {
         if (entries.isEmpty()) return "(no fields)"

@@ -1,14 +1,16 @@
 package io.github.fiol_dev.konstant.test
 
-import io.github.fiol_dev.konstant.core.ConfigSource
 import io.github.fiol_dev.konstant.core.KeyFormat
+import io.github.fiol_dev.konstant.core.MapBackedSource
 
+/**
+ * An in-memory source for tests. Like the real sources, lookups fall back to a
+ * case-insensitive match and `Map` fields read their entries through [children].
+ */
 public class MapSource(
-    private val values: Map<String, String>,
+    values: Map<String, String>,
     override val keyFormat: KeyFormat = KeyFormat.RAW,
-) : ConfigSource {
-    override fun get(key: String): String? = values[key]
-
+) : MapBackedSource(values) {
     public companion object {
         public fun of(vararg pairs: Pair<String, String>): MapSource =
             MapSource(mapOf(*pairs))
