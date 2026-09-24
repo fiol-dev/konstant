@@ -25,10 +25,13 @@ kotlin {
         nodejs()
         browser { testTask { useKarma { useChromeHeadless() } } }
     }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        nodejs()
-        browser { testTask { useKarma { useChromeHeadless() } } }
+    // A module can opt out with konstant.wasmJs=false in its gradle.properties when a dependency's wasm build is broken
+    if (findProperty("konstant.wasmJs")?.toString() != "false") {
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmJs {
+            nodejs()
+            browser { testTask { useKarma { useChromeHeadless() } } }
+        }
     }
     linuxX64()
     macosArm64()

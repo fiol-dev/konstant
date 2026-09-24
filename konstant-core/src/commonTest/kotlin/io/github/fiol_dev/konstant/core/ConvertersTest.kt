@@ -73,4 +73,9 @@ class ConvertersTest {
     fun mapEntriesConvertsValues() {
         assertEquals(mapOf("a" to 1), Converters.mapEntries(mapOf("a" to "1")) { it.toInt() })
     }
+
+    @Test
+    fun doubleQuotedItemsUnescapeQuotesAndBackslashes() {
+        assertEquals(listOf("x\", \"y", "C:\\dir\\", "a\\b"), Converters.list("[\"x\\\", \\\"y\", \"C:\\\\dir\\\\\", 'a\\b']") { it })
+    }
 }
