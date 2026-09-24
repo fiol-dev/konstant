@@ -15,10 +15,10 @@ class ConfigDelegateTest {
     @BeforeTest
     fun setup() {
         Konstant.reset()
-        Konstant.register(appConfig)
+        Konstant.install(appConfig, listOf(appConfig.db, appConfig.server))
     }
 
-    // -- configField<T, V> { } delegate (global registry) --
+    // -- configField<T, V> { } delegate (global holder) --
 
     @Test
     fun configField_extractsField() {
@@ -43,7 +43,6 @@ class ConfigDelegateTest {
 
     @Test
     fun configField_fromSpecificType() {
-        Konstant.register(appConfig.db)
         val url: String by configField<TestDbConfig, String> { it.url }
         assertEquals("jdbc:delegate", url)
     }

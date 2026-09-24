@@ -72,52 +72,48 @@ println(config.server.port)     // 8080
 
 ### 3. Access config fields anywhere in your codebase
 
-**Option A: Global registry** -- initialize once at startup, access anywhere.
+**Option A: Global holder** -- load once at startup, read any spec anywhere.
+
+KSP generates `Konstant.init<Spec>` for every `@ConfigSpec`. It loads the config (throwing `ConfigException` on errors) and makes the root and every nested spec readable through `Konstant.get`:
 
 ```kotlin
 import io.github.fiol_dev.konstant.core.Konstant
 
-// At application startup (main, DI init, etc.)
+// At application startup (main, Application.onCreate, DI init, etc.)
 fun main() {
-    Konstant.init {
+    Konstant.initAppConfig {
         sources {
             +EnvSource()
             +loadTomlFile("config.toml")
         }
     }
-
-    val config = Konstant.loader.loadAppConfig().getOrThrow()
-    Konstant.register(config)            // register the root config
-    Konstant.register(config.database)   // also register nested configs individually
-    Konstant.register(config.server)
-
     startApp()
 }
 
-// Anywhere else in your codebase
+// Anywhere else in your codebase, nested specs included
 class UserRepository {
     private val dbUrl = Konstant.get<DatabaseConfig>().url
-    private val maxPool = Konstant.get<DatabaseConfig>().maxPoolSize
 }
 
 class HttpServer {
     private val port = Konstant.get<ServerConfig>().port
-    private val debug = Konstant.get<ServerConfig>().debug
 }
 ```
+
+The config is published once as an immutable snapshot, so reads are thread-safe on every platform. Calling `init` a second time fails; tests call `Konstant.reset()` between cases. If one spec type appears twice (say `primary` and `replica` databases), `Konstant.get` refuses to pick one, so read it through its parent instead.
 
 **Option B: Property delegates** -- lazy, cached field extraction.
 
 ```kotlin
 import io.github.fiol_dev.konstant.core.configField
 
-// From the global registry (requires Konstant.register() at startup)
+// From the global holder (after Konstant.initAppConfig at startup)
 class UserRepository {
     private val dbUrl: String by configField<AppConfig, String> { it.database.url }
     private val maxPool: Int by configField<AppConfig, Int> { it.database.maxPoolSize }
 }
 
-// From a specific config instance (no global registry needed)
+// From a specific config instance (no global holder needed)
 import io.github.fiol_dev.konstant.core.field
 
 val appConfig: AppConfig = loader.loadAppConfig().getOrThrow()
@@ -552,6 +548,14 @@ fun ConfigLoader.loadDatabaseConfig(prefix: String? = null): ConfigResult<Databa
 ```
 
 Nested `@ConfigSpec` types recursively call their own generated loader, passing the resolved prefix down.
+
+**3. Holder functions** for [global access](#3-access-config-fields-anywhere-in-your-codebase):
+
+```kotlin
+fun Konstant.initDatabaseConfig(prefix: String? = null, block: ConfigLoaderBuilder.() -> Unit): DatabaseConfig
+fun Konstant.initDatabaseConfig(loader: ConfigLoader, prefix: String? = null): DatabaseConfig
+fun DatabaseConfig.konstantNestedConfigs(): List<Any> // every nested spec, at any depth
+```
 
 ## Module Structure
 

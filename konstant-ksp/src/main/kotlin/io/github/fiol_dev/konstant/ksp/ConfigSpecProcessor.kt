@@ -359,7 +359,9 @@ class ConfigSpecProcessor(
             "io.github.fiol_dev.konstant.core.ConfigLoader",
             "io.github.fiol_dev.konstant.core.ConfigResult",
             "io.github.fiol_dev.konstant.core.FieldDescriptor",
+            "io.github.fiol_dev.konstant.core.ConfigLoaderBuilder",
             "io.github.fiol_dev.konstant.core.KeyUtils",
+            "io.github.fiol_dev.konstant.core.Konstant",
             "io.github.fiol_dev.konstant.core.ResolveResult",
         )
         imports += DefaultValueExtractor.extractImports(decl)
@@ -369,6 +371,7 @@ class ConfigSpecProcessor(
                 val nestedPackage = kind.decl.packageName.asString()
                 if (nestedPackage != packageName) {
                     imports += "$nestedPackage.load${kind.decl.simpleName.asString()}"
+                    imports += "$nestedPackage.konstantNestedConfigs"
                 }
             }
         }
@@ -392,6 +395,8 @@ class ConfigSpecProcessor(
             generateSchema(className, fields, defaultValues)
             appendLine()
             generateLoader(className, fields)
+            appendLine()
+            generateHolder(className, fields)
         }
 
         file.write(code.toByteArray())
@@ -481,6 +486,32 @@ class ConfigSpecProcessor(
         appendLine("            reason = e.message ?: \"rejected by $className\",")
         appendLine("        )))")
         appendLine("    }")
+        appendLine("}")
+    }
+
+    /** Loads the spec into the global [Konstant] holder, together with every nested spec. */
+    private fun StringBuilder.generateHolder(className: String, fields: List<Field>) {
+        appendLine("/** Every nested @ConfigSpec inside this config, at any depth. Used by [Konstant.init$className]. */")
+        appendLine("fun $className.konstantNestedConfigs(): List<Any> = buildList {")
+        for (field in fields) {
+            if (field.kind !is FieldKind.Nested) continue
+            appendLine("    add(${field.name})")
+            appendLine("    addAll(${field.name}.konstantNestedConfigs())")
+        }
+        appendLine("}")
+        appendLine()
+        appendLine("/**")
+        appendLine(" * Loads [$className] from the sources in [block] and makes it and its nested specs")
+        appendLine(" * available through Konstant.get. Throws ConfigException if loading fails.")
+        appendLine(" */")
+        appendLine("fun Konstant.init$className(prefix: String? = null, block: ConfigLoaderBuilder.() -> Unit): $className =")
+        appendLine("    init$className(ConfigLoader(block), prefix)")
+        appendLine()
+        appendLine("/** Like the builder overload, with an existing [loader]. */")
+        appendLine("fun Konstant.init$className(loader: ConfigLoader, prefix: String? = null): $className {")
+        appendLine("    val config = loader.load$className(prefix).getOrThrow()")
+        appendLine("    install(config, config.konstantNestedConfigs())")
+        appendLine("    return config")
         appendLine("}")
     }
 

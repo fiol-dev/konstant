@@ -1,9 +1,12 @@
 package io.github.fiol_dev.konstant.core
 
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 data class TestDbConfig(
@@ -22,69 +25,84 @@ data class TestAppConfig(
     val server: TestServerConfig,
 )
 
+data class TestReplicatedConfig(
+    val primary: TestDbConfig,
+    val replica: TestDbConfig,
+)
+
 class KonstantTest {
 
-    private fun sampleConfig() = TestAppConfig(
+    private val config = TestAppConfig(
         appName = "TestApp",
         db = TestDbConfig(url = "jdbc:test", port = 5432),
         server = TestServerConfig(host = "localhost", debug = true),
     )
 
-    @Test
-    fun register_and_get() {
+    @AfterTest
+    fun cleanup() {
         Konstant.reset()
-        val cfg = sampleConfig()
-        Konstant.register(cfg)
-
-        val retrieved = Konstant.get<TestAppConfig>()
-        assertEquals(cfg, retrieved)
     }
 
     @Test
-    fun get_byClass() {
-        Konstant.reset()
-        val cfg = sampleConfig()
-        Konstant.register(cfg)
+    fun installedRootAndNestedConfigsAreReadable() {
+        Konstant.install(config, listOf(config.db, config.server))
 
-        val retrieved = Konstant[TestAppConfig::class]
-        assertEquals("TestApp", retrieved.appName)
-    }
-
-    @Test
-    fun register_multiple_types() {
-        Konstant.reset()
-        val db = TestDbConfig("jdbc:test", 3306)
-        val server = TestServerConfig("0.0.0.0", false)
-        Konstant.register(db)
-        Konstant.register(server)
-
+        assertTrue(Konstant.isInitialized)
+        assertSame(config, Konstant.get<TestAppConfig>())
         assertEquals("jdbc:test", Konstant.get<TestDbConfig>().url)
-        assertEquals("0.0.0.0", Konstant.get<TestServerConfig>().host)
+        assertEquals("localhost", Konstant[TestServerConfig::class].host)
     }
 
     @Test
-    fun get_unregistered_throws() {
-        Konstant.reset()
-        assertFails { Konstant.get<TestDbConfig>() }
+    fun readingBeforeInitExplainsWhatToCall() {
+        assertFalse(Konstant.isInitialized)
+        val error = assertFailsWith<IllegalStateException> { Konstant.get<TestDbConfig>() }
+        assertTrue("not initialized" in error.message.orEmpty(), error.message)
     }
 
     @Test
-    fun has_returnsCorrectly() {
-        val testDbConfig = TestDbConfig("jdbc:test", 3306)
-        Konstant.reset()
-        assertFalse(Konstant.has(testDbConfig))
-        Konstant.register(testDbConfig)
-        assertTrue(Konstant.has(testDbConfig))
+    fun missingTypeReturnsNullFromGetOrNull() {
+        Konstant.install(config)
+
+        assertNull(Konstant.getOrNull<TestDbConfig>())
+        assertFailsWith<IllegalStateException> { Konstant.get<TestDbConfig>() }
     }
 
     @Test
-    fun reset_clearsAll() {
-        val sampleConfig = sampleConfig()
-        Konstant.reset()
-        Konstant.register(sampleConfig)
-        assertTrue(Konstant.has(sampleConfig))
+    fun secondInstallFailsUntilReset() {
+        Konstant.install(config)
+
+        assertFailsWith<IllegalStateException> { Konstant.install(config) }
 
         Konstant.reset()
-        assertFalse(Konstant.has(sampleConfig))
+        Konstant.install(config.copy(appName = "Other"))
+        assertEquals("Other", Konstant.get<TestAppConfig>().appName)
+    }
+
+    @Test
+    fun typeUsedTwiceIsNotGuessed() {
+        val replicated = TestReplicatedConfig(TestDbConfig("a", 1), TestDbConfig("b", 2))
+        Konstant.install(replicated, listOf(replicated.primary, replicated.replica))
+
+        val error = assertFailsWith<IllegalStateException> { Konstant.get<TestDbConfig>() }
+        assertTrue("more than once" in error.message.orEmpty(), error.message)
+        assertEquals("b", Konstant.get<TestReplicatedConfig>().replica.url)
+    }
+
+    @Test
+    fun sameInstanceListedTwiceIsNotAmbiguous() {
+        Konstant.install(config, listOf(config.db, config.db))
+
+        assertSame(config.db, Konstant.get<TestDbConfig>())
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun deprecatedRegisterStillWorks() {
+        Konstant.register(config)
+        Konstant.register(config.db)
+
+        assertSame(config, Konstant.get<TestAppConfig>())
+        assertTrue(Konstant.has(config.db))
     }
 }
