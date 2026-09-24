@@ -12,4 +12,6 @@ public data class FieldDescriptor<T>(
     public val convert: (String) -> T,
     /** Builds the value from [ConfigSource.children] when the key itself is absent (Map fields). */
     public val convertChildren: ((Map<String, String>) -> T)? = null,
+    /** Returns an error message when a converted value breaks a validation annotation. */
+    public val validate: ((T) -> String?)? = null,
 )
