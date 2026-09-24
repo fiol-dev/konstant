@@ -1,5 +1,6 @@
 package io.github.fiol_dev.konstant.core
 
+@InternalKonstantApi
 public object KeyUtils {
 
     public fun camelToScreamingSnake(name: String): String = buildString {

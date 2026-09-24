@@ -1,10 +1,10 @@
 package io.github.fiol_dev.konstant.core
 
-public data class FieldDescriptor<T>(
+/** Describes one config field for [ConfigLoader.resolve]. Built by generated code. */
+@InternalKonstantApi
+public class FieldDescriptor<T>(
     public val propertyName: String,
-    public val envKey: String,
     public val typeName: String,
-    public val required: Boolean,
     public val secret: Boolean,
     public val default: T?,
     public val hasDefault: Boolean,

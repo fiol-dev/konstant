@@ -1,8 +1,10 @@
 package io.github.fiol_dev.konstant.core
 
+/** The outcome of resolving one field. Used by generated code. */
+@InternalKonstantApi
 public sealed class ResolveResult<out T> {
-    public data class Success<T>(val value: T) : ResolveResult<T>()
-    public data class Error(val error: ConfigError) : ResolveResult<Nothing>()
+    public class Success<T>(public val value: T) : ResolveResult<T>()
+    public class Error(public val error: ConfigError) : ResolveResult<Nothing>()
 
     public fun onError(action: (ConfigError) -> Unit): ResolveResult<T> {
         if (this is Error) action(error)

@@ -1,3 +1,5 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.test
 
 import io.github.fiol_dev.konstant.core.*
@@ -39,9 +41,7 @@ data class AppConfig(
 object DatabaseConfigSchema {
     val url = FieldDescriptor(
         propertyName = "url",
-        envKey = "URL",
         typeName = "String",
-        required = true,
         secret = false,
         default = null,
         hasDefault = false,
@@ -49,9 +49,7 @@ object DatabaseConfigSchema {
     )
     val port = FieldDescriptor(
         propertyName = "port",
-        envKey = "PORT",
         typeName = "Int",
-        required = false,
         secret = false,
         default = 5432,
         hasDefault = true,
@@ -59,9 +57,7 @@ object DatabaseConfigSchema {
     )
     val maxPoolSize = FieldDescriptor(
         propertyName = "maxPoolSize",
-        envKey = "MAX_POOL_SIZE",
         typeName = "Int",
-        required = false,
         secret = false,
         default = 10,
         hasDefault = true,
@@ -69,9 +65,7 @@ object DatabaseConfigSchema {
     )
     val password = FieldDescriptor(
         propertyName = "password",
-        envKey = "PASSWORD",
         typeName = "String",
-        required = true,
         secret = true,
         default = null,
         hasDefault = false,
@@ -79,9 +73,7 @@ object DatabaseConfigSchema {
     )
     val apiKey = FieldDescriptor(
         propertyName = "apiKey",
-        envKey = "API_KEY",
         typeName = "String",
-        required = false,
         secret = false,
         default = "",
         hasDefault = true,
@@ -93,9 +85,7 @@ object DatabaseConfigSchema {
 object ServerConfigSchema {
     val host = FieldDescriptor(
         propertyName = "host",
-        envKey = "HOST",
         typeName = "String",
-        required = false,
         secret = false,
         default = "0.0.0.0",
         hasDefault = true,
@@ -103,9 +93,7 @@ object ServerConfigSchema {
     )
     val port = FieldDescriptor(
         propertyName = "port",
-        envKey = "PORT",
         typeName = "Int",
-        required = false,
         secret = false,
         default = 8080,
         hasDefault = true,
@@ -113,9 +101,7 @@ object ServerConfigSchema {
     )
     val debug = FieldDescriptor(
         propertyName = "debug",
-        envKey = "DEBUG",
         typeName = "Boolean",
-        required = false,
         secret = false,
         default = false,
         hasDefault = true,
@@ -126,9 +112,7 @@ object ServerConfigSchema {
 object AppConfigSchema {
     val appName = FieldDescriptor(
         propertyName = "appName",
-        envKey = "APP_NAME",
         typeName = "String",
-        required = false,
         secret = false,
         default = "MyApp",
         hasDefault = true,
@@ -377,9 +361,7 @@ class ConfigLoaderIntegrationTest {
     fun secretField_maskedInConversionError() {
         val secretField = FieldDescriptor(
             propertyName = "password",
-            envKey = "PASSWORD",
             typeName = "Int",
-            required = true,
             secret = true,
             default = null,
             hasDefault = false,
