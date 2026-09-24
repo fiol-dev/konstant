@@ -40,6 +40,7 @@ public object Konstant {
      *
      * @throws IllegalStateException if a config was already installed.
      */
+    @InternalKonstantApi
     public fun install(root: Any, nested: List<Any> = emptyList()) {
         val configs = mutableMapOf<KClass<*>, Any>()
         val ambiguous = mutableSetOf<KClass<*>>()

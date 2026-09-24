@@ -4,6 +4,7 @@ package io.github.fiol_dev.konstant.core
  * Checks used by generated loaders for the validation annotations. Each returns an error
  * message, or null when the value is valid.
  */
+@InternalKonstantApi
 public object Validators {
 
     public fun range(value: Double, min: Double, max: Double): String? = when {

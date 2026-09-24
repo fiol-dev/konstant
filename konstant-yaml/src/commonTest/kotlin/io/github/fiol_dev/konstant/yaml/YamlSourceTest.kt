@@ -1,6 +1,9 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.yaml
 
 import io.github.fiol_dev.konstant.core.Converters
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
