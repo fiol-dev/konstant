@@ -1,80 +1,49 @@
 public final class io/github/fiol_dev/konstant/core/ConfigDelegateKt {
+	public static final fun configField (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)Lkotlin/properties/ReadOnlyProperty;
 	public static final fun field (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Lkotlin/properties/ReadOnlyProperty;
 }
 
 public abstract class io/github/fiol_dev/konstant/core/ConfigError {
+	public fun equals (Ljava/lang/Object;)Z
 	public abstract fun getKey ()Ljava/lang/String;
 	public abstract fun getMessage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigError$ConversionFailed : io/github/fiol_dev/konstant/core/ConfigError {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/fiol_dev/konstant/core/ConfigError$ConversionFailed;
-	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/core/ConfigError$ConversionFailed;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/core/ConfigError$ConversionFailed;
-	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCause ()Ljava/lang/String;
 	public fun getKey ()Ljava/lang/String;
 	public fun getMessage ()Ljava/lang/String;
 	public final fun getRawValue ()Ljava/lang/String;
 	public final fun getTargetType ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigError$MissingRequired : io/github/fiol_dev/konstant/core/ConfigError {
 	public fun <init> (Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;)Lio/github/fiol_dev/konstant/core/ConfigError$MissingRequired;
-	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/core/ConfigError$MissingRequired;Ljava/lang/String;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/core/ConfigError$MissingRequired;
-	public fun equals (Ljava/lang/Object;)Z
 	public fun getKey ()Ljava/lang/String;
 	public fun getMessage ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigError$NestedFailure : io/github/fiol_dev/konstant/core/ConfigError {
 	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/util/List;
-	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/fiol_dev/konstant/core/ConfigError$NestedFailure;
-	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/core/ConfigError$NestedFailure;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/core/ConfigError$NestedFailure;
-	public fun equals (Ljava/lang/Object;)Z
 	public final fun getErrors ()Ljava/util/List;
 	public fun getKey ()Ljava/lang/String;
 	public fun getMessage ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigError$ValidationFailed : io/github/fiol_dev/konstant/core/ConfigError {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/fiol_dev/konstant/core/ConfigError$ValidationFailed;
-	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/core/ConfigError$ValidationFailed;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/core/ConfigError$ValidationFailed;
-	public fun equals (Ljava/lang/Object;)Z
 	public fun getKey ()Ljava/lang/String;
 	public fun getMessage ()Ljava/lang/String;
 	public final fun getRawValue ()Ljava/lang/String;
 	public final fun getReason ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigException : java/lang/RuntimeException {
 	public fun <init> (Ljava/util/List;)V
 	public final fun getErrors ()Ljava/util/List;
-}
-
-public final class io/github/fiol_dev/konstant/core/ConfigFieldDelegate : kotlin/properties/ReadOnlyProperty {
-	public fun <init> (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
-	public fun getValue (Ljava/lang/Object;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigLoader {
@@ -104,11 +73,6 @@ public final class io/github/fiol_dev/konstant/core/ConfigReport$Companion {
 
 public final class io/github/fiol_dev/konstant/core/ConfigReport$Entry {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/fiol_dev/konstant/core/ConfigReport$Entry;
-	public static synthetic fun copy$default (Lio/github/fiol_dev/konstant/core/ConfigReport$Entry;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/core/ConfigReport$Entry;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getKey ()Ljava/lang/String;
 	public final fun getOrigin ()Ljava/lang/String;

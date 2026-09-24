@@ -45,12 +45,6 @@ abstract class io.github.fiol_dev.konstant.core/MapBackedSource : io.github.fiol
     open fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.core/MapBackedSource.get|get(kotlin.String){}[0]
 }
 
-final class <#A: kotlin/Any, #B: kotlin/Any?> io.github.fiol_dev.konstant.core/ConfigFieldDelegate : kotlin.properties/ReadOnlyProperty<kotlin/Any?, #B> { // io.github.fiol_dev.konstant.core/ConfigFieldDelegate|null[0]
-    constructor <init>(kotlin.reflect/KClass<#A>, kotlin/Function1<#A, #B>) // io.github.fiol_dev.konstant.core/ConfigFieldDelegate.<init>|<init>(kotlin.reflect.KClass<1:0>;kotlin.Function1<1:0,1:1>){}[0]
-
-    final fun getValue(kotlin/Any?, kotlin.reflect/KProperty<*>): #B // io.github.fiol_dev.konstant.core/ConfigFieldDelegate.getValue|getValue(kotlin.Any?;kotlin.reflect.KProperty<*>){}[0]
-}
-
 final class <#A: kotlin/Any?> io.github.fiol_dev.konstant.core/FieldDescriptor { // io.github.fiol_dev.konstant.core/FieldDescriptor|null[0]
     constructor <init>(kotlin/String, kotlin/String, kotlin/Boolean, #A?, kotlin/Boolean, kotlin/String? = ..., kotlin/Function1<kotlin/String, #A>, kotlin/Function1<kotlin.collections/Map<kotlin/String, kotlin/String>, #A>? = ..., kotlin/Function1<#A, kotlin/String?>? = ...) // io.github.fiol_dev.konstant.core/FieldDescriptor.<init>|<init>(kotlin.String;kotlin.String;kotlin.Boolean;1:0?;kotlin.Boolean;kotlin.String?;kotlin.Function1<kotlin.String,1:0>;kotlin.Function1<kotlin.collections.Map<kotlin.String,kotlin.String>,1:0>?;kotlin.Function1<1:0,kotlin.String?>?){}[0]
 
@@ -94,10 +88,6 @@ final class <#A: out kotlin/Any?> io.github.fiol_dev.konstant.core/ConfigReport 
         final val value // io.github.fiol_dev.konstant.core/ConfigReport.Entry.value|{}value[0]
             final fun <get-value>(): kotlin/String? // io.github.fiol_dev.konstant.core/ConfigReport.Entry.value.<get-value>|<get-value>(){}[0]
 
-        final fun component1(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigReport.Entry.component1|component1(){}[0]
-        final fun component2(): kotlin/String? // io.github.fiol_dev.konstant.core/ConfigReport.Entry.component2|component2(){}[0]
-        final fun component3(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigReport.Entry.component3|component3(){}[0]
-        final fun copy(kotlin/String = ..., kotlin/String? = ..., kotlin/String = ...): io.github.fiol_dev.konstant.core/ConfigReport.Entry // io.github.fiol_dev.konstant.core/ConfigReport.Entry.copy|copy(kotlin.String;kotlin.String?;kotlin.String){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.core/ConfigReport.Entry.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.core/ConfigReport.Entry.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigReport.Entry.toString|toString(){}[0]
@@ -201,6 +191,10 @@ sealed class io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_de
     abstract val message // io.github.fiol_dev.konstant.core/ConfigError.message|{}message[0]
         abstract fun <get-message>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.message.<get-message>|<get-message>(){}[0]
 
+    open fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.core/ConfigError.equals|equals(kotlin.Any?){}[0]
+    open fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.core/ConfigError.hashCode|hashCode(){}[0]
+    open fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.toString|toString(){}[0]
+
     final class ConversionFailed : io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed|null[0]
         constructor <init>(kotlin/String, kotlin/String, kotlin/String, kotlin/String) // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.<init>|<init>(kotlin.String;kotlin.String;kotlin.String;kotlin.String){}[0]
 
@@ -214,15 +208,6 @@ sealed class io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_de
             final fun <get-rawValue>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.rawValue.<get-rawValue>|<get-rawValue>(){}[0]
         final val targetType // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.targetType|{}targetType[0]
             final fun <get-targetType>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.targetType.<get-targetType>|<get-targetType>(){}[0]
-
-        final fun component1(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.component1|component1(){}[0]
-        final fun component2(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.component2|component2(){}[0]
-        final fun component3(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.component3|component3(){}[0]
-        final fun component4(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.component4|component4(){}[0]
-        final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/String = ..., kotlin/String = ...): io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.copy|copy(kotlin.String;kotlin.String;kotlin.String;kotlin.String){}[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ConversionFailed.toString|toString(){}[0]
     }
 
     final class MissingRequired : io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired|null[0]
@@ -232,12 +217,6 @@ sealed class io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_de
             final fun <get-key>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.key.<get-key>|<get-key>(){}[0]
         final val message // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.message|{}message[0]
             final fun <get-message>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.message.<get-message>|<get-message>(){}[0]
-
-        final fun component1(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.component1|component1(){}[0]
-        final fun copy(kotlin/String = ...): io.github.fiol_dev.konstant.core/ConfigError.MissingRequired // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.copy|copy(kotlin.String){}[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.MissingRequired.toString|toString(){}[0]
     }
 
     final class NestedFailure : io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure|null[0]
@@ -249,13 +228,6 @@ sealed class io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_de
             final fun <get-key>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.key.<get-key>|<get-key>(){}[0]
         final val message // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.message|{}message[0]
             final fun <get-message>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.message.<get-message>|<get-message>(){}[0]
-
-        final fun component1(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.component1|component1(){}[0]
-        final fun component2(): kotlin.collections/List<io.github.fiol_dev.konstant.core/ConfigError> // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.component2|component2(){}[0]
-        final fun copy(kotlin/String = ..., kotlin.collections/List<io.github.fiol_dev.konstant.core/ConfigError> = ...): io.github.fiol_dev.konstant.core/ConfigError.NestedFailure // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.copy|copy(kotlin.String;kotlin.collections.List<io.github.fiol_dev.konstant.core.ConfigError>){}[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.NestedFailure.toString|toString(){}[0]
     }
 
     final class ValidationFailed : io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed|null[0]
@@ -269,14 +241,6 @@ sealed class io.github.fiol_dev.konstant.core/ConfigError { // io.github.fiol_de
             final fun <get-rawValue>(): kotlin/String? // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.rawValue.<get-rawValue>|<get-rawValue>(){}[0]
         final val reason // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.reason|{}reason[0]
             final fun <get-reason>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.reason.<get-reason>|<get-reason>(){}[0]
-
-        final fun component1(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.component1|component1(){}[0]
-        final fun component2(): kotlin/String? // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.component2|component2(){}[0]
-        final fun component3(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.component3|component3(){}[0]
-        final fun copy(kotlin/String = ..., kotlin/String? = ..., kotlin/String = ...): io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.copy|copy(kotlin.String;kotlin.String?;kotlin.String){}[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigError.ValidationFailed.toString|toString(){}[0]
     }
 }
 
@@ -315,5 +279,6 @@ final object io.github.fiol_dev.konstant.core/Validators { // io.github.fiol_dev
     final fun size(kotlin/Int, kotlin/Int, kotlin/Int): kotlin/String? // io.github.fiol_dev.konstant.core/Validators.size|size(kotlin.Int;kotlin.Int;kotlin.Int){}[0]
 }
 
+final fun <#A: kotlin/Any, #B: kotlin/Any?> io.github.fiol_dev.konstant.core/configField(kotlin.reflect/KClass<#A>, kotlin/Function1<#A, #B>): kotlin.properties/ReadOnlyProperty<kotlin/Any?, #B> // io.github.fiol_dev.konstant.core/configField|configField(kotlin.reflect.KClass<0:0>;kotlin.Function1<0:0,0:1>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (#A).io.github.fiol_dev.konstant.core/field(kotlin/Function1<#A, #B>): kotlin.properties/ReadOnlyProperty<kotlin/Any?, #B> // io.github.fiol_dev.konstant.core/field|field@0:0(kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final inline fun <#A: reified kotlin/Any, #B: kotlin/Any?> io.github.fiol_dev.konstant.core/configField(noinline kotlin/Function1<#A, #B>): kotlin.properties/ReadOnlyProperty<kotlin/Any?, #B> // io.github.fiol_dev.konstant.core/configField|configField(kotlin.Function1<0:0,0:1>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
