@@ -20,16 +20,6 @@ public final class io/github/fiol_dev/konstant/sources/parser/PropertiesParser {
 	public final fun parse (Ljava/lang/String;)Ljava/util/Map;
 }
 
-public final class io/github/fiol_dev/konstant/sources/parser/TomlParser {
-	public static final field INSTANCE Lio/github/fiol_dev/konstant/sources/parser/TomlParser;
-	public final fun parse (Ljava/lang/String;)Ljava/util/Map;
-}
-
-public final class io/github/fiol_dev/konstant/sources/parser/YamlParser {
-	public static final field INSTANCE Lio/github/fiol_dev/konstant/sources/parser/YamlParser;
-	public final fun parse (Ljava/lang/String;)Ljava/util/Map;
-}
-
 public final class io/github/fiol_dev/konstant/sources/source/DotEnvSource : io/github/fiol_dev/konstant/core/ConfigSource {
 	public static final field Companion Lio/github/fiol_dev/konstant/sources/source/DotEnvSource$Companion;
 	public synthetic fun <init> (Ljava/util/Map;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -76,41 +66,5 @@ public final class io/github/fiol_dev/konstant/sources/source/ResourcesKt {
 	public static synthetic fun loadDotEnvResource$default (Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/source/DotEnvSource;
 	public static final fun loadPropertiesResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/source/PropertiesSource;
 	public static synthetic fun loadPropertiesResource$default (Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/source/PropertiesSource;
-	public static final fun loadTomlResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/source/TomlSource;
-	public static synthetic fun loadTomlResource$default (Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/source/TomlSource;
-	public static final fun loadYamlResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/source/YamlSource;
-	public static synthetic fun loadYamlResource$default (Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/source/YamlSource;
-}
-
-public final class io/github/fiol_dev/konstant/sources/source/TomlSource : io/github/fiol_dev/konstant/core/MapBackedSource {
-	public static final field Companion Lio/github/fiol_dev/konstant/sources/source/TomlSource$Companion;
-	public fun <init> (Ljava/util/Map;)V
-	public fun getFallbackKeyFormats ()Ljava/util/List;
-	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
-}
-
-public final class io/github/fiol_dev/konstant/sources/source/TomlSource$Companion {
-	public final fun fromFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/TomlSource;
-	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/TomlSource;
-}
-
-public final class io/github/fiol_dev/konstant/sources/source/TomlSourceKt {
-	public static final fun loadTomlFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/TomlSource;
-}
-
-public final class io/github/fiol_dev/konstant/sources/source/YamlSource : io/github/fiol_dev/konstant/core/MapBackedSource {
-	public static final field Companion Lio/github/fiol_dev/konstant/sources/source/YamlSource$Companion;
-	public fun <init> (Ljava/util/Map;)V
-	public fun getFallbackKeyFormats ()Ljava/util/List;
-	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
-}
-
-public final class io/github/fiol_dev/konstant/sources/source/YamlSource$Companion {
-	public final fun fromFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/YamlSource;
-	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/YamlSource;
-}
-
-public final class io/github/fiol_dev/konstant/sources/source/YamlSourceKt {
-	public static final fun loadYamlFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/source/YamlSource;
 }
 
