@@ -1,6 +1,6 @@
 package io.github.fiol_dev.konstant.sources.parser
 
-public object DotEnvParser {
+internal object DotEnvParser {
 
     public fun parse(content: String): Map<String, String> {
         val result = mutableMapOf<String, String>()

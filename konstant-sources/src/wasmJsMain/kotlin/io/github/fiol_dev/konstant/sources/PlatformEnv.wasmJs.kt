@@ -6,4 +6,4 @@ package io.github.fiol_dev.konstant.sources
 private fun envValue(key: String): String? =
     js("(typeof process !== 'undefined' && process.env && typeof process.env[key] === 'string') ? process.env[key] : null")
 
-public actual fun getEnvironmentVariable(key: String): String? = envValue(key)
+internal actual fun getEnvironmentVariable(key: String): String? = envValue(key)

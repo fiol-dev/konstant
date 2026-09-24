@@ -1,6 +1,9 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.sources
 
 import android.content.Context
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import java.io.FileNotFoundException
 
 @Volatile
@@ -15,6 +18,7 @@ public fun initKonstantAndroid(context: Context) {
     appContext = context.applicationContext ?: context
 }
 
+@InternalKonstantApi
 public actual fun readResourceText(path: String): String? {
     val context = appContext ?: throw IllegalStateException(
         "Konstant has no Android context yet. Call initKonstantAndroid(context) before loading resources."

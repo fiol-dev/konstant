@@ -1,6 +1,6 @@
 package io.github.fiol_dev.konstant.sources.parser
 
-public object PropertiesParser {
+internal object PropertiesParser {
 
     public fun parse(content: String): Map<String, String> {
         val result = mutableMapOf<String, String>()

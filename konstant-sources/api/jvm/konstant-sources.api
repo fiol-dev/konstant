@@ -1,23 +1,9 @@
-public final class io/github/fiol_dev/konstant/sources/PlatformEnv_jvmKt {
-	public static final fun getEnvironmentVariable (Ljava/lang/String;)Ljava/lang/String;
-}
-
 public final class io/github/fiol_dev/konstant/sources/PlatformFile_jvmKt {
 	public static final fun readFileText (Ljava/lang/String;)Ljava/lang/String;
 }
 
 public final class io/github/fiol_dev/konstant/sources/PlatformResource_jvmKt {
 	public static final fun readResourceText (Ljava/lang/String;)Ljava/lang/String;
-}
-
-public final class io/github/fiol_dev/konstant/sources/parser/DotEnvParser {
-	public static final field INSTANCE Lio/github/fiol_dev/konstant/sources/parser/DotEnvParser;
-	public final fun parse (Ljava/lang/String;)Ljava/util/Map;
-}
-
-public final class io/github/fiol_dev/konstant/sources/parser/PropertiesParser {
-	public static final field INSTANCE Lio/github/fiol_dev/konstant/sources/parser/PropertiesParser;
-	public final fun parse (Ljava/lang/String;)Ljava/util/Map;
 }
 
 public final class io/github/fiol_dev/konstant/sources/source/DotEnvSource : io/github/fiol_dev/konstant/core/ConfigSource {

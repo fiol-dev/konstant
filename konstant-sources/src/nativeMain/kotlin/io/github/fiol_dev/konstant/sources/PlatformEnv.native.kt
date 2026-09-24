@@ -5,4 +5,4 @@ import kotlinx.cinterop.toKString
 import platform.posix.getenv
 
 @OptIn(ExperimentalForeignApi::class)
-public actual fun getEnvironmentVariable(key: String): String? = getenv(key)?.toKString()
+internal actual fun getEnvironmentVariable(key: String): String? = getenv(key)?.toKString()

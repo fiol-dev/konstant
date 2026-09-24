@@ -1,6 +1,9 @@
+@file:OptIn(InternalKonstantApi::class)
+
 package io.github.fiol_dev.konstant.sources.source
 
 import io.github.fiol_dev.konstant.core.ConfigSource
+import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.sources.parser.DotEnvParser
 import io.github.fiol_dev.konstant.sources.readFileText
