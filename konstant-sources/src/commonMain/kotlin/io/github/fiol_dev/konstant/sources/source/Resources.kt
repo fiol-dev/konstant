@@ -5,13 +5,8 @@ import io.github.fiol_dev.konstant.sources.requireResourceText
 
 // Loaders for config files bundled with the app, see readResourceText for where each platform
 // looks. With optional = true a missing file gives an empty source instead of an error, which
-// suits per-environment overrides such as "config.local.toml".
-
-public fun loadTomlResource(path: String, optional: Boolean = false): TomlSource =
-    TomlSource.fromString(resourceText(path, optional))
-
-public fun loadYamlResource(path: String, optional: Boolean = false): YamlSource =
-    YamlSource.fromString(resourceText(path, optional))
+// suits per-environment overrides such as "config.local.properties". TOML, YAML and JSON files
+// load through TomlSource.fromResource and friends in konstant-toml, konstant-yaml and konstant-json.
 
 public fun loadPropertiesResource(path: String, optional: Boolean = false): PropertiesSource =
     PropertiesSource.fromString(resourceText(path, optional))

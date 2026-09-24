@@ -53,14 +53,14 @@ data class AppConfig(
 
 ```kotlin
 import io.github.fiol_dev.konstant.core.ConfigLoader
-import io.github.fiol_dev.konstant.sources.*
+import io.github.fiol_dev.konstant.sources.source.*
+import io.github.fiol_dev.konstant.toml.TomlSource // konstant-toml module
 
 val loader = ConfigLoader {
     sources {
         +EnvSource()                             // highest priority
         +DotEnvSource(".env")
-        +loadTomlFile("config.toml")             // TOML support
-        +loadYamlFile("config.yaml")             // YAML support
+        +TomlSource.fromFile("config.toml")
         +loadPropertiesFile("config.properties") // lowest
     }
 }
@@ -85,7 +85,7 @@ fun main() {
     Konstant.initAppConfig {
         sources {
             +EnvSource()
-            +loadTomlFile("config.toml")
+            +TomlSource.fromFile("config.toml")
         }
     }
     startApp()
@@ -182,6 +182,8 @@ kotlin {
             implementation("io.github.fiol-dev.konstant:konstant-annotations:0.0.1-alpha1")
             implementation("io.github.fiol-dev.konstant:konstant-core:0.0.1-alpha1")
             implementation("io.github.fiol-dev.konstant:konstant-sources:0.0.1-alpha1")
+            // Optional formats: konstant-toml, konstant-yaml, konstant-json
+            implementation("io.github.fiol-dev.konstant:konstant-toml:0.0.1-alpha1")
         }
         commonTest.dependencies {
             implementation("io.github.fiol-dev.konstant:konstant-test:0.0.1-alpha1")
@@ -278,68 +280,9 @@ The built-in `.properties` parser is pure Kotlin (no `java.util.Properties`):
 - Splits on first `=` or `:` delimiter
 - Trims key and value whitespace
 
-### `TomlSource`
+### TOML, YAML and JSON (`konstant-toml`, `konstant-yaml`, `konstant-json`)
 
-Reads from TOML files. Nested tables are flattened to `dot.notation` keys with `SCREAMING_SNAKE_CASE` fallback.
-
-```toml
-# config.toml
-[database]
-url = "jdbc:postgresql://localhost:5432/mydb"
-port = 5432
-max_pool_size = 10
-
-[server]
-host = "0.0.0.0"
-port = 8080
-debug = false
-```
-
-```kotlin
-import io.github.fiol_dev.konstant.sources.loadTomlFile
-
-+loadTomlFile("config.toml")
-```
-
-The built-in TOML parser is pure Kotlin (zero dependencies):
-- Tables (`[section]`) and nested tables (`[section.subsection]`)
-- Basic strings (`"..."`), literal strings (`'...'`), and bare values
-- Inline tables (`{ key = "val", key2 = "val2" }`)
-- Comments (`#`)
-
-### `YamlSource`
-
-Reads from YAML files. Indentation-based nesting is flattened to `dot.notation` keys with `SCREAMING_SNAKE_CASE` fallback.
-
-```yaml
-# config.yaml
-database:
-  url: jdbc:postgresql://localhost:5432/mydb
-  port: 5432
-  max_pool_size: 10
-
-server:
-  host: 0.0.0.0
-  port: 8080
-  debug: false
-```
-
-```kotlin
-import io.github.fiol_dev.konstant.sources.loadYamlFile
-
-+loadYamlFile("config.yaml")
-+loadYamlFile("config.yml")
-```
-
-The built-in YAML parser is pure Kotlin (zero dependencies):
-- Key-value pairs with `:` separator
-- Indentation-based nesting (spaces)
-- Quoted strings (`"..."` and `'...'`)
-- Comments (`#`)
-
-### Full TOML, YAML and JSON (`konstant-toml`, `konstant-yaml`, `konstant-json`)
-
-The built-in parsers above cover common config files. For the full TOML 1.0 and YAML 1.2 specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections), add the optional modules. For JSON config files, add `konstant-json`. They are backed by [ktoml](https://github.com/orchestr7/ktoml), [kaml](https://github.com/charleskorn/kaml) and [kotlinx-serialization-json](https://github.com/Kotlin/kotlinx.serialization) and work on every Konstant target, except that `konstant-toml` has no wasmJs build yet (ktoml's wasm artifact is broken with Kotlin 2.3):
+TOML, YAML and JSON files are read by optional modules, so apps only pay for the formats they use. They support the full TOML 1.0, YAML 1.2 and JSON specs (arrays of tables, multi-line strings, anchors and merge keys, block scalars, flow collections). They are backed by [ktoml](https://github.com/orchestr7/ktoml), [kaml](https://github.com/charleskorn/kaml) and [kotlinx-serialization-json](https://github.com/Kotlin/kotlinx.serialization) and work on every Konstant target, except that `konstant-toml` has no wasmJs build yet (ktoml's wasm artifact is broken with Kotlin 2.3):
 
 ```kotlin
 // build.gradle.kts
@@ -365,11 +308,11 @@ val loader = ConfigLoader {
 }
 ```
 
-Keys work the same as with the built-in sources: tables and mappings become `dot.notation` keys, arrays become lists, and entries of an array of tables (or a YAML list of mappings, or a JSON array of objects) are numbered, as in `servers.0.name`. JSON files may contain comments and trailing commas, and `null` values are skipped so the spec's default applies. Import these classes by name rather than with `*` when you also use `konstant-sources`, which has classes with the same names.
+Nested tables and mappings become `dot.notation` keys, arrays become lists, and entries of an array of tables (or a YAML list of mappings, or a JSON array of objects) are numbered, as in `servers.0.name`. JSON files may contain comments and trailing commas, and `null` values are skipped so the spec's default applies.
 
 ### Bundled resources (mobile)
 
-Apps usually ship config inside the package rather than as files on disk. The `load*Resource` functions read it from wherever each platform bundles files:
+Apps usually ship config inside the package rather than as files on disk. `fromResource` in the format modules and the `load*Resource` functions in `konstant-sources` read it from wherever each platform bundles files:
 
 | Platform      | Location                                               |
 |---------------|--------------------------------------------------------|
@@ -380,17 +323,18 @@ Apps usually ship config inside the package rather than as files on disk. The `l
 
 ```kotlin
 import io.github.fiol_dev.konstant.sources.source.*
+import io.github.fiol_dev.konstant.toml.TomlSource
 
 val loader = ConfigLoader {
     sources {
         +EnvSource()
-        +loadTomlResource("config.local.toml", optional = true) // missing file = empty source
-        +loadTomlResource("config.toml")
+        +TomlSource.fromResource("config.local.toml", optional = true) // missing file = empty source
+        +TomlSource.fromResource("config.toml")
     }
 }
 ```
 
-`loadYamlResource`, `loadPropertiesResource` and `loadDotEnvResource` work the same way. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
+`YamlSource.fromResource`, `JsonSource.fromResource`, `loadPropertiesResource` and `loadDotEnvResource` work the same way. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
 
 ### Baked config (Gradle plugin)
 
@@ -409,7 +353,7 @@ konstant {
 }
 ```
 
-`{env}` is the environment: `dev` by default, set with `./gradlew build -Pkonstant.env=prod` or `environment.set(...)`. A missing file fails the build unless it is `optional`. Files can be `.toml`, `.yaml`/`.yml`, `.properties` or `.env`; later files override earlier ones.
+`{env}` is the environment: `dev` by default, set with `./gradlew build -Pkonstant.env=prod` or `environment.set(...)`. A missing file fails the build unless it is `optional`. Files can be `.toml`, `.yaml`/`.yml`, `.properties` or `.env`; later files override earlier ones. Baking `.toml` or `.yaml` files needs the `konstant-toml` or `konstant-yaml` dependency, since the generated code reads them with those modules' sources.
 
 The plugin generates `KonstantBaked` (rename it with `objectName`) and adds it to `commonMain` (or `main` on JVM and Android projects):
 
@@ -423,7 +367,7 @@ val loader = ConfigLoader {
 println(KonstantBaked.ENVIRONMENT) // "prod"
 ```
 
-The module using the baked sources needs `konstant-sources` as a dependency.
+The module using the baked sources needs `konstant-sources` as a dependency, plus `konstant-toml` or `konstant-yaml` when it bakes `.toml` or `.yaml` files. `konstant-toml` has no wasmJs build yet, so projects with a wasmJs target should bake `.yaml`, `.properties` or `.env` files instead of `.toml`.
 
 ### `MapSource` (testing)
 

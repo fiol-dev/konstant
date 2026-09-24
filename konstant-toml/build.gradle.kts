@@ -1,4 +1,4 @@
-// Full TOML 1.0 support backed by ktoml, as an alternative to the lightweight parser in konstant-sources
+// Full TOML 1.0 support backed by ktoml
 plugins {
     id("konstant.kmp-library")
     id("konstant.publishing")

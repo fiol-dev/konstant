@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":konstant-annotations"))
     implementation(project(":konstant-core"))
     implementation(project(":konstant-sources"))
+    implementation(project(":konstant-toml"))
+    implementation(project(":konstant-yaml"))
     ksp(project(":konstant-ksp"))
     testImplementation(project(":konstant-test"))
     testImplementation(libs.kotlin.test)

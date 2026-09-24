@@ -8,9 +8,9 @@ import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.ksptests.other.CacheConfig
 import io.github.fiol_dev.konstant.ksptests.other.Mode
 import io.github.fiol_dev.konstant.sources.source.PropertiesSource
-import io.github.fiol_dev.konstant.sources.source.TomlSource
-import io.github.fiol_dev.konstant.sources.source.YamlSource
 import io.github.fiol_dev.konstant.test.MapSource
+import io.github.fiol_dev.konstant.toml.TomlSource
+import io.github.fiol_dev.konstant.yaml.YamlSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

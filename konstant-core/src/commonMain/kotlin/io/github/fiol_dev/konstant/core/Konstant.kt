@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
  * Konstant.initAppConfig {
  *     sources {
  *         +EnvSource()
- *         +loadTomlResource("config.toml")
+ *         +TomlSource.fromResource("config.toml")
  *     }
  * }
  *
