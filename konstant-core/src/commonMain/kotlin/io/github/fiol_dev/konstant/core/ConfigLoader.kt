@@ -10,7 +10,9 @@ public class ConfigLoader private constructor(
 
     /**
      * Runs [load] and reports, for every field, the value used and which source it came from.
-     * Secrets are shown as `***`. Useful for debugging which file or variable won:
+     * Secrets are shown as `***`. A value that fails conversion or validation is still listed
+     * with its source; the error itself is in [ConfigReport.result]. Useful for debugging which
+     * file or variable won:
      *
      * ```kotlin
      * println(loader.explain { loadAppConfig() })
@@ -52,7 +54,7 @@ public class ConfigLoader private constructor(
             customKey = field.customKey,
         )
         if (field.hasDefault) {
-            record(field, resolvedKey, field.default.toString(), ConfigReport.DEFAULT)
+            if (recorder != null) record(field, resolvedKey, field.default?.toString(), ConfigReport.DEFAULT)
             @Suppress("UNCHECKED_CAST")
             return ResolveResult.Success(field.default as T)
         }

@@ -499,10 +499,11 @@ val config = loader.loadAppConfig().getOrThrow()
 
 ```kotlin
 println(loader.explain { loadAppConfig() })
-// APP_NAME         Demo                     #1 EnvSource
-// DATABASE_URL     jdbc:postgresql://db/app #3 TomlSource
-// DATABASE_PASSWORD ***                     #2 DotEnvSource
-// SERVER_PORT      8080                     default
+// APP_NAME           Demo                      #1 EnvSource
+// DATABASE_URL       jdbc:postgresql://db/app  #3 TomlSource
+// DATABASE_PASSWORD  ***                       #2 DotEnvSource
+// ...
+// SERVER_PORT        8080                      default
 ```
 
 The report also carries the load `result`, so it works for failed loads too (missing fields show as `missing`).
