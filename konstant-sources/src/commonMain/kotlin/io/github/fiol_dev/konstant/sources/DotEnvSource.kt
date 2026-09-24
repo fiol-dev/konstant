@@ -1,12 +1,11 @@
 @file:OptIn(InternalKonstantApi::class)
 
-package io.github.fiol_dev.konstant.sources.source
+package io.github.fiol_dev.konstant.sources
 
 import io.github.fiol_dev.konstant.core.ConfigSource
 import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.sources.parser.DotEnvParser
-import io.github.fiol_dev.konstant.sources.readFileText
 
 public class DotEnvSource private constructor(
     private val entries: Map<String, String>,
@@ -17,18 +16,26 @@ public class DotEnvSource private constructor(
 
     public companion object {
         /**
-         * Load from a .env file. If the file does not exist, returns an empty source.
-         * Parse errors in a successfully read file are propagated as exceptions.
+         * Reads a `.env` file. A missing file gives an empty source unless [optional] is false,
+         * since a local `.env` usually exists only on developer machines.
          */
-        public operator fun invoke(path: String = ".env"): DotEnvSource {
+        public fun fromFile(path: String = ".env", optional: Boolean = true): DotEnvSource {
+            if (!optional) return fromString(readFileText(path))
             val content = try {
                 readFileText(path)
             } catch (_: Exception) {
-                // File not found — different platforms throw different exception types
+                // File not found: platforms throw different exception types
                 return DotEnvSource(emptyMap())
             }
-            return DotEnvSource(DotEnvParser.parse(content))
+            return fromString(content)
         }
+
+        /**
+         * Reads a `.env` file bundled with the app, see [readResourceText] for where each platform
+         * looks. With [optional] a missing file gives an empty source instead of an error.
+         */
+        public fun fromResource(path: String, optional: Boolean = false): DotEnvSource =
+            fromString(resourceText(path, optional))
 
         /**
          * Create from an already-read string content.

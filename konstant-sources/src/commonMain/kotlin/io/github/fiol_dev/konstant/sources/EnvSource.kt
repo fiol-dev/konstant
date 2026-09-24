@@ -1,8 +1,7 @@
-package io.github.fiol_dev.konstant.sources.source
+package io.github.fiol_dev.konstant.sources
 
 import io.github.fiol_dev.konstant.core.ConfigSource
 import io.github.fiol_dev.konstant.core.KeyFormat
-import io.github.fiol_dev.konstant.sources.getEnvironmentVariable
 
 public class EnvSource : ConfigSource {
     override val keyFormat: KeyFormat = KeyFormat.SCREAMING_SNAKE

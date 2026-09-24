@@ -1,6 +1,5 @@
 package io.github.fiol_dev.konstant.sources
 
-import io.github.fiol_dev.konstant.sources.source.loadPropertiesResource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -10,12 +9,12 @@ class ResourceSourcesTest {
 
     @Test
     fun readsPropertiesFromClasspath() {
-        assertEquals("9090", loadPropertiesResource("konstant-test.properties").get("server.port"))
+        assertEquals("9090", PropertiesSource.fromResource("konstant-test.properties").get("server.port"))
     }
 
     @Test
     fun missingResourceFailsUnlessOptional() {
-        assertFailsWith<IllegalArgumentException> { loadPropertiesResource("missing.properties") }
-        assertNull(loadPropertiesResource("missing.properties", optional = true).get("any"))
+        assertFailsWith<IllegalArgumentException> { PropertiesSource.fromResource("missing.properties") }
+        assertNull(PropertiesSource.fromResource("missing.properties", optional = true).get("any"))
     }
 }

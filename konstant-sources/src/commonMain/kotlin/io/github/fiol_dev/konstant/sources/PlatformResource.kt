@@ -18,3 +18,6 @@ public expect fun readResourceText(path: String): String?
 
 internal fun requireResourceText(path: String): String =
     readResourceText(path) ?: throw IllegalArgumentException("Bundled resource not found: $path")
+
+internal fun resourceText(path: String, optional: Boolean): String =
+    if (optional) readResourceText(path).orEmpty() else requireResourceText(path)

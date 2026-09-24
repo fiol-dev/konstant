@@ -5,7 +5,7 @@ import io.github.fiol_dev.konstant.core.ConfigLoader
 import io.github.fiol_dev.konstant.core.ConfigResult
 import io.github.fiol_dev.konstant.core.ConfigSource
 import io.github.fiol_dev.konstant.core.InternalKonstantApi
-import io.github.fiol_dev.konstant.sources.source.PropertiesSource
+import io.github.fiol_dev.konstant.sources.PropertiesSource
 import io.github.fiol_dev.konstant.test.MapSource
 import kotlin.test.Test
 import kotlin.test.assertEquals

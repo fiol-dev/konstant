@@ -16,6 +16,8 @@ internal fun nodeFs(): dynamic = js(
 @InternalKonstantApi
 public actual fun readFileText(path: String): String {
     val fs = nodeFs() ?: throw UnsupportedOperationException(BROWSER_FILES_MESSAGE)
+    // Checked first so a missing file is a Kotlin exception rather than a raw JS Error
+    if (!(fs.existsSync(path) as Boolean)) throw IllegalArgumentException("File not found: $path")
     return fs.readFileSync(path, "utf8") as String
 }
 
