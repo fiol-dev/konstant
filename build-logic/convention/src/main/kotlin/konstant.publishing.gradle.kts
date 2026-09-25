@@ -26,7 +26,7 @@ mavenPublishing {
 
     pom {
         name.set("Konstant")
-        description.set("Pydantic Settings but for KMP")
+        description.set("Typed configuration for Kotlin Multiplatform apps, loaded from env vars, files and remote sources")
         inceptionYear.set("2026")
         url.set("https://github.com/fiol-dev/konstant")
         licenses {
