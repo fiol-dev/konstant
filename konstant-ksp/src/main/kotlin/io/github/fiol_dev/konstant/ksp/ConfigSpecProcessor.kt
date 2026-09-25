@@ -92,7 +92,7 @@ class ConfigSpecProcessor(
         val deferred = mutableListOf<KSAnnotated>()
 
         for (symbol in symbols) {
-            if (!symbol.validate()) {
+            if (!symbol.validate(enableNewFeatures = false)) {
                 deferred += symbol
                 continue
             }
