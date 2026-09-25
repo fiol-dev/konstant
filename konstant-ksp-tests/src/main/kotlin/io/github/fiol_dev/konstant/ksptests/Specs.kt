@@ -5,7 +5,7 @@ import io.github.fiol_dev.konstant.annotations.Key
 import io.github.fiol_dev.konstant.annotations.Secret
 
 @ConfigSpec
-data class PrimitivesConfig(
+public data class PrimitivesConfig(
     val name: String,
     val count: Int,
     val bigCount: Long,
@@ -15,7 +15,7 @@ data class PrimitivesConfig(
 )
 
 @ConfigSpec
-data class DefaultsConfig(
+public data class DefaultsConfig(
     val host: String = "localhost",
     val port: Int = 8080,
     val timeoutMs: Long = 60_000L,
@@ -25,32 +25,32 @@ data class DefaultsConfig(
 )
 
 @ConfigSpec
-data class AnnotatedConfig(
+public data class AnnotatedConfig(
     @Key("CUSTOM_API_KEY") val apiKey: String,
     @Secret val password: String,
     @Secret val pin: Int = 0,
 )
 
 @ConfigSpec
-data class PoolConfig(
+public data class PoolConfig(
     val size: Int = 1,
 )
 
 @ConfigSpec
-data class DatabaseConfig(
+public data class DatabaseConfig(
     val url: String,
     val maxPoolSize: Int = 10,
     val pool: PoolConfig = PoolConfig(),
 )
 
 @ConfigSpec
-data class AppConfig(
+public data class AppConfig(
     val appName: String = "MyApp",
     val database: DatabaseConfig,
 )
 
 @ConfigSpec
-data class BakedAppConfig(
+public data class BakedAppConfig(
     val retries: Int,
     val apiUrl: String,
 )

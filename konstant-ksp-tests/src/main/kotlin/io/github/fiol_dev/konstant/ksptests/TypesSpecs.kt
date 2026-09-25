@@ -6,10 +6,10 @@ import io.github.fiol_dev.konstant.ksptests.other.Mode
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-enum class LogLevel { DEBUG, INFO, WARN_ONLY }
+public enum class LogLevel { DEBUG, INFO, WARN_ONLY }
 
 @ConfigSpec
-data class TypesConfig(
+public data class TypesConfig(
     val level: LogLevel,
     val timeout: Duration,
     val hosts: List<String>,
@@ -24,7 +24,7 @@ data class TypesConfig(
 
 // Nested spec and default expression both come from another package
 @ConfigSpec
-data class ServiceConfig(
+public data class ServiceConfig(
     val name: String = "svc",
     val mode: Mode = Mode.FIFO,
     val cache: CacheConfig,

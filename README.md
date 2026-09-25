@@ -491,7 +491,7 @@ class SystemPropertiesSource : MapBackedSource(
 | `List<T>`, `Set<T>`         | comma-separated (`a, b`) or an inline array (`["a", "b"]`)               |
 | `Map<String, T>`            | `key=value` pairs (`a=1, b=2`), a TOML table or a YAML mapping           |
 | `T?` (any of the above)     | optional: `null` when no source has the key and there is no default      |
-| Nested `@ConfigSpec`        | loaded recursively with a key prefix                                     |
+| Nested `@ConfigSpec`        | loaded recursively with a key prefix; its default, if any, is used when only required keys are missing |
 
 `T` in collections is any of the scalar types above. Other types trigger a **compile-time error**.
 
@@ -658,12 +658,13 @@ The KSP processor emits a **compilation error** (not a warning) for:
 - `@ConfigSpec` applied to a non-data class
 - A field type that is unsupported (e.g. a class without `@ConfigSpec`, `Map` with non-`String` keys, nullable collection elements)
 - A nullable nested `@ConfigSpec` field
+- A `@ConfigSpec` class that is local, `inner`, or private or protected (itself or a class it is nested in)
 - `@Convert` naming something other than an object implementing `ValueConverter` of the field's type
 - A validation annotation on a type it doesn't apply to, or an invalid `@Pattern` regex
 
 ## What KSP Generates
 
-For each `@ConfigSpec` class, the processor generates:
+For each `@ConfigSpec` class, the processor generates the declarations below. They are `public`, or `internal` for an internal class, so modules in explicit API mode compile. For a class nested in another, the names join the enclosing class names with `_`: `Outer.Db` gets `Outer_DbSchema`, `loadOuter_Db` and `initOuter_Db`.
 
 **1. A schema object** (`DatabaseConfigSchema`) with one field descriptor per property, which the loader reads. Its shape is internal and may change between releases, so application code shouldn't use it.
 

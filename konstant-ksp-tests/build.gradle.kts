@@ -6,6 +6,12 @@ plugins {
     id("io.github.fiol-dev.konstant")
 }
 
+// The specs and the code KSP generates for them are main sources, so this checks that generated
+// declarations carry explicit visibility and types. Test sources are not affected.
+kotlin {
+    explicitApi()
+}
+
 konstant {
     packageName.set("io.github.fiol_dev.konstant.ksptests.baked")
     bake("baked/app.toml")

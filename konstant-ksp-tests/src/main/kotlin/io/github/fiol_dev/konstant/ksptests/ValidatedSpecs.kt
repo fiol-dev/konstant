@@ -9,9 +9,9 @@ import io.github.fiol_dev.konstant.annotations.Secret
 import io.github.fiol_dev.konstant.annotations.Size
 import io.github.fiol_dev.konstant.core.ValueConverter
 
-data class HostPort(val host: String, val port: Int)
+public data class HostPort(val host: String, val port: Int)
 
-object HostPortConverter : ValueConverter<HostPort> {
+public object HostPortConverter : ValueConverter<HostPort> {
     override fun convert(raw: String): HostPort {
         val parts = raw.trim().split(':')
         require(parts.size == 2) { "expected host:port" }
@@ -20,12 +20,12 @@ object HostPortConverter : ValueConverter<HostPort> {
 }
 
 /** Accepts `75%` as well as `75`. */
-object PercentConverter : ValueConverter<Int> {
+public object PercentConverter : ValueConverter<Int> {
     override fun convert(raw: String): Int = raw.trim().removeSuffix("%").toInt()
 }
 
 @ConfigSpec
-data class ValidatedConfig(
+public data class ValidatedConfig(
     @Range(min = 1.0, max = 65535.0) val port: Int = 8080,
     @Range(min = 0.0) val ratio: Double = 0.5,
     @NotBlank @Size(max = 10) val name: String = "app",
