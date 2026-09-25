@@ -262,6 +262,8 @@ The property name in the parent class becomes the prefix for nested config field
 | `AppConfig::server` -> `ServerConfig::port`                | `SERVER_PORT`              | `server.port`               |
 | `AppConfig::database` -> `DatabaseConfig::pool` -> `PoolConfig::size` | `DATABASE_POOL_SIZE` | `database.pool.size`   |
 
+A nested field with a default (`val replica: DbConfig = DbConfig(url = "jdbc:local")`) uses that default when the nested spec's only errors are missing required keys. The whole default is used in that case, so any nested keys that were set are ignored; a value that fails to convert or validate is still reported.
+
 ### `@Key` Override
 
 `@Key("CUSTOM_KEY")` overrides the resolved key entirely (prefix is not applied):
