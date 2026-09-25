@@ -11,10 +11,9 @@ import io.github.fiol_dev.konstant.sources.parser.PropertiesParser
  * Reads `.properties` files. Keys use `dot.notation`, with `SCREAMING_SNAKE_CASE` as a fallback;
  * a key with no exact match falls back to a case-insensitive one.
  *
- * The parser handles one `key=value` or `key: value` pair per line, split at the first `=` or
- * `:`, with surrounding whitespace trimmed. Lines starting with `#` or `!` are comments, and a
- * later duplicate key wins. It does not support whitespace as the separator, `\` escapes
- * (including `\uXXXX`) or line continuations.
+ * The parser follows the `java.util.Properties` basics: `key=value`, `key: value` or `key value`,
+ * `#` and `!` comments, lines continued with a trailing `\`, and the escapes `\uXXXX`, `\t`, `\n`,
+ * `\r`, `\f` and escaped separators. Values are trimmed, and a later duplicate key wins.
  */
 public class PropertiesSource(properties: Map<String, String>) : MapBackedSource(properties) {
     override val keyFormat: KeyFormat = KeyFormat.DOT_NOTATION

@@ -11,10 +11,10 @@ import io.github.fiol_dev.konstant.sources.parser.DotEnvParser
  * Reads a `.env` file of `KEY=value` lines, with keys in `SCREAMING_SNAKE_CASE`. Unlike the other
  * file sources, keys are matched exactly, including case.
  *
- * The parser is deliberately simple. It supports blank lines, full-line `#` comments, and one
- * pair of matching `"` or `'` quotes around a value, which are removed. Lines without `=` are
- * skipped, and a later duplicate key wins. It does not support an `export` prefix, inline
- * comments, escape sequences, multiline values or `${VAR}` expansion: such text is kept as is.
+ * The parser supports blank lines, full-line `#` comments, a leading `export `, and ` # comments`
+ * after unquoted values. Double-quoted values unescape `\n`, `\r`, `\t`, `\"` and `\\`;
+ * single-quoted values are taken literally. Lines without `=` are skipped, and a later duplicate
+ * key wins. Multiline values and `${VAR}` expansion are not supported.
  */
 public class DotEnvSource private constructor(
     private val entries: Map<String, String>,
