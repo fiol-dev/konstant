@@ -51,9 +51,11 @@ public class TomlSource(entries: Map<String, String>) : MapBackedSource(entries)
         }
 
         internal fun flatten(content: String): Map<String, String> {
-            if (content.isBlank()) return emptyMap()
+            // Editors on Windows often save files with a byte order mark
+            val text = content.removePrefix("﻿")
+            if (text.isBlank()) return emptyMap()
             val out = linkedMapOf<String, String>()
-            val root = TomlParser(TomlInputConfig(allowEmptyToml = true)).parseString(content)
+            val root = TomlParser(TomlInputConfig(allowEmptyToml = true)).parseString(text)
             root.children.forEach { collect(it, "", out) }
             return out
         }

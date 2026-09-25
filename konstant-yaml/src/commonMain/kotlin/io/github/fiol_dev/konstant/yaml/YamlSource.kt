@@ -51,10 +51,12 @@ public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries)
         private val yaml = Yaml(configuration = YamlConfiguration(anchorsAndAliases = AnchorsAndAliases.Permitted()))
 
         internal fun flatten(content: String): Map<String, String> {
-            if (content.isBlank()) return emptyMap()
+            // Editors on Windows often save files with a byte order mark
+            val text = content.removePrefix("﻿")
+            if (text.isBlank()) return emptyMap()
             val out = linkedMapOf<String, String>()
             val root = try {
-                yaml.parseToYamlNode(content)
+                yaml.parseToYamlNode(text)
             } catch (_: EmptyYamlDocumentException) {
                 return emptyMap() // only comments
             }

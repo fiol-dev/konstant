@@ -97,4 +97,10 @@ class TomlSourceTest {
         assertTrue(TomlSource.flatten("").isEmpty())
         assertTrue(TomlSource.flatten("# only a comment\n").isEmpty())
     }
+
+    @Test
+    fun ignoresByteOrderMark() {
+        assertEquals("1", TomlSource.flatten("﻿a = 1")["a"])
+        assertTrue(TomlSource.flatten("﻿").isEmpty())
+    }
 }
