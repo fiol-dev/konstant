@@ -15,8 +15,8 @@ version = libs.version("libVersion")
 kotlin {
     explicitApi()
 
-    // Public API dumps live in each module's api/ folder: checkLegacyAbi fails on unreviewed
-    // changes, and updateLegacyAbi rewrites the dumps after an intended change
+    // Public API dumps live in each module's api/ folder: checkKotlinAbi fails on unreviewed
+    // changes, and updateKotlinAbi rewrites the dumps after an intended change
     // (Kotlin 2.4: calling abiValidation enables it, and klib dumps are always on)
     @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
     abiValidation {}

@@ -727,7 +727,7 @@ Konstant is in alpha, so the API can still change between releases. Declarations
 
 ## Contributing
 
-Each library module keeps a dump of its public API in its `api/` folder, and CI fails when the code no longer matches it. After an intended public API change, run `./gradlew updateLegacyAbi` (on macOS, which builds every target) and commit the updated dumps with the change.
+Each library module keeps a dump of its public API in its `api/` folder, and CI fails when the code no longer matches it. After an intended public API change, run `./gradlew updateKotlinAbi` (on macOS, which builds every target) and commit the updated dumps with the change.
 
 ## License
 
