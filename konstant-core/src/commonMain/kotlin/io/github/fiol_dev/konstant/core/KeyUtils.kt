@@ -1,8 +1,10 @@
 package io.github.fiol_dev.konstant.core
 
+/** Builds lookup keys from property names for [ConfigLoader.resolve] and generated code. */
 @InternalKonstantApi
 public object KeyUtils {
 
+    /** `maxPoolSize` to `MAX_POOL_SIZE`. */
     public fun camelToScreamingSnake(name: String): String = buildString {
         for ((i, ch) in name.withIndex()) {
             if (ch.isUpperCase() && i > 0) append('_')
@@ -10,6 +12,7 @@ public object KeyUtils {
         }
     }
 
+    /** `maxPoolSize` to `max.pool.size`. */
     public fun camelToDotNotation(name: String): String = buildString {
         for ((i, ch) in name.withIndex()) {
             if (ch.isUpperCase() && i > 0) append('.')
@@ -17,6 +20,10 @@ public object KeyUtils {
         }
     }
 
+    /**
+     * The key for [propertyName] in [format] under the `SCREAMING_SNAKE` [prefix], or [customKey]
+     * unchanged when it is set.
+     */
     public fun resolveKey(
         propertyName: String,
         prefix: String?,
@@ -40,6 +47,7 @@ public object KeyUtils {
         }
     }
 
+    /** The `SCREAMING_SNAKE` prefix for a nested spec held in [propertyName], e.g. `OUTER_INNER`. */
     public fun resolvePrefix(
         propertyName: String,
         parentPrefix: String?,

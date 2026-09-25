@@ -7,14 +7,15 @@ Define your config as annotated data classes. A KSP processor generates all sche
 ## Features
 
 - **Type-safe**: Config fields are fully typed with compile-time validation
-- **Multiplatform**: JVM, JS (Node.js), Linux, macOS, iOS
+- **Multiplatform**: Android, iOS, macOS, JVM, Linux, JS and Wasm (Node.js and browser)
 - **Multiple sources**: Environment variables, `.env` files, `.properties`, TOML, YAML, JSON, maps (for testing)
 - **Source priority**: Stack multiple sources; first non-null value wins
 - **Nested configs**: Compose config classes with automatic prefix resolution
 - **Error aggregation**: All errors collected before throwing -- never fail-fast on the first missing field
-- **Secret masking**: `@Secret` fields are masked as `***` in error messages and logs
+- **Secret masking**: `@Secret` values show as `***` in errors and `explain` reports
 - **Zero runtime reflection**: KSP generates everything at compile time
 - **Live reload**: Optional `StateFlow` of validated updates that keeps the last good config on errors
+- **Baked config**: A Gradle plugin compiles per-environment config files into the app
 
 ## Quick Start
 
@@ -122,6 +123,7 @@ Each `config<T>()` is a Koin single that reads `Konstant.get<T>()` on first inje
 
 ```kotlin
 import io.github.fiol_dev.konstant.core.configField
+import io.github.fiol_dev.konstant.core.field
 
 // From the global holder (after Konstant.initAppConfig at startup)
 class UserRepository {
@@ -130,8 +132,6 @@ class UserRepository {
 }
 
 // From a specific config instance (no global holder needed)
-import io.github.fiol_dev.konstant.core.field
-
 val appConfig: AppConfig = loader.loadAppConfig().getOrThrow()
 
 class HttpServer {
@@ -139,6 +139,8 @@ class HttpServer {
     private val debug: Boolean by appConfig.field { it.server.debug }
 }
 ```
+
+Each delegate reads the config the first time it is used and then keeps that value, so `configField` delegates created before a `Konstant.reset()` keep returning the old config.
 
 **Option C: Direct access** -- just use the loaded config object.
 
@@ -157,42 +159,83 @@ connectToDatabase(
 
 ### 4. Gradle setup
 
-```kotlin
-// settings.gradle.kts
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
+All artifacts use the group `io.github.fiol-dev.konstant` and share one version.
 
+| Artifact              | What it adds                                                       |
+|-----------------------|--------------------------------------------------------------------|
+| `konstant-core`       | Loader, results, errors, global holder (brings `konstant-annotations`) |
+| `konstant-ksp`        | KSP processor that generates the loaders (build time only)         |
+| `konstant-sources`    | `EnvSource`, `DotEnvSource`, `PropertiesSource`                    |
+| `konstant-toml`       | `TomlSource` (no wasmJs build)                                     |
+| `konstant-yaml`       | `YamlSource`                                                       |
+| `konstant-json`       | `JsonSource`                                                       |
+| `konstant-reload`     | `ReloadableConfig`, `RemoteSource`                                 |
+| `konstant-koin`       | Koin `config<T>()` definitions                                     |
+| `konstant-test`       | `MapSource` for tests                                              |
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+konstant = "<version>"
+ksp = "<ksp version matching your Kotlin>"
+
+[libraries]
+konstant-core = { module = "io.github.fiol-dev.konstant:konstant-core", version.ref = "konstant" }
+konstant-sources = { module = "io.github.fiol-dev.konstant:konstant-sources", version.ref = "konstant" }
+konstant-toml = { module = "io.github.fiol-dev.konstant:konstant-toml", version.ref = "konstant" }
+konstant-test = { module = "io.github.fiol-dev.konstant:konstant-test", version.ref = "konstant" }
+konstant-ksp = { module = "io.github.fiol-dev.konstant:konstant-ksp", version.ref = "konstant" }
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+```
+
+**Kotlin Multiplatform.** Run the processor once on common code and compile its output into `commonMain`, so every target shares the generated loaders:
+
+```kotlin
 // build.gradle.kts
 plugins {
     kotlin("multiplatform")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
     jvm()
-    // add other targets as needed
+    iosArm64()
+    // other targets as needed
 
     sourceSets {
-        commonMain.dependencies {
-            implementation("io.github.fiol-dev.konstant:konstant-annotations:0.0.1-alpha1")
-            implementation("io.github.fiol-dev.konstant:konstant-core:0.0.1-alpha1")
-            implementation("io.github.fiol-dev.konstant:konstant-sources:0.0.1-alpha1")
-            // Optional formats: konstant-toml, konstant-yaml, konstant-json
-            implementation("io.github.fiol-dev.konstant:konstant-toml:0.0.1-alpha1")
+        commonMain {
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+            dependencies {
+                implementation(libs.konstant.core)
+                implementation(libs.konstant.sources)
+                implementation(libs.konstant.toml) // optional formats
+            }
         }
         commonTest.dependencies {
-            implementation("io.github.fiol-dev.konstant:konstant-test:0.0.1-alpha1")
+            implementation(libs.konstant.test)
         }
     }
 }
 
 dependencies {
-    add("kspCommonMainMetadata", "io.github.fiol-dev.konstant:konstant-ksp:0.0.1-alpha1")
+    add("kspCommonMainMetadata", libs.konstant.ksp)
+}
+
+// Generate the loaders before any target compiles
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompilationTask<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") dependsOn("kspCommonMainKotlinMetadata")
+}
+```
+
+**JVM or Android only.** Use the plain `ksp` configuration:
+
+```kotlin
+dependencies {
+    implementation(libs.konstant.core)
+    implementation(libs.konstant.sources)
+    ksp(libs.konstant.ksp)
 }
 ```
 
@@ -334,11 +377,24 @@ val loader = ConfigLoader {
 }
 ```
 
-`YamlSource`, `JsonSource`, `PropertiesSource` and `DotEnvSource` have the same `fromResource`. On Android no `Context` is needed: the library registers a small startup provider that captures the application context. If you remove that provider, call `initKonstantAndroid(context)` before loading.
+`YamlSource`, `JsonSource`, `PropertiesSource` and `DotEnvSource` have the same `fromResource`.
+
+**Android.** No `Context` is needed: `konstant-sources` merges a small `KonstantInitProvider` into your manifest, and it captures the application context at startup. To drop the provider (for example if you use App Startup), remove it in your manifest and call `initKonstantAndroid(context)` in `Application.onCreate` before loading:
+
+```xml
+<provider
+    android:name="io.github.fiol_dev.konstant.sources.KonstantInitProvider"
+    android:authorities="${applicationId}.konstant-init"
+    tools:node="remove" />
+```
+
+Unit tests on the JVM have no provider either, so call `initKonstantAndroid` there too.
 
 ### Baked config (Gradle plugin)
 
 The `io.github.fiol-dev.konstant` Gradle plugin compiles config files into the app, choosing files per environment at build time. This suits values that differ per flavor or stage but shouldn't be read from disk at runtime.
+
+> The plugin is not published yet. Until it is, use it from a checkout of this repository with `includeBuild("konstant/konstant-gradle-plugin")` in your `pluginManagement` block.
 
 ```kotlin
 // build.gradle.kts
@@ -353,9 +409,9 @@ konstant {
 }
 ```
 
-`{env}` is the environment: `dev` by default, set with `./gradlew build -Pkonstant.env=prod` or `environment.set(...)`. A missing file fails the build unless it is `optional`. Files can be `.toml`, `.yaml`/`.yml`, `.properties` or `.env`; later files override earlier ones. Baking `.toml` or `.yaml` files needs the `konstant-toml` or `konstant-yaml` dependency, since the generated code reads them with those modules' sources.
+`{env}` is the environment: `dev` by default, set with `./gradlew build -Pkonstant.env=prod` or `environment.set(...)`. A missing file fails the build unless it is `optional`. Files can be `.toml`, `.yaml`/`.yml`, `.properties` or `.env` (not `.json`); later files override earlier ones. Baking `.toml` or `.yaml` files needs the `konstant-toml` or `konstant-yaml` dependency, since the generated code reads them with those modules' sources.
 
-The plugin generates `KonstantBaked` (rename it with `objectName`) and adds it to `commonMain` (or `main` on JVM and Android projects):
+The plugin generates `KonstantBaked` (rename it with `objectName`) and adds it to `commonMain` in Kotlin Multiplatform projects, or to `main` in projects that apply `org.jetbrains.kotlin.jvm` or `org.jetbrains.kotlin.android`:
 
 ```kotlin
 val loader = ConfigLoader {
@@ -387,17 +443,37 @@ val loader = ConfigLoader {
 ```
 
 Available factory methods:
-- `MapSource.of(...)` -- raw keys (matched as-is)
-- `MapSource.screamingSnake(...)` -- `SCREAMING_SNAKE_CASE` resolution
-- `MapSource.dotNotation(...)` -- `dot.notation` resolution
+- `MapSource.of(...)` -- raw keys (the property name as written, e.g. `maxPoolSize`)
+- `MapSource.screamingSnake(...)` -- `SCREAMING_SNAKE_CASE` keys, like `EnvSource`
+- `MapSource.dotNotation(...)` -- `dot.notation` keys, like `PropertiesSource`
+
+Like the file-based sources, `MapSource` falls back to a case-insensitive match and fills `Map` fields from nested keys. Call `Konstant.reset()` between tests that use the global holder.
+
+### Custom sources
+
+Any `ConfigSource` can join the stack. Map-backed sources can extend `MapBackedSource`, which adds case-insensitive lookup and `Map` field support:
+
+```kotlin
+class SystemPropertiesSource : MapBackedSource(
+    System.getProperties().entries.associate { (k, v) -> k.toString() to v.toString() }
+) {
+    override val keyFormat = KeyFormat.DOT_NOTATION
+}
+```
+
+`keyFormat` picks how property names become keys (`SCREAMING_SNAKE`, `DOT_NOTATION` or `RAW`), and `fallbackKeyFormats` lists formats to try next. Implement `children(key)` only if the source can list nested entries (`server.headers.a`, `server.headers.b`) for `Map` fields; `MapBackedSource` does this for you. Keys under a `Map` field's prefix all become map entries, so don't give the map a sibling field whose key starts with the same prefix (a `pool` map next to a `poolSize` field in dot notation).
 
 ## Annotations
 
 | Annotation     | Target   | Description                                                        |
 |----------------|----------|--------------------------------------------------------------------|
 | `@ConfigSpec`  | Class    | Marks a data class for KSP processing. Must be a `data class`.    |
-| `@Secret`      | Property | Masks the value as `***` in error messages and logs.               |
+| `@Secret`      | Property | Shows the value as `***` in errors and `explain` reports.          |
 | `@Key("NAME")` | Property | Overrides the automatically resolved key with a custom name.       |
+| `@Convert(X::class)` | Property | Converts the value with your `ValueConverter` ([Custom Converters](#custom-converters)). |
+| `@Range`, `@Size`, `@NotBlank`, `@Pattern` | Property | Validate the value ([Validation](#validation)). |
+
+`@Secret` only affects what Konstant prints. Your config is your own data class, so `println(config)` or logging it still shows the secret; override `toString` if that matters.
 
 ## Supported Field Types
 
@@ -483,6 +559,10 @@ when (result) {
 val config = loader.loadAppConfig().getOrThrow()
 ```
 
+`getOrThrow` throws a `ConfigException` whose message lists every error on its own line, and whose `errors` holds them. `getOrNull`, `getOrElse`, `map` and `onFailure` cover the other common cases. Errors of nested configs carry the full prefixed key (`DATABASE_URL`). When a key is missing, the error names it in `SCREAMING_SNAKE` form whatever format your sources use, so `DATABASE_URL` means `database.url` in a TOML file.
+
+An `init` block that calls `require` is reported as a `ValidationFailed` error keyed by the config's prefix (or its class name for the root). Only `IllegalArgumentException` is turned into an error; `check` and other exceptions propagate.
+
 ### Which source won?
 
 `explain` runs a load and lists every field's key, the value used (secrets as `***`) and where it came from, with sources numbered in priority order:
@@ -505,7 +585,7 @@ The report also carries the load `result`, so it works for failed loads too (mis
 | `MissingRequired`   | A required field (no default) is not found in any source             |
 | `ConversionFailed`  | A value was found but couldn't be converted to the target type       |
 | `ValidationFailed`  | A value broke a validation annotation, or the class's `init` rejected it |
-| `NestedFailure`     | A nested `@ConfigSpec` config had errors                             |
+| `NestedFailure`     | Not produced by generated loaders, which report nested errors with prefixed keys; available to hand-written loaders |
 
 ## Reloading at Runtime
 
@@ -535,7 +615,7 @@ appConfig.reloadOn(scope, fileChangedEvents)    // or reload on your own trigger
 val port = appConfig.current.server.port
 ```
 
-The first load throws a `ConfigException` if it fails, since there is no good config to fall back on yet. After that, reloads never throw: `reload()` is a suspend function that returns `Updated`, `Unchanged` or `Failed`, and reloads run one at a time so a slow one never overwrites a newer result. `context` is where reloads read their sources; pass `Dispatchers.IO` (or `Dispatchers.Default` where there is no IO dispatcher) when reloads start from the main thread.
+The first load throws a `ConfigException` if it fails, since there is no good config to fall back on yet. After that, reloads never throw: `reload()` is a suspend function that returns `Updated`, `Unchanged` or `Failed`, and reloads run one at a time so a slow one never overwrites a newer result. `context` is where reloads read their sources; pass `Dispatchers.IO` when reloads start from the main thread. `Dispatchers.IO` does not exist on JS and Wasm; use `Dispatchers.Default` there, or in common code.
 
 `Konstant.get` still returns the config installed at startup, so read reloadable values through `appConfig`.
 
@@ -565,15 +645,14 @@ scope.launch {
 }
 ```
 
-Keys are matched in dot notation (`server.port`) and, as a fallback, in SCREAMING_SNAKE case, ignoring case. Firebase parameter keys cannot contain dots, so name them in snake case (`server_port`, `database_pool_size`); `Map` fields cannot come from Firebase for the same reason. Any other source whose values change can implement `ReloadableSource` and report changes on its `changes` flow; `watch` it the same way, with the instance that the `sources` block adds.
+Keys are matched in dot notation (`server.port`) and, as a fallback, in SCREAMING_SNAKE case, ignoring case. Firebase parameter keys cannot contain dots, so name them in snake case (`server_port`, `database_pool_size`). A `Map` field can still come from Firebase as one inline value (`server_headers` = `a=1, b=2`). Any other source whose values change can implement `ReloadableSource` and report changes on its `changes` flow; `watch` it the same way, with the instance that the `sources` block adds.
 
 ## KSP Compile-Time Validations
 
 The KSP processor emits a **compilation error** (not a warning) for:
 
 - `@ConfigSpec` applied to a non-data class
-- A field type that is another `@ConfigSpec` class but is not itself annotated with `@ConfigSpec`
-- A field type that is unsupported (e.g. arbitrary classes, `Map` with non-`String` keys, nullable collection elements)
+- A field type that is unsupported (e.g. a class without `@ConfigSpec`, `Map` with non-`String` keys, nullable collection elements)
 - A nullable nested `@ConfigSpec` field
 - `@Convert` naming something other than an object implementing `ValueConverter` of the field's type
 - A validation annotation on a type it doesn't apply to, or an invalid `@Pattern` regex
@@ -582,29 +661,7 @@ The KSP processor emits a **compilation error** (not a warning) for:
 
 For each `@ConfigSpec` class, the processor generates:
 
-**1. A schema object** with one `FieldDescriptor` per property. The loader reads it; it is marked `@InternalKonstantApi` and may change between releases, so application code shouldn't depend on it:
-
-```kotlin
-object DatabaseConfigSchema {
-    val url = FieldDescriptor<String>(
-        propertyName = "url",
-        typeName = "String",
-        secret = false,
-        default = null,
-        hasDefault = false,
-        convert = { it }
-    )
-    val port = FieldDescriptor<Int>(
-        propertyName = "port",
-        typeName = "Int",
-        secret = false,
-        default = 5432,
-        hasDefault = true,
-        convert = String::toInt
-    )
-    // ...
-}
-```
+**1. A schema object** (`DatabaseConfigSchema`) with one field descriptor per property, which the loader reads. Its shape is internal and may change between releases, so application code shouldn't use it.
 
 **2. A typed loader extension** on `ConfigLoader`:
 
@@ -626,18 +683,17 @@ fun DatabaseConfig.konstantNestedConfigs(): List<Any> // every nested spec, at a
 
 ```
 konstant/
-+-- konstant-annotations/    # @ConfigSpec, @Secret, @Key -- zero deps, commonMain
-+-- konstant-core/           # FieldDescriptor, ConfigSource, ConfigLoader,
-|                             # ConfigResult, key resolution utils -- commonMain
++-- konstant-annotations/    # @ConfigSpec, @Key, @Secret, @Convert, @Range, @Size, @NotBlank, @Pattern
++-- konstant-core/           # ConfigLoader, ConfigResult, ConfigError, ConfigReport, ConfigSource,
+|                            # ValueConverter, Konstant holder, configField/field delegates
 +-- konstant-ksp/            # KSP processor -- JVM only, runs at build time
-+-- konstant-sources/        # EnvSource, DotEnvSource, PropertiesSource
-|                             # with expect/actual per platform
-+-- konstant-test/           # MapSource for unit testing configs
-+-- konstant-koin/           # Koin integration: config<T>() definitions
-+-- konstant-toml/           # Full TOML 1.0 source (ktoml)
-+-- konstant-yaml/           # Full YAML 1.2 source (kaml)
++-- konstant-sources/        # EnvSource, DotEnvSource, PropertiesSource, per-platform file access
++-- konstant-toml/           # TOML 1.0 source (ktoml)
++-- konstant-yaml/           # YAML 1.2 source (kaml)
 +-- konstant-json/           # JSON source (kotlinx-serialization-json)
 +-- konstant-reload/         # ReloadableConfig (StateFlow of validated reloads), RemoteSource
++-- konstant-koin/           # Koin integration: config<T>() definitions
++-- konstant-test/           # MapSource for unit testing configs
 +-- konstant-gradle-plugin/  # Gradle plugin baking config files per environment
 ```
 
@@ -646,13 +702,21 @@ konstant/
 | Platform                   | Environment variables | Files (`fromFile`) | Bundled resources |
 |----------------------------|-----------------------|--------------------|-------------------|
 | Android                    | Yes                   | Yes                | Yes (assets)      |
-| iOS, macOS (arm64)         | Yes                   | Yes                | Yes (main bundle) |
+| iOS (arm64, x64, simulator arm64), macOS (arm64) | Yes | Yes            | Yes (main bundle) |
 | JVM                        | Yes                   | Yes                | Yes (classpath)   |
 | Linux (x64)                | Yes                   | Yes                | Yes (files)       |
 | JS and Wasm on Node.js     | Yes                   | Yes                | Yes (files)       |
 | JS and Wasm in the browser | No (always empty)     | No                 | No                |
 
+Android needs minSdk 24. Wasm on Node.js reads files through `process.getBuiltinModule`, so it needs Node.js 20.16 or 22.3 and later; on older versions file sources fail and resources read as missing. Windows, watchOS, tvOS and Linux arm64 are not built yet.
+
 In the browser, bake config into the app with the [Gradle plugin](#baked-config-gradle-plugin) or pass text to a source's `fromString`. Parsing, loading and validation work the same on every platform.
+
+## API reference and stability
+
+`./gradlew dokkaGenerate` builds the API reference for every module into `build/dokka/html`.
+
+Konstant is in alpha, so the API can still change between releases. Declarations marked `@InternalKonstantApi` exist for generated code; using them needs an explicit opt-in and they can change in any release. Everything else is tracked in each module's `api/` dump, and changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 

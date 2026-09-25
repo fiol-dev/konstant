@@ -12,5 +12,6 @@ package io.github.fiol_dev.konstant.core
  * ```
  */
 public fun interface ValueConverter<out T> {
+    /** Converts the [raw] text from a source into the field's value. */
     public fun convert(raw: String): T
 }

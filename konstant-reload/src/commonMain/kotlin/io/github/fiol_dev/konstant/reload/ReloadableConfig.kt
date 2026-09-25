@@ -120,6 +120,7 @@ public class ReloadableConfig<T : Any> private constructor(
         return reloadOn(scope, sources.map { it.changes }.merge())
     }
 
+    /** Creates a [ReloadableConfig] with [load]. */
     public companion object {
         /**
          * Loads the config for the first time.

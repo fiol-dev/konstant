@@ -1,6 +1,6 @@
 [versions]
 libGroup = "io.github.fiol-dev.konstant"
-libVersion = "0.1.0-alpha01"
+libVersion = "0.1.0-alpha2"
 agp = "9.1.0"
 android-minSdk = "24"
 android-compileSdk = "36"
