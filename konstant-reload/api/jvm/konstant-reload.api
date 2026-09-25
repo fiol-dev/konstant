@@ -39,7 +39,6 @@ public final class io/github/fiol_dev/konstant/reload/ReloadResult$Updated : io/
 
 public final class io/github/fiol_dev/konstant/reload/ReloadableConfig {
 	public static final field Companion Lio/github/fiol_dev/konstant/reload/ReloadableConfig$Companion;
-	public synthetic fun <init> (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getConfig ()Lkotlinx/coroutines/flow/StateFlow;
 	public final fun getCurrent ()Ljava/lang/Object;
 	public final fun getFailures ()Lkotlinx/coroutines/flow/SharedFlow;
