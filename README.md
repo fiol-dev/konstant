@@ -320,8 +320,12 @@ To load a file bundled with the app instead, see [Bundled resources](#bundled-re
 
 The built-in `.properties` parser is pure Kotlin (no `java.util.Properties`):
 - Skips blank lines and lines starting with `#` or `!`
-- Splits on first `=` or `:` delimiter
-- Trims key and value whitespace
+- Splits on the first unescaped `=`, `:` or whitespace (`key=value`, `key: value`, `key value`)
+- Continues a line ending in a backslash onto the next one
+- Unescapes `\uXXXX`, `\t`, `\n`, `\r`, `\f` and escaped separators (`\=`, `\:`, `\ `, `\#`, `\\`)
+- Trims leading and trailing whitespace from values
+
+The `.env` parser accepts a leading `export `, strips ` # comments` from unquoted values, unescapes `\n`, `\r`, `\t`, `\"` and `\\` in double-quoted values, and takes single-quoted values literally.
 
 ### TOML, YAML and JSON (`konstant-toml`, `konstant-yaml`, `konstant-json`)
 
