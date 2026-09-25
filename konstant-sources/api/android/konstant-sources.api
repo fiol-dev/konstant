@@ -1,0 +1,59 @@
+public final class io/github/fiol_dev/konstant/sources/DotEnvSource : io/github/fiol_dev/konstant/core/ConfigSource {
+	public static final field Companion Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;
+	public fun children (Ljava/lang/String;)Ljava/util/Map;
+	public fun get (Ljava/lang/String;)Ljava/lang/String;
+	public fun getFallbackKeyFormats ()Ljava/util/List;
+	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
+	public fun getName ()Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/sources/DotEnvSource$Companion {
+	public final fun fromFile (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+	public static synthetic fun fromFile$default (Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+	public final fun fromResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+	public static synthetic fun fromResource$default (Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+}
+
+public final class io/github/fiol_dev/konstant/sources/EnvSource : io/github/fiol_dev/konstant/core/ConfigSource {
+	public fun <init> ()V
+	public fun children (Ljava/lang/String;)Ljava/util/Map;
+	public fun get (Ljava/lang/String;)Ljava/lang/String;
+	public fun getFallbackKeyFormats ()Ljava/util/List;
+	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
+	public fun getName ()Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/sources/KonstantInitProvider : android/content/ContentProvider {
+	public fun <init> ()V
+	public fun delete (Landroid/net/Uri;Ljava/lang/String;[Ljava/lang/String;)I
+	public fun getType (Landroid/net/Uri;)Ljava/lang/String;
+	public fun insert (Landroid/net/Uri;Landroid/content/ContentValues;)Landroid/net/Uri;
+	public fun onCreate ()Z
+	public fun query (Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;
+	public fun update (Landroid/net/Uri;Landroid/content/ContentValues;Ljava/lang/String;[Ljava/lang/String;)I
+}
+
+public final class io/github/fiol_dev/konstant/sources/PlatformFile_androidKt {
+	public static final fun readFileText (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/sources/PlatformResource_androidKt {
+	public static final fun initKonstantAndroid (Landroid/content/Context;)V
+	public static final fun readResourceText (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/fiol_dev/konstant/sources/PropertiesSource : io/github/fiol_dev/konstant/core/MapBackedSource {
+	public static final field Companion Lio/github/fiol_dev/konstant/sources/PropertiesSource$Companion;
+	public fun <init> (Ljava/util/Map;)V
+	public fun getFallbackKeyFormats ()Ljava/util/List;
+	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
+}
+
+public final class io/github/fiol_dev/konstant/sources/PropertiesSource$Companion {
+	public final fun fromFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
+	public final fun fromResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
+	public static synthetic fun fromResource$default (Lio/github/fiol_dev/konstant/sources/PropertiesSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
+	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
+}
+

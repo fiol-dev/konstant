@@ -61,7 +61,7 @@ jobs:
       run: ./gradlew ${{ matrix.target }} --continue
 
   # Fails when the public API no longer matches the dumps in each module's api/ folder.
-  # After an intended API change, run ./gradlew updateLegacyAbi and commit the new dumps.
+  # After an intended API change, run ./gradlew updateKotlinAbi and commit the new dumps.
   api:
     runs-on: macos-latest
     steps:
@@ -74,7 +74,7 @@ jobs:
     - name: Set up Gradle
       uses: gradle/actions/setup-gradle@v4
     - name: Check public API
-      run: ./gradlew checkLegacyAbi
+      run: ./gradlew checkKotlinAbi
 
   # Builds the merged API docs (./gradlew dokkaGenerate) so broken KDoc links fail the PR.
   # The generated site is attached to the run as the "api-docs" artifact.
