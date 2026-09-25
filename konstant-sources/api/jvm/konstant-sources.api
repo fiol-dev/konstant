@@ -1,6 +1,5 @@
 public final class io/github/fiol_dev/konstant/sources/DotEnvSource : io/github/fiol_dev/konstant/core/ConfigSource {
 	public static final field Companion Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;
-	public synthetic fun <init> (Ljava/util/Map;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun children (Ljava/lang/String;)Ljava/util/Map;
 	public fun get (Ljava/lang/String;)Ljava/lang/String;
 	public fun getFallbackKeyFormats ()Ljava/util/List;

@@ -1,18 +1,18 @@
 [versions]
 libGroup = "io.github.fiol-dev.konstant"
 libVersion = "0.1.0-alpha2"
-agp = "9.1.0"
+agp = "9.2.1"
 android-minSdk = "24"
 android-compileSdk = "36"
 kotlin = "2.4.0"
-ksp = "2.3.6"
+ksp = "2.3.9"
 kotlinpoet = "2.3.0"
 koin = "4.2.2"
 ktoml = "0.7.1"
 kaml = "0.104.0"
 kotlinx-serialization = "1.9.0"
 kotlinx-coroutines = "1.11.0"
-mavenPublish = "0.36.0"
+mavenPublish = "0.37.0"
 dokka = "2.2.0"
 
 [libraries]
