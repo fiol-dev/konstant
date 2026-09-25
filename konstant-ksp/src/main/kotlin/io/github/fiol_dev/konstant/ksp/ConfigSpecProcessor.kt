@@ -242,7 +242,11 @@ class ConfigSpecProcessor(
             val min = (it.argument("min") as? Double) ?: Double.NEGATIVE_INFINITY
             val max = (it.argument("max") as? Double) ?: Double.POSITIVE_INFINITY
             // Via toString so a Float like 0.1f compares as 0.1, not 0.10000000149
-            val asDouble = if (kind.type.code == "kotlin.Float") "v.toString().toDouble()" else "v.toDouble()"
+            val asDouble = when (kind.type.code) {
+                "kotlin.Float" -> "v.toString().toDouble()"
+                "kotlin.Double" -> "v"
+                else -> "v.toDouble()"
+            }
             checks += "$VALIDATORS.range($asDouble, ${doubleLiteral(min)}, ${doubleLiteral(max)})"
         }
         findAnnotation(prop, Size::class.qualifiedName!!)?.let {
