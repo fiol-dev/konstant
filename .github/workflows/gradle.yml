@@ -13,6 +13,8 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_call:
+  # Lets CI be started by hand, e.g. when a run failed to start and can't be retried
+  workflow_dispatch:
 
 permissions:
   contents: read
