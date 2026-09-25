@@ -1,0 +1,14 @@
+public final class io/github/fiol_dev/konstant/yaml/YamlSource : io/github/fiol_dev/konstant/core/MapBackedSource {
+	public static final field Companion Lio/github/fiol_dev/konstant/yaml/YamlSource$Companion;
+	public fun <init> (Ljava/util/Map;)V
+	public fun getFallbackKeyFormats ()Ljava/util/List;
+	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
+}
+
+public final class io/github/fiol_dev/konstant/yaml/YamlSource$Companion {
+	public final fun fromFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/yaml/YamlSource;
+	public final fun fromResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/yaml/YamlSource;
+	public static synthetic fun fromResource$default (Lio/github/fiol_dev/konstant/yaml/YamlSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/yaml/YamlSource;
+	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/yaml/YamlSource;
+}
+

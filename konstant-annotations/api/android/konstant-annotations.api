@@ -1,0 +1,31 @@
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/ConfigSpec : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/Convert : java/lang/annotation/Annotation {
+	public abstract fun with ()Ljava/lang/Class;
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/Key : java/lang/annotation/Annotation {
+	public abstract fun name ()Ljava/lang/String;
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/NotBlank : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/Pattern : java/lang/annotation/Annotation {
+	public abstract fun regex ()Ljava/lang/String;
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/Range : java/lang/annotation/Annotation {
+	public abstract fun max ()D
+	public abstract fun min ()D
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/Secret : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class io/github/fiol_dev/konstant/annotations/Size : java/lang/annotation/Annotation {
+	public abstract fun max ()I
+	public abstract fun min ()I
+}
+
