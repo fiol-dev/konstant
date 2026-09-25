@@ -80,4 +80,11 @@ class ConvertersTest {
     fun doubleQuotedItemsUnescapeQuotesAndBackslashes() {
         assertEquals(listOf("x\", \"y", "C:\\dir\\", "a\\b"), Converters.list("[\"x\\\", \\\"y\", \"C:\\\\dir\\\\\", 'a\\b']") { it })
     }
+
+    @Test
+    fun backslashIsLiteralOutsideDoubleQuotes() {
+        assertEquals(listOf("C:\\", "D:\\"), Converters.list("'C:\\', 'D:\\'") { it })
+        assertEquals(listOf("C:\\", "D:\\"), Converters.list("C:\\, D:\\") { it })
+        assertEquals(mapOf("a" to "x\\", "b" to "y"), Converters.map("a='x\\', b=y") { it })
+    }
 }
