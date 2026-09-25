@@ -4,9 +4,9 @@ plugins {
 }
 
 signing {
-    val signingKey: String? by project
-    val signingKeyId: String? by project
-    val signingKeyPassword: String? by project
+    val signingKey = project.findProperty("signingKey") as String?
+    val signingKeyId = project.findProperty("signingKeyId") as String?
+    val signingKeyPassword = project.findProperty("signingKeyPassword") as String?
     useInMemoryPgpKeys(
         signingKeyId,
         signingKey,

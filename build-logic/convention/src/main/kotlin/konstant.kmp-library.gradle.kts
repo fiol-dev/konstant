@@ -50,8 +50,8 @@ kotlin {
 // Keep kotlin-js-store/yarn.lock current instead of failing when JS test tooling changes
 rootProject.plugins.withType<YarnPlugin> {
     rootProject.the<YarnRootExtension>().apply {
-        yarnLockMismatchReport = YarnLockMismatchReport.WARNING
-        reportNewYarnLock = false
-        yarnLockAutoReplace = true
+        yarnLockMismatchReportProperty.set(YarnLockMismatchReport.WARNING)
+        reportNewYarnLockProperty.set(false)
+        yarnLockAutoReplaceProperty.set(true)
     }
 }
