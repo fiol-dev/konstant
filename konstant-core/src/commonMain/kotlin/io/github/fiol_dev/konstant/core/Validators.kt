@@ -7,6 +7,7 @@ package io.github.fiol_dev.konstant.core
 @InternalKonstantApi
 public object Validators {
 
+    /** Checks `@Range`: [value] must be a number within [min]..[max]. */
     public fun range(value: Double, min: Double, max: Double): String? = when {
         value.isNaN() -> "must be a number"
         value < min && max == Double.POSITIVE_INFINITY -> "must be at least ${format(min)}"
@@ -15,6 +16,7 @@ public object Validators {
         else -> null
     }
 
+    /** Checks `@Size`: [size] must be within [min]..[max]. */
     public fun size(size: Int, min: Int, max: Int): String? = when {
         size < min && max == Int.MAX_VALUE -> "size must be at least $min"
         size > max && min == 0 -> "size must be at most $max"
@@ -22,8 +24,10 @@ public object Validators {
         else -> null
     }
 
+    /** Checks `@NotBlank`. */
     public fun notBlank(value: String): String? = if (value.isBlank()) "must not be blank" else null
 
+    /** Checks `@Pattern`: the whole [value] must match [regex]. */
     public fun pattern(value: String, regex: String): String? =
         if (Regex(regex).matches(value)) null else "must match $regex"
 

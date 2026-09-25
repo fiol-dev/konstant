@@ -7,6 +7,15 @@ import io.github.fiol_dev.konstant.core.InternalKonstantApi
 import io.github.fiol_dev.konstant.core.KeyFormat
 import io.github.fiol_dev.konstant.sources.parser.DotEnvParser
 
+/**
+ * Reads a `.env` file of `KEY=value` lines, with keys in `SCREAMING_SNAKE_CASE`. Unlike the other
+ * file sources, keys are matched exactly, including case.
+ *
+ * The parser supports blank lines, full-line `#` comments, a leading `export `, and ` # comments`
+ * after unquoted values. Double-quoted values unescape `\n`, `\r`, `\t`, `\"` and `\\`;
+ * single-quoted values are taken literally. Lines without `=` are skipped, and a later duplicate
+ * key wins. Multiline values and `${VAR}` expansion are not supported.
+ */
 public class DotEnvSource private constructor(
     private val entries: Map<String, String>,
 ) : ConfigSource {
@@ -37,9 +46,7 @@ public class DotEnvSource private constructor(
         public fun fromResource(path: String, optional: Boolean = false): DotEnvSource =
             fromString(resourceText(path, optional))
 
-        /**
-         * Create from an already-read string content.
-         */
+        /** Parses `.env` text that is already in memory. */
         public fun fromString(content: String): DotEnvSource =
             DotEnvSource(DotEnvParser.parse(content))
     }

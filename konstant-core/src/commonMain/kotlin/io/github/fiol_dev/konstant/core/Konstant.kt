@@ -65,12 +65,22 @@ public object Konstant {
     /** The loaded config of type [T], root or nested. */
     public inline fun <reified T : Any> get(): T = get(T::class)
 
+    /**
+     * The loaded config of [type], root or nested, so `Konstant[AppConfig::class]` works.
+     *
+     * @throws IllegalStateException if Konstant is not initialized, no config of [type] was
+     *   loaded, or [type] appears more than once among the nested specs.
+     */
     public operator fun <T : Any> get(type: KClass<T>): T =
         getOrNull(type) ?: error(missingMessage(type))
 
     /** The loaded config of type [T], or null if there is none. */
     public inline fun <reified T : Any> getOrNull(): T? = getOrNull(T::class)
 
+    /**
+     * The loaded config of [type], or null if there is none. Also null when [type] appears more
+     * than once among the nested specs, since it is ambiguous.
+     */
     @Suppress("UNCHECKED_CAST")
     public fun <T : Any> getOrNull(type: KClass<T>): T? = snapshot.load().configs[type] as T?
 

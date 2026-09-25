@@ -29,6 +29,10 @@ public class JsonSource(entries: Map<String, String>) : MapBackedSource(entries)
         /** @throws IllegalArgumentException if [content] is not valid JSON. */
         public fun fromString(content: String): JsonSource = JsonSource(flatten(content))
 
+        /**
+         * Reads the file at [path]. Throws if it cannot be read, as in browsers, which have no
+         * file system; use [fromString] there.
+         */
         public fun fromFile(path: String): JsonSource = fromString(readFileText(path))
 
         /** Reads a bundled file (see `readResourceText` for each platform); [optional] allows it to be missing. */

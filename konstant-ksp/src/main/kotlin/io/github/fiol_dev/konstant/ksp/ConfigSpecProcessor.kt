@@ -3,6 +3,9 @@ package io.github.fiol_dev.konstant.ksp
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.isAnnotationPresent
+import com.google.devtools.ksp.isInternal
+import com.google.devtools.ksp.isPrivate
+import com.google.devtools.ksp.isProtected
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -74,6 +77,16 @@ class ConfigSpecProcessor(
         val property: KSPropertyDeclaration?,
     )
 
+    private data class Names(
+        /** Fully qualified class name, used wherever the type appears in generated code. */
+        val type: String,
+        val display: String,
+        /** Base of generated declaration names, see [generatedName]. */
+        val generated: String,
+        /** Modifier for every generated declaration, so modules with explicit API mode compile. */
+        val visibility: String,
+    )
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver.getSymbolsWithAnnotation(ConfigSpec::class.qualifiedName!!)
         val deferred = mutableListOf<KSAnnotated>()
@@ -94,6 +107,18 @@ class ConfigSpecProcessor(
     private fun collectFields(decl: KSClassDeclaration): List<Field>? {
         if (decl.classKind != ClassKind.CLASS || Modifier.DATA !in decl.modifiers) {
             logger.error("@ConfigSpec can only be applied to data classes", decl)
+            return null
+        }
+        if (decl.qualifiedName == null) {
+            logger.error("@ConfigSpec can't be applied to a local class", decl)
+            return null
+        }
+        if (Modifier.INNER in decl.modifiers) {
+            logger.error("@ConfigSpec can't be applied to an inner class; remove 'inner'", decl)
+            return null
+        }
+        if (enclosingClasses(decl).any { it.isPrivate() || it.isProtected() }) {
+            logger.error("@ConfigSpec classes and the classes they are nested in must be public or internal", decl)
             return null
         }
         val params = decl.primaryConstructor?.parameters ?: return null
@@ -128,7 +153,8 @@ class ConfigSpecProcessor(
                 val shown = type.declaration.qualifiedName?.asString() ?: type.toString()
                 val nullableNested = type.isMarkedNullable && isConfigSpec(type)
                 val reason = if (nullableNested) {
-                    "Nullable @ConfigSpec field '$name' is not supported; give it a default instead."
+                    "Nullable @ConfigSpec field '$name' is not supported; make it non-null with a default, " +
+                        "which is used when none of its required keys are set."
                 } else {
                     "Unsupported field type '$shown${if (type.isMarkedNullable) "?" else ""}' " +
                         "for property '$name'. $SUPPORTED_TYPES_HINT"
@@ -265,6 +291,8 @@ class ConfigSpecProcessor(
                 '"' -> append("\\\"")
                 '$' -> append("\\$")
                 '\n' -> append("\\n")
+                '\r' -> append("\\r")
+                '\t' -> append("\\t")
                 else -> append(ch)
             }
         }
@@ -347,8 +375,29 @@ class ConfigSpecProcessor(
         return decl is KSClassDeclaration && decl.isAnnotationPresent(ConfigSpec::class)
     }
 
+    /** [decl] and the classes it is nested in, outermost first. */
+    private fun enclosingClasses(decl: KSClassDeclaration): List<KSClassDeclaration> =
+        generateSequence(decl) { it.parentDeclaration as? KSClassDeclaration }.toList().asReversed()
+
+    /**
+     * Base of the generated names: `Db` for a top-level class, `Cfg_Db` for `Db` nested in `Cfg`,
+     * giving `DbSchema`/`loadDb` and `Cfg_DbSchema`/`loadCfg_Db`.
+     */
+    private fun generatedName(decl: KSClassDeclaration): String =
+        enclosingClasses(decl).joinToString("_") { it.simpleName.asString() }
+
+    /** How the class is named in messages and KDoc, e.g. `Cfg.Db`. */
+    private fun displayName(decl: KSClassDeclaration): String =
+        enclosingClasses(decl).joinToString(".") { it.simpleName.asString() }
+
     private fun generateCode(decl: KSClassDeclaration, fields: List<Field>) {
-        val className = decl.simpleName.asString()
+        val names = Names(
+            type = decl.qualifiedName!!.asString(),
+            display = displayName(decl),
+            generated = generatedName(decl),
+            // Generated declarations are as visible as the class, which must be public or internal
+            visibility = if (enclosingClasses(decl).any { it.isInternal() }) "internal" else "public",
+        )
         val packageName = decl.packageName.asString()
         val sourceFile = decl.containingFile!!
 
@@ -370,7 +419,7 @@ class ConfigSpecProcessor(
             if (kind is FieldKind.Nested) {
                 val nestedPackage = kind.decl.packageName.asString()
                 if (nestedPackage != packageName) {
-                    imports += "$nestedPackage.load${kind.decl.simpleName.asString()}"
+                    imports += "$nestedPackage.load${generatedName(kind.decl)}"
                     imports += "$nestedPackage.konstantNestedConfigs"
                 }
             }
@@ -379,11 +428,14 @@ class ConfigSpecProcessor(
         val file = codeGenerator.createNewFile(
             dependencies = Dependencies(true, sourceFile),
             packageName = packageName,
-            fileName = "${className}Generated",
+            fileName = "${names.generated}Generated",
         )
 
         val code = buildString {
-            appendLine("@file:Suppress(\"UNCHECKED_CAST\", \"RedundantSuppression\", \"UnusedImport\")")
+            appendLine(
+                "@file:Suppress(\"UNCHECKED_CAST\", \"RedundantSuppression\", \"UnusedImport\", " +
+                    "\"RedundantVisibilityModifier\", \"LocalVariableName\", \"FunctionName\", \"ObjectPropertyName\")",
+            )
             appendLine("@file:OptIn(io.github.fiol_dev.konstant.core.InternalKonstantApi::class)")
             appendLine()
             if (packageName.isNotEmpty()) {
@@ -393,11 +445,12 @@ class ConfigSpecProcessor(
             imports.forEach { appendLine("import $it") }
             appendLine()
 
-            generateSchema(className, fields, defaultValues)
+            generateSchema(names, fields, defaultValues)
             appendLine()
-            generateLoader(className, fields)
+            generateNestedDefaults(names, fields, defaultValues)
+            generateLoader(names, fields, defaultValues)
             appendLine()
-            generateHolder(className, fields)
+            generateHolder(names, fields)
         }
 
         file.write(code.toByteArray())
@@ -405,11 +458,11 @@ class ConfigSpecProcessor(
     }
 
     private fun StringBuilder.generateSchema(
-        className: String,
+        names: Names,
         fields: List<Field>,
         defaultValues: Map<String, String>,
     ) {
-        appendLine("object ${className}Schema {")
+        appendLine("${names.visibility} object ${names.generated}Schema {")
         for (field in fields) {
             val kind = field.kind as? FieldKind.Value ?: continue
             val propName = field.name
@@ -420,14 +473,14 @@ class ConfigSpecProcessor(
             val hasDefault = field.param.hasDefault || kind.nullable
             val defaultExpr = if (field.param.hasDefault) defaultValues[propName] else null
 
-            appendLine("    val $propName = FieldDescriptor<$codeType>(")
+            appendLine("    public val $propName: FieldDescriptor<$codeType> = FieldDescriptor<$codeType>(")
             appendLine("        propertyName = \"$propName\",")
             appendLine("        typeName = \"${kind.type.display}\",")
             appendLine("        secret = $isSecret,")
             appendLine("        default = ${defaultExpr ?: "null"},")
             appendLine("        hasDefault = $hasDefault,")
             if (customKey != null) {
-                appendLine("        customKey = \"$customKey\",")
+                appendLine("        customKey = ${kotlinString(customKey)},")
             }
             appendLine("        convert = ${kind.type.converter},")
             kind.type.childrenConverter?.let { appendLine("        convertChildren = $it,") }
@@ -437,61 +490,99 @@ class ConfigSpecProcessor(
         appendLine("}")
     }
 
-    private fun StringBuilder.generateLoader(className: String, fields: List<Field>) {
-        appendLine("fun ConfigLoader.load$className(prefix: String? = null): ConfigResult<$className> {")
-        appendLine("    val errors = mutableListOf<ConfigError>()")
+    /** Default of a nested spec field, or null when it has none (or it couldn't be read from source). */
+    private fun nestedDefault(field: Field, defaultValues: Map<String, String>): String? =
+        if (field.kind is FieldKind.Nested && field.param.hasDefault) defaultValues[field.name] else null
+
+    /**
+     * One file-private function per nested spec field with a default. Like the schema's defaults,
+     * they are evaluated outside the loader, so the loader's locals can't change what they mean.
+     */
+    private fun StringBuilder.generateNestedDefaults(
+        names: Names,
+        fields: List<Field>,
+        defaultValues: Map<String, String>,
+    ) {
+        for (field in fields) {
+            val kind = field.kind as? FieldKind.Nested ?: continue
+            val default = nestedDefault(field, defaultValues) ?: continue
+            appendLine("private fun __default_${names.generated}_${field.name}(): ${kind.decl.qualifiedName!!.asString()} =")
+            appendLine("    $default")
+            appendLine()
+        }
+    }
+
+    // Generated locals start with `__`, so they can't clash with or shadow the config's field names
+    // (a field named `prefix` or `errors`) or the loader's `prefix` parameter.
+    private fun StringBuilder.generateLoader(names: Names, fields: List<Field>, defaultValues: Map<String, String>) {
+        val loadName = "load${names.generated}"
+        appendLine("${names.visibility} fun ConfigLoader.$loadName(prefix: String? = null): ConfigResult<${names.type}> {")
+        appendLine("    val __errors = mutableListOf<ConfigError>()")
         appendLine()
 
         for (field in fields) {
             val propName = field.name
+            val result = "__r_$propName"
+            val value = "__v_$propName"
             when (val kind = field.kind) {
                 is FieldKind.Nested -> {
                     val nestedQualified = kind.decl.qualifiedName!!.asString()
-                    val capName = propName.replaceFirstChar { it.uppercase() }
-                    appendLine("    val nestedPrefix$capName = KeyUtils.resolvePrefix(\"$propName\", prefix)")
-                    appendLine("    val ${propName}Result = load${kind.decl.simpleName.asString()}(nestedPrefix$capName)")
-                    appendLine("    val $propName: $nestedQualified? = when (${propName}Result) {")
-                    appendLine("        is ConfigResult.Success -> ${propName}Result.value")
-                    appendLine("        is ConfigResult.Failure -> { errors += ${propName}Result.errors; null }")
+                    val nestedLoad = "load${generatedName(kind.decl)}"
+                    appendLine("    val $result = $nestedLoad(KeyUtils.resolvePrefix(\"$propName\", prefix))")
+                    appendLine("    val $value: $nestedQualified? = when ($result) {")
+                    appendLine("        is ConfigResult.Success -> $result.value")
+                    if (nestedDefault(field, defaultValues) != null) {
+                        // The default stands in only when the nested keys are absent, not when they are wrong
+                        appendLine("        is ConfigResult.Failure -> if ($result.errors.all { it is ConfigError.MissingRequired }) {")
+                        appendLine("            __default_${names.generated}_$propName()")
+                        appendLine("        } else {")
+                        appendLine("            __errors += $result.errors")
+                        appendLine("            null")
+                        appendLine("        }")
+                    } else {
+                        appendLine("        is ConfigResult.Failure -> { __errors += $result.errors; null }")
+                    }
                     appendLine("    }")
                 }
                 is FieldKind.Value -> {
-                    appendLine("    val ${propName}Result = resolve(${className}Schema.$propName, prefix)")
-                    appendLine("    val $propName: ${kind.type.code}? = when (${propName}Result) {")
-                    appendLine("        is ResolveResult.Success -> ${propName}Result.value")
-                    appendLine("        is ResolveResult.Error -> { errors += ${propName}Result.error; null }")
+                    appendLine("    val $result = resolve(${names.generated}Schema.$propName, prefix)")
+                    appendLine("    val $value: ${kind.type.code}? = when ($result) {")
+                    appendLine("        is ResolveResult.Success -> $result.value")
+                    appendLine("        is ResolveResult.Error -> { __errors += $result.error; null }")
                     appendLine("    }")
                 }
             }
             appendLine()
         }
 
-        appendLine("    if (errors.isNotEmpty()) return ConfigResult.Failure(errors)")
+        appendLine("    if (__errors.isNotEmpty()) return ConfigResult.Failure(__errors)")
         appendLine()
 
         // require(...) in the class's init block becomes a ValidationFailed error
         appendLine("    return try {")
-        appendLine("        ConfigResult.Success($className(")
+        appendLine("        ConfigResult.Success(${names.type}(")
         for (field in fields) {
             val nullable = (field.kind as? FieldKind.Value)?.nullable == true
-            // Every non-null field is set once errors is empty
-            appendLine("            ${field.name} = ${field.name}${if (nullable) "" else "!!"},")
+            // Every non-null field is set once __errors is empty
+            appendLine("            ${field.name} = __v_${field.name}${if (nullable) "" else "!!"},")
         }
         appendLine("        ))")
-        appendLine("    } catch (e: IllegalArgumentException) {")
+        appendLine("    } catch (__e: IllegalArgumentException) {")
         appendLine("        ConfigResult.Failure(listOf(ConfigError.ValidationFailed(")
-        appendLine("            key = prefix ?: \"$className\",")
+        appendLine("            key = prefix ?: \"${names.display}\",")
         appendLine("            rawValue = null,")
-        appendLine("            reason = e.message ?: \"rejected by $className\",")
+        appendLine("            reason = __e.message ?: \"rejected by ${names.display}\",")
         appendLine("        )))")
         appendLine("    }")
         appendLine("}")
     }
 
     /** Loads the spec into the global [Konstant] holder, together with every nested spec. */
-    private fun StringBuilder.generateHolder(className: String, fields: List<Field>) {
-        appendLine("/** Every nested @ConfigSpec inside this config, at any depth. Used by [Konstant.init$className]. */")
-        appendLine("fun $className.konstantNestedConfigs(): List<Any> = buildList {")
+    private fun StringBuilder.generateHolder(names: Names, fields: List<Field>) {
+        val vis = names.visibility
+        val initName = "init${names.generated}"
+        appendLine("/** Every nested @ConfigSpec inside this config, at any depth. Used by [Konstant.$initName]. */")
+        appendLine("$vis fun ${names.type}.konstantNestedConfigs(): List<Any> = buildList {")
         for (field in fields) {
             if (field.kind !is FieldKind.Nested) continue
             // Qualified, so a field named like a list member (size, indices) still means the config's
@@ -502,15 +593,15 @@ class ConfigSpecProcessor(
         appendLine("}")
         appendLine()
         appendLine("/**")
-        appendLine(" * Loads [$className] from the sources in [block] and makes it and its nested specs")
+        appendLine(" * Loads [${names.display}] from the sources in [block] and makes it and its nested specs")
         appendLine(" * available through Konstant.get. Throws ConfigException if loading fails.")
         appendLine(" */")
-        appendLine("fun Konstant.init$className(prefix: String? = null, block: ConfigLoaderBuilder.() -> Unit): $className =")
-        appendLine("    init$className(ConfigLoader(block), prefix)")
+        appendLine("$vis fun Konstant.$initName(prefix: String? = null, block: ConfigLoaderBuilder.() -> Unit): ${names.type} =")
+        appendLine("    $initName(ConfigLoader(block), prefix)")
         appendLine()
         appendLine("/** Like the builder overload, with an existing [loader]. */")
-        appendLine("fun Konstant.init$className(loader: ConfigLoader, prefix: String? = null): $className {")
-        appendLine("    val config = loader.load$className(prefix).getOrThrow()")
+        appendLine("$vis fun Konstant.$initName(loader: ConfigLoader, prefix: String? = null): ${names.type} {")
+        appendLine("    val config = loader.load${names.generated}(prefix).getOrThrow()")
         appendLine("    install(config, config.konstantNestedConfigs())")
         appendLine("    return config")
         appendLine("}")

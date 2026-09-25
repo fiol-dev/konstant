@@ -2,11 +2,30 @@
 
 package io.github.fiol_dev.konstant.core
 
+/**
+ * Reads config values from a list of sources. The KSP processor adds a `load<Spec>()`
+ * extension for each `@ConfigSpec` class, which returns a [ConfigResult]:
+ *
+ * ```kotlin
+ * val loader = ConfigLoader {
+ *     sources {
+ *         +EnvSource()
+ *         +TomlSource.fromFile("config.toml")
+ *     }
+ * }
+ * val config = loader.loadAppConfig().getOrThrow()
+ * ```
+ */
 public class ConfigLoader private constructor(
+    /**
+     * The sources in priority order: for each field, the first source that has a value wins,
+     * and later sources are only asked when earlier ones have none.
+     */
     public val sources: List<ConfigSource>,
     // Set only on the copy made by explain, so ordinary loads record nothing
     private val recorder: MutableList<ConfigReport.Entry>?,
 ) {
+    /** Creates a loader with the sources declared in [block]'s [ConfigLoaderBuilder.sources]. */
     public constructor(block: ConfigLoaderBuilder.() -> Unit) :
         this(ConfigLoaderBuilder().apply(block).buildSources(), null)
 
@@ -98,9 +117,14 @@ public class ConfigLoader private constructor(
     }
 }
 
+/** Configures a [ConfigLoader]. */
 public class ConfigLoaderBuilder {
     private val sourceList = mutableListOf<ConfigSource>()
 
+    /**
+     * Adds sources with `+source`, highest priority first. Calling it again appends
+     * after the sources already added.
+     */
     public fun sources(block: SourcesBuilder.() -> Unit) {
         val builder = SourcesBuilder()
         builder.block()
@@ -110,9 +134,11 @@ public class ConfigLoaderBuilder {
     internal fun buildSources(): List<ConfigSource> = sourceList.toList()
 }
 
+/** Collects sources inside [ConfigLoaderBuilder.sources], in the order they are added. */
 public class SourcesBuilder {
     internal val sources = mutableListOf<ConfigSource>()
 
+    /** Adds this source after the ones already added, so it has lower priority. */
     public operator fun ConfigSource.unaryPlus() {
         sources += this
     }

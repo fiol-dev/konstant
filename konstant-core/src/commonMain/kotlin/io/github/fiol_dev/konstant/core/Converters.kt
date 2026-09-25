@@ -114,7 +114,8 @@ public object Converters {
 
     /**
      * Index of [target] outside quotes and brackets, or -1. A quote only opens a quoted section at
-     * the start of a value, so apostrophes inside words (`O'Brien`) are plain characters.
+     * the start of a value, so apostrophes inside words (`O'Brien`) are plain characters. Inside
+     * double quotes `\` escapes the next character; inside single quotes it is literal.
      */
     private fun indexOfTopLevel(text: String, target: Char, from: Int = 0): Int {
         var depth = 0
@@ -124,7 +125,8 @@ public object Converters {
         while (i < text.length) {
             val ch = text[i]
             when {
-                quote != null -> if (ch == '\\') i++ else if (ch == quote) quote = null
+                // Backslash escapes only exist inside double quotes; single quotes are literal (`'C:\'`)
+                quote != null -> if (ch == '\\' && quote == '"') i++ else if (ch == quote) quote = null
                 ch == target && depth == 0 -> return i
                 (ch == '"' || ch == '\'') && atValueStart -> quote = ch
                 ch == '[' || ch == '{' -> depth++

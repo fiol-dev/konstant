@@ -28,8 +28,16 @@ public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries)
     override val fallbackKeyFormats: List<KeyFormat> = listOf(KeyFormat.SCREAMING_SNAKE)
 
     public companion object {
+        /**
+         * Parses YAML text that is already in memory. Blank text, or text with only comments,
+         * gives an empty source.
+         */
         public fun fromString(content: String): YamlSource = YamlSource(flatten(content))
 
+        /**
+         * Reads the file at [path]. Throws if it cannot be read, as in browsers, which have no
+         * file system; use [fromString] there.
+         */
         public fun fromFile(path: String): YamlSource = fromString(readFileText(path))
 
         /** Reads a bundled file (see `readResourceText` for each platform); [optional] allows it to be missing. */
@@ -43,10 +51,12 @@ public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries)
         private val yaml = Yaml(configuration = YamlConfiguration(anchorsAndAliases = AnchorsAndAliases.Permitted()))
 
         internal fun flatten(content: String): Map<String, String> {
-            if (content.isBlank()) return emptyMap()
+            // Editors on Windows often save files with a byte order mark
+            val text = content.removePrefix("﻿")
+            if (text.isBlank()) return emptyMap()
             val out = linkedMapOf<String, String>()
             val root = try {
-                yaml.parseToYamlNode(content)
+                yaml.parseToYamlNode(text)
             } catch (_: EmptyYamlDocumentException) {
                 return emptyMap() // only comments
             }

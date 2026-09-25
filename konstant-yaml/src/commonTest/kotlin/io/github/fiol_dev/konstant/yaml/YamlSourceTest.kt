@@ -83,4 +83,10 @@ class YamlSourceTest {
         assertTrue(YamlSource.flatten("").isEmpty())
         assertTrue(YamlSource.flatten("# only a comment\n").isEmpty())
     }
+
+    @Test
+    fun ignoresByteOrderMark() {
+        assertEquals("1", YamlSource.flatten("﻿a: 1")["a"])
+        assertTrue(YamlSource.flatten("﻿").isEmpty())
+    }
 }

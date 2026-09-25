@@ -5,7 +5,9 @@ package io.github.fiol_dev.konstant.core
  * order, its key, the value used and where it came from. [toString] renders a table.
  */
 public class ConfigReport<out T>(
+    /** What the load returned, including any errors. */
     public val result: ConfigResult<T>,
+    /** One entry per field, in load order. */
     public val entries: List<Entry>,
 ) {
     /**
@@ -33,7 +35,10 @@ public class ConfigReport<out T>(
     }
 
     public companion object {
+        /** [Entry.origin] of a field that no source had, so its default was used. */
         public const val DEFAULT: String = "default"
+
+        /** [Entry.origin] of a required field that no source had. */
         public const val MISSING: String = "missing"
     }
 }
