@@ -48,6 +48,13 @@ public class ConfigLoader private constructor(
     /** Resolves one field from the sources in priority order. Called by generated code. */
     @InternalKonstantApi
     public fun <T> resolve(field: FieldDescriptor<T>, prefix: String?): ResolveResult<T> {
+        // Reports name every field the same way, whichever source format supplied it
+        val reportKey = if (recorder == null) "" else KeyUtils.resolveKey(
+            propertyName = field.propertyName,
+            prefix = prefix,
+            format = KeyFormat.DOT_NOTATION,
+            customKey = field.customKey,
+        )
         for ((index, source) in sources.withIndex()) {
             val formats = listOf(source.keyFormat) + source.fallbackKeyFormats
             for (format in formats) {
@@ -59,13 +66,13 @@ public class ConfigLoader private constructor(
                 )
                 val raw = source.get(key)
                 if (raw != null) {
-                    record(field, key, raw, "#${index + 1} ${source.name}")
+                    record(field, reportKey, raw, "#${index + 1} ${source.name}", key)
                     return convert(field, key, raw) { field.convert(raw) }
                 }
                 val convertChildren = field.convertChildren ?: continue
                 val children = source.children(key) ?: continue
                 val shown = children.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }
-                record(field, key, shown, "#${index + 1} ${source.name}")
+                record(field, reportKey, shown, "#${index + 1} ${source.name}", key)
                 return convert(field, key, shown) { convertChildren(children) }
             }
         }
@@ -77,16 +84,24 @@ public class ConfigLoader private constructor(
             customKey = field.customKey,
         )
         if (field.hasDefault) {
-            if (recorder != null) record(field, resolvedKey, field.default?.toString(), ConfigReport.DEFAULT)
+            if (recorder != null) record(field, reportKey, field.default?.toString(), ConfigReport.DEFAULT)
             @Suppress("UNCHECKED_CAST")
             return ResolveResult.Success(field.default as T)
         }
-        record(field, resolvedKey, null, ConfigReport.MISSING)
+        record(field, reportKey, null, ConfigReport.MISSING)
         return ResolveResult.Error(ConfigError.MissingRequired(resolvedKey))
     }
 
-    private fun record(field: FieldDescriptor<*>, key: String, value: String?, origin: String) {
-        recorder?.add(ConfigReport.Entry(key, if (field.secret && value != null) "***" else value, origin))
+    private fun record(
+        field: FieldDescriptor<*>,
+        key: String,
+        value: String?,
+        origin: String,
+        sourceKey: String? = null,
+    ) {
+        val recorder = recorder ?: return
+        val shown = if (field.secret && value != null) "***" else value
+        recorder.add(ConfigReport.Entry(key, shown, origin, sourceKey?.takeIf { it != key }))
     }
 
     private inline fun <T> convert(

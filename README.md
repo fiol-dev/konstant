@@ -586,12 +586,14 @@ An `init` block that calls `require` is reported as a `ValidationFailed` error k
 
 ```kotlin
 println(loader.explain { loadAppConfig() })
-// APP_NAME           Demo                      #1 EnvSource
-// DATABASE_URL       jdbc:postgresql://db/app  #3 TomlSource
-// DATABASE_PASSWORD  ***                       #2 DotEnvSource
+// app.name           Demo                      #1 EnvSource as APP_NAME
+// database.url       jdbc:postgresql://db/app  #3 TomlSource(config/app.dev.toml)
+// database.password  ***                       #2 DotEnvSource(.env)
 // ...
-// SERVER_PORT        8080                      default
+// server.port        8080                      default
 ```
+
+Keys are always shown in `dot.notation` (or as written in `@Key`), and `as …` gives the name the source used when it differs. Sources read with `fromFile`, `fromResource` or the Gradle plugin show their file; for `fromString`, pass `origin = "…"` to label it.
 
 The report also carries the load `result`, so it works for failed loads too (missing fields show as `missing`).
 

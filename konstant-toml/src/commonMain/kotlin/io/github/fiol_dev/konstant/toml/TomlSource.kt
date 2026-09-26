@@ -26,7 +26,7 @@ import io.github.fiol_dev.konstant.sources.readResourceText
  * (`[database] url` is `database.url`), arrays become `[a, "b"]` lists, and each entry of an
  * array of tables is numbered (`servers.0.name`).
  */
-public class TomlSource(entries: Map<String, String>) : MapBackedSource(entries) {
+public class TomlSource(entries: Map<String, String>, origin: String? = null) : MapBackedSource(entries, origin) {
     override val keyFormat: KeyFormat = KeyFormat.DOT_NOTATION
     override val fallbackKeyFormats: List<KeyFormat> = listOf(KeyFormat.SCREAMING_SNAKE)
 
@@ -34,20 +34,22 @@ public class TomlSource(entries: Map<String, String>) : MapBackedSource(entries)
         /**
          * Parses TOML text that is already in memory. Blank text gives an empty source, and
          * invalid TOML throws ktoml's parse exception.
+         * [origin], such as the file name, labels the source in `ConfigLoader.explain` reports.
          */
-        public fun fromString(content: String): TomlSource = TomlSource(flatten(content))
+        public fun fromString(content: String, origin: String? = null): TomlSource =
+            TomlSource(flatten(content), origin)
 
         /**
          * Reads the file at [path]. Throws if it cannot be read, as in browsers, which have no
          * file system; use [fromString] there.
          */
-        public fun fromFile(path: String): TomlSource = fromString(readFileText(path))
+        public fun fromFile(path: String): TomlSource = fromString(readFileText(path), origin = path)
 
         /** Reads a bundled file (see `readResourceText` for each platform); [optional] allows it to be missing. */
         public fun fromResource(path: String, optional: Boolean = false): TomlSource {
             val text = readResourceText(path)
                 ?: if (optional) "" else throw IllegalArgumentException("Bundled resource not found: $path")
-            return fromString(text)
+            return fromString(text, origin = path)
         }
 
         internal fun flatten(content: String): Map<String, String> {
