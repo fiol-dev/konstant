@@ -50,6 +50,7 @@ public final class io/github/fiol_dev/konstant/core/ConfigLoader {
 	public fun <init> (Lkotlin/jvm/functions/Function1;)V
 	public final fun explain (Lkotlin/jvm/functions/Function1;)Lio/github/fiol_dev/konstant/core/ConfigReport;
 	public final fun getSources ()Ljava/util/List;
+	public final fun loadOptional (Ljava/lang/String;Lkotlin/jvm/functions/Function2;)Lio/github/fiol_dev/konstant/core/ConfigResult;
 	public final fun resolve (Lio/github/fiol_dev/konstant/core/FieldDescriptor;Ljava/lang/String;)Lio/github/fiol_dev/konstant/core/ResolveResult;
 }
 
@@ -72,10 +73,12 @@ public final class io/github/fiol_dev/konstant/core/ConfigReport$Companion {
 }
 
 public final class io/github/fiol_dev/konstant/core/ConfigReport$Entry {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getKey ()Ljava/lang/String;
 	public final fun getOrigin ()Ljava/lang/String;
+	public final fun getSourceKey ()Ljava/lang/String;
 	public final fun getValue ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -181,7 +184,8 @@ public final class io/github/fiol_dev/konstant/core/Konstant {
 }
 
 public abstract class io/github/fiol_dev/konstant/core/MapBackedSource : io/github/fiol_dev/konstant/core/ConfigSource {
-	public fun <init> (Ljava/util/Map;)V
+	public fun <init> (Ljava/util/Map;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/util/Map;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun children (Ljava/lang/String;)Ljava/util/Map;
 	public fun get (Ljava/lang/String;)Ljava/lang/String;
 	public fun getFallbackKeyFormats ()Ljava/util/List;

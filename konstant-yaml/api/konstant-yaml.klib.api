@@ -7,7 +7,7 @@
 
 // Library unique name: <io.github.fiol-dev.konstant:konstant-yaml>
 final class io.github.fiol_dev.konstant.yaml/YamlSource : io.github.fiol_dev.konstant.core/MapBackedSource { // io.github.fiol_dev.konstant.yaml/YamlSource|null[0]
-    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.yaml/YamlSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>, kotlin/String? = ...) // io.github.fiol_dev.konstant.yaml/YamlSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>;kotlin.String?){}[0]
 
     final val fallbackKeyFormats // io.github.fiol_dev.konstant.yaml/YamlSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
         final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.yaml/YamlSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
@@ -17,6 +17,6 @@ final class io.github.fiol_dev.konstant.yaml/YamlSource : io.github.fiol_dev.kon
     final object Companion { // io.github.fiol_dev.konstant.yaml/YamlSource.Companion|null[0]
         final fun fromFile(kotlin/String): io.github.fiol_dev.konstant.yaml/YamlSource // io.github.fiol_dev.konstant.yaml/YamlSource.Companion.fromFile|fromFile(kotlin.String){}[0]
         final fun fromResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.yaml/YamlSource // io.github.fiol_dev.konstant.yaml/YamlSource.Companion.fromResource|fromResource(kotlin.String;kotlin.Boolean){}[0]
-        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.yaml/YamlSource // io.github.fiol_dev.konstant.yaml/YamlSource.Companion.fromString|fromString(kotlin.String){}[0]
+        final fun fromString(kotlin/String, kotlin/String? = ...): io.github.fiol_dev.konstant.yaml/YamlSource // io.github.fiol_dev.konstant.yaml/YamlSource.Companion.fromString|fromString(kotlin.String;kotlin.String?){}[0]
     }
 }
