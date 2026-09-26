@@ -22,7 +22,8 @@ kotlin {
     abiValidation {}
 
     android {
-        namespace = "$group.${project.name.removePrefix("konstant-")}"
+        // Android namespaces must be valid Java packages, so the hyphen in the group becomes an underscore
+        namespace = "${group.toString().replace('-', '_')}.${project.name.removePrefix("konstant-").replace('-', '_')}"
         compileSdk = libs.version("android-compileSdk").toInt()
         minSdk = libs.version("android-minSdk").toInt()
         withHostTest {}
