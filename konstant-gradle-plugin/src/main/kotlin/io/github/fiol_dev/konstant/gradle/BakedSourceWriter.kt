@@ -35,7 +35,11 @@ internal object BakedSourceWriter {
                 // Split long files: a JVM string constant can't exceed 64 KB
                 val literal = chunks(file.content)
                     .joinToString(" +\n                ") { kotlinString(it) }
-                appendLine("            ${factory.substringAfterLast('.')}.fromString($literal),")
+                // The path labels the source in ConfigLoader.explain reports
+                appendLine("            ${factory.substringAfterLast('.')}.fromString(")
+                appendLine("                $literal,")
+                appendLine("                origin = ${kotlinString(file.path)},")
+                appendLine("            ),")
             }
             appendLine("        )")
             appendLine("    }")

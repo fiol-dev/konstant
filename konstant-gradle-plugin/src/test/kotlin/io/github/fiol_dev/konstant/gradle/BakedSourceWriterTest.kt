@@ -32,6 +32,20 @@ class BakedSourceWriterTest {
     }
 
     @Test
+    fun labelsEachSourceWithItsPath() {
+        val source = BakedSourceWriter.render(
+            "com.example", "Baked", "prod",
+            listOf(
+                BakedSourceWriter.Input("config/app.properties", "a=1"),
+                BakedSourceWriter.Input("config/app.prod.properties", "a=2"),
+            ),
+        )
+
+        assertTrue("origin = \"config/app.properties\"," in source, source)
+        assertTrue("origin = \"config/app.prod.properties\"," in source, source)
+    }
+
+    @Test
     fun escapesContentIntoValidKotlinStrings() {
         assertEquals(
             "\"a \\\"quoted\\\" \\\$HOME \\\\n\\nnext\"",

@@ -39,7 +39,10 @@ abstract interface io.github.fiol_dev.konstant.core/ConfigSource { // io.github.
 }
 
 abstract class io.github.fiol_dev.konstant.core/MapBackedSource : io.github.fiol_dev.konstant.core/ConfigSource { // io.github.fiol_dev.konstant.core/MapBackedSource|null[0]
-    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.core/MapBackedSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>, kotlin/String? = ...) // io.github.fiol_dev.konstant.core/MapBackedSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>;kotlin.String?){}[0]
+
+    open val name // io.github.fiol_dev.konstant.core/MapBackedSource.name|{}name[0]
+        open fun <get-name>(): kotlin/String // io.github.fiol_dev.konstant.core/MapBackedSource.name.<get-name>|<get-name>(){}[0]
 
     open fun children(kotlin/String): kotlin.collections/Map<kotlin/String, kotlin/String>? // io.github.fiol_dev.konstant.core/MapBackedSource.children|children(kotlin.String){}[0]
     open fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.core/MapBackedSource.get|get(kotlin.String){}[0]
@@ -79,12 +82,14 @@ final class <#A: out kotlin/Any?> io.github.fiol_dev.konstant.core/ConfigReport 
     final fun toString(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigReport.toString|toString(){}[0]
 
     final class Entry { // io.github.fiol_dev.konstant.core/ConfigReport.Entry|null[0]
-        constructor <init>(kotlin/String, kotlin/String?, kotlin/String) // io.github.fiol_dev.konstant.core/ConfigReport.Entry.<init>|<init>(kotlin.String;kotlin.String?;kotlin.String){}[0]
+        constructor <init>(kotlin/String, kotlin/String?, kotlin/String, kotlin/String? = ...) // io.github.fiol_dev.konstant.core/ConfigReport.Entry.<init>|<init>(kotlin.String;kotlin.String?;kotlin.String;kotlin.String?){}[0]
 
         final val key // io.github.fiol_dev.konstant.core/ConfigReport.Entry.key|{}key[0]
             final fun <get-key>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigReport.Entry.key.<get-key>|<get-key>(){}[0]
         final val origin // io.github.fiol_dev.konstant.core/ConfigReport.Entry.origin|{}origin[0]
             final fun <get-origin>(): kotlin/String // io.github.fiol_dev.konstant.core/ConfigReport.Entry.origin.<get-origin>|<get-origin>(){}[0]
+        final val sourceKey // io.github.fiol_dev.konstant.core/ConfigReport.Entry.sourceKey|{}sourceKey[0]
+            final fun <get-sourceKey>(): kotlin/String? // io.github.fiol_dev.konstant.core/ConfigReport.Entry.sourceKey.<get-sourceKey>|<get-sourceKey>(){}[0]
         final val value // io.github.fiol_dev.konstant.core/ConfigReport.Entry.value|{}value[0]
             final fun <get-value>(): kotlin/String? // io.github.fiol_dev.konstant.core/ConfigReport.Entry.value.<get-value>|<get-value>(){}[0]
 
@@ -115,6 +120,7 @@ final class io.github.fiol_dev.konstant.core/ConfigLoader { // io.github.fiol_de
         final fun <get-sources>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/ConfigSource> // io.github.fiol_dev.konstant.core/ConfigLoader.sources.<get-sources>|<get-sources>(){}[0]
 
     final fun <#A1: kotlin/Any?> explain(kotlin/Function1<io.github.fiol_dev.konstant.core/ConfigLoader, io.github.fiol_dev.konstant.core/ConfigResult<#A1>>): io.github.fiol_dev.konstant.core/ConfigReport<#A1> // io.github.fiol_dev.konstant.core/ConfigLoader.explain|explain(kotlin.Function1<io.github.fiol_dev.konstant.core.ConfigLoader,io.github.fiol_dev.konstant.core.ConfigResult<0:0>>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> loadOptional(kotlin/String, kotlin/Function2<io.github.fiol_dev.konstant.core/ConfigLoader, kotlin/String, io.github.fiol_dev.konstant.core/ConfigResult<#A1>>): io.github.fiol_dev.konstant.core/ConfigResult<#A1>? // io.github.fiol_dev.konstant.core/ConfigLoader.loadOptional|loadOptional(kotlin.String;kotlin.Function2<io.github.fiol_dev.konstant.core.ConfigLoader,kotlin.String,io.github.fiol_dev.konstant.core.ConfigResult<0:0>>){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> resolve(io.github.fiol_dev.konstant.core/FieldDescriptor<#A1>, kotlin/String?): io.github.fiol_dev.konstant.core/ResolveResult<#A1> // io.github.fiol_dev.konstant.core/ConfigLoader.resolve|resolve(io.github.fiol_dev.konstant.core.FieldDescriptor<0:0>;kotlin.String?){0§<kotlin.Any?>}[0]
 }
 

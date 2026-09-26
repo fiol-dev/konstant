@@ -39,5 +39,6 @@ class ConfigErrorTest {
         assertEquals(ConfigReport.Entry("a", null, "missing"), ConfigReport.Entry("a", null, "missing"))
         assertNotEquals(ConfigReport.Entry("a", "1", "default"), ConfigReport.Entry("a", "2", "default"))
         assertEquals("Entry(key=a, value=null, origin=missing)", ConfigReport.Entry("a", null, "missing").toString())
+        assertNotEquals(ConfigReport.Entry("a", "1", "#1 EnvSource", "A"), ConfigReport.Entry("a", "1", "#1 EnvSource"))
     }
 }

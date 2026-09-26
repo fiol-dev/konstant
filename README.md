@@ -264,6 +264,20 @@ The property name in the parent class becomes the prefix for nested config field
 
 A nested field with a default (`val replica: DbConfig = DbConfig(url = "jdbc:local")`) uses that default when the nested spec's only errors are missing required keys. The whole default is used in that case, so any nested keys that were set are ignored; a value that fails to convert or validate is still reported.
 
+### Optional sections
+
+Make a nested field nullable for a section that may be switched off, such as OIDC in a local build:
+
+```kotlin
+@ConfigSpec
+data class AuthConfig(
+    val oidc: OidcConfig?,                          // null when no OIDC_* key is set
+    val flags: FeatureFlags? = FeatureFlags(),      // or a default of your choice
+)
+```
+
+The section is absent, and gets its default (`null` if none is given), when no source has any of its keys. Once any of its keys is set, the section loads as usual, so a missing required key such as `OIDC_CLIENT_ID` is an error. In `explain` reports an absent section is one `default` line.
+
 ### `@Key` Override
 
 `@Key("CUSTOM_KEY")` overrides the resolved key entirely (prefix is not applied):
@@ -385,27 +399,48 @@ val loader = ConfigLoader {
 
 `YamlSource`, `JsonSource`, `PropertiesSource` and `DotEnvSource` have the same `fromResource`.
 
-**Android.** No `Context` is needed: `konstant-sources` merges a small `KonstantInitProvider` into your manifest, and it captures the application context at startup. To drop the provider (for example if you use App Startup), remove it in your manifest and call `initKonstantAndroid(context)` in `Application.onCreate` before loading:
+**Android.** Reading assets needs the application context. Call `initKonstantAndroid(context)` in `Application.onCreate` before loading:
+
+```kotlin
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        initKonstantAndroid(this)
+    }
+}
+```
+
+Or let a content provider do it at app start by declaring it in your manifest:
 
 ```xml
 <provider
     android:name="io.github.fiol_dev.konstant.sources.KonstantInitProvider"
     android:authorities="${applicationId}.konstant-init"
-    tools:node="remove" />
+    android:exported="false" />
 ```
 
-Unit tests on the JVM have no provider either, so call `initKonstantAndroid` there too.
+Konstant adds nothing to your manifest itself, so apps that only use `fromString`, `fromFile` or baked config need neither. Unit tests on the JVM call `initKonstantAndroid` too.
 
 ### Baked config (Gradle plugin)
 
 The `io.github.fiol-dev.konstant` Gradle plugin compiles config files into the app, choosing files per environment at build time. This suits values that differ per flavor or stage but shouldn't be read from disk at runtime.
 
-> The plugin is not published yet. Until it is, use it from a checkout of this repository with `includeBuild("konstant/konstant-gradle-plugin")` in your `pluginManagement` block.
+The plugin is published to Maven Central (from 0.1.0-alpha3) with the same version as the libraries, so `mavenCentral()` must be in your plugin repositories:
+
+```kotlin
+// settings.gradle.kts
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
 
 ```kotlin
 // build.gradle.kts
 plugins {
-    id("io.github.fiol-dev.konstant")
+    id("io.github.fiol-dev.konstant") version "<version>"
 }
 
 konstant {
@@ -494,6 +529,7 @@ class SystemPropertiesSource : MapBackedSource(
 | `Map<String, T>`            | `key=value` pairs (`a=1, b=2`), a TOML table or a YAML mapping           |
 | `T?` (any of the above)     | optional: `null` when no source has the key and there is no default      |
 | Nested `@ConfigSpec`        | loaded recursively with a key prefix; its default, if any, is used when only required keys are missing |
+| Nullable nested `@ConfigSpec` | an optional section: its default (or `null`) when none of its keys is set ([Optional sections](#optional-sections)) |
 
 `T` in collections is any of the scalar types above. Other types trigger a **compile-time error**.
 
@@ -575,12 +611,14 @@ An `init` block that calls `require` is reported as a `ValidationFailed` error k
 
 ```kotlin
 println(loader.explain { loadAppConfig() })
-// APP_NAME           Demo                      #1 EnvSource
-// DATABASE_URL       jdbc:postgresql://db/app  #3 TomlSource
-// DATABASE_PASSWORD  ***                       #2 DotEnvSource
+// app.name           Demo                      #1 EnvSource as APP_NAME
+// database.url       jdbc:postgresql://db/app  #3 TomlSource(config/app.dev.toml)
+// database.password  ***                       #2 DotEnvSource(.env)
 // ...
-// SERVER_PORT        8080                      default
+// server.port        8080                      default
 ```
+
+Keys are always shown in `dot.notation` (or as written in `@Key`), and `as …` gives the name the source used when it differs. Sources read with `fromFile`, `fromResource` or the Gradle plugin show their file; for `fromString`, pass `origin = "…"` to label it.
 
 The report also carries the load `result`, so it works for failed loads too (missing fields show as `missing`).
 
@@ -659,7 +697,6 @@ The KSP processor emits a **compilation error** (not a warning) for:
 
 - `@ConfigSpec` applied to a non-data class
 - A field type that is unsupported (e.g. a class without `@ConfigSpec`, `Map` with non-`String` keys, nullable collection elements)
-- A nullable nested `@ConfigSpec` field
 - A `@ConfigSpec` class that is local, `inner`, or private or protected (itself or a class it is nested in)
 - `@Convert` naming something other than an object implementing `ValueConverter` of the field's type
 - A validation annotation on a type it doesn't apply to, or an invalid `@Pattern` regex
@@ -728,6 +765,8 @@ Konstant is in alpha, so the API can still change between releases. Declarations
 ## Contributing
 
 Each library module keeps a dump of its public API in its `api/` folder, and CI fails when the code no longer matches it. After an intended public API change, run `./gradlew updateKotlinAbi` (on macOS, which builds every target) and commit the updated dumps with the change.
+
+`./gradlew publishToMavenLocal :konstant-gradle-plugin:publishToMavenLocal` installs a local build without signing keys; only release builds sign. JVM and Android artifacts target Java 11 bytecode whatever JDK builds them.
 
 ## License
 

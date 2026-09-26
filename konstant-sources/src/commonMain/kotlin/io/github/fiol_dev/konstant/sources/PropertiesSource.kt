@@ -15,27 +15,30 @@ import io.github.fiol_dev.konstant.sources.parser.PropertiesParser
  * `#` and `!` comments, lines continued with a trailing `\`, and the escapes `\uXXXX`, `\t`, `\n`,
  * `\r`, `\f` and escaped separators. Values are trimmed, and a later duplicate key wins.
  */
-public class PropertiesSource(properties: Map<String, String>) : MapBackedSource(properties) {
+public class PropertiesSource(properties: Map<String, String>, origin: String? = null) : MapBackedSource(properties, origin) {
     override val keyFormat: KeyFormat = KeyFormat.DOT_NOTATION
     override val fallbackKeyFormats: List<KeyFormat> = listOf(KeyFormat.SCREAMING_SNAKE)
 
     public companion object {
-        /** Parses properties text that is already in memory. */
-        public fun fromString(content: String): PropertiesSource =
-            PropertiesSource(PropertiesParser.parse(content))
+        /**
+         * Parses properties text that is already in memory.
+         * [origin], such as the file name, labels the source in `ConfigLoader.explain` reports.
+         */
+        public fun fromString(content: String, origin: String? = null): PropertiesSource =
+            PropertiesSource(PropertiesParser.parse(content), origin)
 
         /**
          * Reads the file at [path]. Throws if it cannot be read, as in browsers, which have no
          * file system; use [fromString] there.
          */
         public fun fromFile(path: String): PropertiesSource =
-            fromString(readFileText(path))
+            fromString(readFileText(path), origin = path)
 
         /**
          * Reads a file bundled with the app, see [readResourceText] for where each platform looks.
          * With [optional] a missing file gives an empty source instead of an error.
          */
         public fun fromResource(path: String, optional: Boolean = false): PropertiesSource =
-            fromString(resourceText(path, optional))
+            fromString(resourceText(path, optional), origin = path)
     }
 }

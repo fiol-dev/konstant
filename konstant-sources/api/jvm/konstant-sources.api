@@ -12,7 +12,8 @@ public final class io/github/fiol_dev/konstant/sources/DotEnvSource$Companion {
 	public static synthetic fun fromFile$default (Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
 	public final fun fromResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
 	public static synthetic fun fromResource$default (Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
-	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+	public final fun fromString (Ljava/lang/String;Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
+	public static synthetic fun fromString$default (Lio/github/fiol_dev/konstant/sources/DotEnvSource$Companion;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/DotEnvSource;
 }
 
 public final class io/github/fiol_dev/konstant/sources/EnvSource : io/github/fiol_dev/konstant/core/ConfigSource {
@@ -34,7 +35,8 @@ public final class io/github/fiol_dev/konstant/sources/PlatformResource_jvmKt {
 
 public final class io/github/fiol_dev/konstant/sources/PropertiesSource : io/github/fiol_dev/konstant/core/MapBackedSource {
 	public static final field Companion Lio/github/fiol_dev/konstant/sources/PropertiesSource$Companion;
-	public fun <init> (Ljava/util/Map;)V
+	public fun <init> (Ljava/util/Map;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/util/Map;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getFallbackKeyFormats ()Ljava/util/List;
 	public fun getKeyFormat ()Lio/github/fiol_dev/konstant/core/KeyFormat;
 }
@@ -43,6 +45,7 @@ public final class io/github/fiol_dev/konstant/sources/PropertiesSource$Companio
 	public final fun fromFile (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
 	public final fun fromResource (Ljava/lang/String;Z)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
 	public static synthetic fun fromResource$default (Lio/github/fiol_dev/konstant/sources/PropertiesSource$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
-	public final fun fromString (Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
+	public final fun fromString (Ljava/lang/String;Ljava/lang/String;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
+	public static synthetic fun fromString$default (Lio/github/fiol_dev/konstant/sources/PropertiesSource$Companion;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/fiol_dev/konstant/sources/PropertiesSource;
 }
 

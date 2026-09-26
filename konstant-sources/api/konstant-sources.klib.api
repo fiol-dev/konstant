@@ -9,13 +9,15 @@
 final class io.github.fiol_dev.konstant.sources/DotEnvSource : io.github.fiol_dev.konstant.core/ConfigSource { // io.github.fiol_dev.konstant.sources/DotEnvSource|null[0]
     final val keyFormat // io.github.fiol_dev.konstant.sources/DotEnvSource.keyFormat|{}keyFormat[0]
         final fun <get-keyFormat>(): io.github.fiol_dev.konstant.core/KeyFormat // io.github.fiol_dev.konstant.sources/DotEnvSource.keyFormat.<get-keyFormat>|<get-keyFormat>(){}[0]
+    final val name // io.github.fiol_dev.konstant.sources/DotEnvSource.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.fiol_dev.konstant.sources/DotEnvSource.name.<get-name>|<get-name>(){}[0]
 
     final fun get(kotlin/String): kotlin/String? // io.github.fiol_dev.konstant.sources/DotEnvSource.get|get(kotlin.String){}[0]
 
     final object Companion { // io.github.fiol_dev.konstant.sources/DotEnvSource.Companion|null[0]
         final fun fromFile(kotlin/String = ..., kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources/DotEnvSource // io.github.fiol_dev.konstant.sources/DotEnvSource.Companion.fromFile|fromFile(kotlin.String;kotlin.Boolean){}[0]
         final fun fromResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources/DotEnvSource // io.github.fiol_dev.konstant.sources/DotEnvSource.Companion.fromResource|fromResource(kotlin.String;kotlin.Boolean){}[0]
-        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.sources/DotEnvSource // io.github.fiol_dev.konstant.sources/DotEnvSource.Companion.fromString|fromString(kotlin.String){}[0]
+        final fun fromString(kotlin/String, kotlin/String? = ...): io.github.fiol_dev.konstant.sources/DotEnvSource // io.github.fiol_dev.konstant.sources/DotEnvSource.Companion.fromString|fromString(kotlin.String;kotlin.String?){}[0]
     }
 }
 
@@ -29,7 +31,7 @@ final class io.github.fiol_dev.konstant.sources/EnvSource : io.github.fiol_dev.k
 }
 
 final class io.github.fiol_dev.konstant.sources/PropertiesSource : io.github.fiol_dev.konstant.core/MapBackedSource { // io.github.fiol_dev.konstant.sources/PropertiesSource|null[0]
-    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>) // io.github.fiol_dev.konstant.sources/PropertiesSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, kotlin/String>, kotlin/String? = ...) // io.github.fiol_dev.konstant.sources/PropertiesSource.<init>|<init>(kotlin.collections.Map<kotlin.String,kotlin.String>;kotlin.String?){}[0]
 
     final val fallbackKeyFormats // io.github.fiol_dev.konstant.sources/PropertiesSource.fallbackKeyFormats|{}fallbackKeyFormats[0]
         final fun <get-fallbackKeyFormats>(): kotlin.collections/List<io.github.fiol_dev.konstant.core/KeyFormat> // io.github.fiol_dev.konstant.sources/PropertiesSource.fallbackKeyFormats.<get-fallbackKeyFormats>|<get-fallbackKeyFormats>(){}[0]
@@ -39,7 +41,7 @@ final class io.github.fiol_dev.konstant.sources/PropertiesSource : io.github.fio
     final object Companion { // io.github.fiol_dev.konstant.sources/PropertiesSource.Companion|null[0]
         final fun fromFile(kotlin/String): io.github.fiol_dev.konstant.sources/PropertiesSource // io.github.fiol_dev.konstant.sources/PropertiesSource.Companion.fromFile|fromFile(kotlin.String){}[0]
         final fun fromResource(kotlin/String, kotlin/Boolean = ...): io.github.fiol_dev.konstant.sources/PropertiesSource // io.github.fiol_dev.konstant.sources/PropertiesSource.Companion.fromResource|fromResource(kotlin.String;kotlin.Boolean){}[0]
-        final fun fromString(kotlin/String): io.github.fiol_dev.konstant.sources/PropertiesSource // io.github.fiol_dev.konstant.sources/PropertiesSource.Companion.fromString|fromString(kotlin.String){}[0]
+        final fun fromString(kotlin/String, kotlin/String? = ...): io.github.fiol_dev.konstant.sources/PropertiesSource // io.github.fiol_dev.konstant.sources/PropertiesSource.Companion.fromString|fromString(kotlin.String;kotlin.String?){}[0]
     }
 }
 

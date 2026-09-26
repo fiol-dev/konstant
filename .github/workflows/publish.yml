@@ -23,4 +23,5 @@ jobs:
           distribution: 'zulu'
           java-version: 21
       - name: Publish to MavenCentral
-        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        # The Gradle plugin is an included build, so its publish task is named explicitly
+        run: ./gradlew publishToMavenCentral :konstant-gradle-plugin:publishToMavenCentral --no-configuration-cache

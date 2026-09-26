@@ -21,25 +21,29 @@ import kotlinx.serialization.json.JsonPrimitive
  * and arrays of objects are numbered (`servers.0.name`). Numbers keep their text as written,
  * and `null` values are skipped, so the spec's default applies.
  */
-public class JsonSource(entries: Map<String, String>) : MapBackedSource(entries) {
+public class JsonSource(entries: Map<String, String>, origin: String? = null) : MapBackedSource(entries, origin) {
     override val keyFormat: KeyFormat = KeyFormat.DOT_NOTATION
     override val fallbackKeyFormats: List<KeyFormat> = listOf(KeyFormat.SCREAMING_SNAKE)
 
     public companion object {
-        /** @throws IllegalArgumentException if [content] is not valid JSON. */
-        public fun fromString(content: String): JsonSource = JsonSource(flatten(content))
+        /**
+         * @throws IllegalArgumentException if [content] is not valid JSON.
+         * [origin], such as the file name, labels the source in `ConfigLoader.explain` reports.
+         */
+        public fun fromString(content: String, origin: String? = null): JsonSource =
+            JsonSource(flatten(content), origin)
 
         /**
          * Reads the file at [path]. Throws if it cannot be read, as in browsers, which have no
          * file system; use [fromString] there.
          */
-        public fun fromFile(path: String): JsonSource = fromString(readFileText(path))
+        public fun fromFile(path: String): JsonSource = fromString(readFileText(path), origin = path)
 
         /** Reads a bundled file (see `readResourceText` for each platform); [optional] allows it to be missing. */
         public fun fromResource(path: String, optional: Boolean = false): JsonSource {
             val text = readResourceText(path)
                 ?: if (optional) "" else throw IllegalArgumentException("Bundled resource not found: $path")
-            return fromString(text)
+            return fromString(text, origin = path)
         }
 
         // Config files are hand-written, so tolerate comments and trailing commas

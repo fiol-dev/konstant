@@ -5,8 +5,9 @@ platform. Each source has companion factories: `fromFile`, `fromResource` and
 `fromString`. Resources are read from the classpath on the JVM, from assets on Android,
 from the main bundle on Apple platforms, and from files on Node and Linux.
 
-On Android the library registers `KonstantInitProvider`, which captures the application context
-at startup. Call `initKonstantAndroid` yourself only when that provider is removed, or in tests.
+On Android, reading assets needs the application context: call `initKonstantAndroid` in
+`Application.onCreate`, or register `KonstantInitProvider` in your manifest. Sources built with
+`fromString` or `fromFile` need neither, so nothing is added to your manifest.
 
 # Package io.github.fiol_dev.konstant.sources
 

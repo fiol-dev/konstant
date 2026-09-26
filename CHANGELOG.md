@@ -2,6 +2,17 @@
 
 ## 0.1.0-alpha3 (unreleased)
 
+### Added
+- Nullable nested `@ConfigSpec` fields for optional sections: `val oidc: OidcConfig?` is null (or its default) when no source has any of its keys, and loads as usual once one is set.
+- The Gradle plugin `io.github.fiol-dev.konstant` is published to Maven Central with the libraries.
+- `fromString(content, origin = "…")` on every file source labels it in `explain` reports.
+
+### Changed
+- `explain` reports show every key in `dot.notation` (or its `@Key`), whether it was found, defaulted or missing, and name the key the source used with `as …` when it differs. File sources show their path: `#2 TomlSource(config/app.dev.toml)`, including files baked by the Gradle plugin.
+- `konstant-sources` no longer adds `KonstantInitProvider` to your manifest. Apps that read assets with `fromResource` on Android call `initKonstantAndroid(context)` in `Application.onCreate`, or declare the provider in their manifest.
+- JVM and Android artifacts target Java 11 bytecode whatever JDK builds them. Before, a build on a newer JDK produced jars that older runtimes could not load.
+- `publishToMavenLocal` works without PGP keys; only builds with a `signingKey` sign.
+
 ### Fixed
 - Android libraries now have a valid namespace (`io.github.fiol_dev.konstant.*`). In 0.1.0-alpha2 the namespace contained a hyphen, so AGP rejected every Konstant `.aar`.
 

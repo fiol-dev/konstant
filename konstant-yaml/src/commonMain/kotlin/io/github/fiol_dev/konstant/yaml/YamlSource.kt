@@ -23,7 +23,7 @@ import io.github.fiol_dev.konstant.sources.readResourceText
  * collections). Mappings become dotted keys (`database: {url: x}` is `database.url`), lists
  * of scalars become `[a, "b"]` lists, and lists of mappings are numbered (`servers.0.name`).
  */
-public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries) {
+public class YamlSource(entries: Map<String, String>, origin: String? = null) : MapBackedSource(entries, origin) {
     override val keyFormat: KeyFormat = KeyFormat.DOT_NOTATION
     override val fallbackKeyFormats: List<KeyFormat> = listOf(KeyFormat.SCREAMING_SNAKE)
 
@@ -31,20 +31,22 @@ public class YamlSource(entries: Map<String, String>) : MapBackedSource(entries)
         /**
          * Parses YAML text that is already in memory. Blank text, or text with only comments,
          * gives an empty source.
+         * [origin], such as the file name, labels the source in `ConfigLoader.explain` reports.
          */
-        public fun fromString(content: String): YamlSource = YamlSource(flatten(content))
+        public fun fromString(content: String, origin: String? = null): YamlSource =
+            YamlSource(flatten(content), origin)
 
         /**
          * Reads the file at [path]. Throws if it cannot be read, as in browsers, which have no
          * file system; use [fromString] there.
          */
-        public fun fromFile(path: String): YamlSource = fromString(readFileText(path))
+        public fun fromFile(path: String): YamlSource = fromString(readFileText(path), origin = path)
 
         /** Reads a bundled file (see `readResourceText` for each platform); [optional] allows it to be missing. */
         public fun fromResource(path: String, optional: Boolean = false): YamlSource {
             val text = readResourceText(path)
                 ?: if (optional) "" else throw IllegalArgumentException("Bundled resource not found: $path")
-            return fromString(text)
+            return fromString(text, origin = path)
         }
 
         // Anchors and aliases are common in config files for shared defaults
