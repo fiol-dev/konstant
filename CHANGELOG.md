@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.1.0-alpha2 (unreleased)
+## 0.1.0-alpha3 (unreleased)
+
+### Fixed
+- Android libraries now have a valid namespace (`io.github.fiol_dev.konstant.*`). In 0.1.0-alpha2 the namespace contained a hyphen, so AGP rejected every Konstant `.aar`.
+
+## 0.1.0-alpha2
+
+Do not use on Android: its `.aar` files have an invalid namespace. Use 0.1.0-alpha3 instead.
+
 
 The first release meant for use. The API may still change before 1.0.
 
