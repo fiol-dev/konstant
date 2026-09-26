@@ -24,10 +24,23 @@ public class ConfigLoader private constructor(
     public val sources: List<ConfigSource>,
     // Set only on the copy made by explain, so ordinary loads record nothing
     private val recorder: MutableList<ConfigReport.Entry>?,
+    // Set only on the copies made by loadOptional, to tell whether a nested spec has any key set
+    private val presence: Presence?,
 ) {
     /** Creates a loader with the sources declared in [block]'s [ConfigLoaderBuilder.sources]. */
     public constructor(block: ConfigLoaderBuilder.() -> Unit) :
-        this(ConfigLoaderBuilder().apply(block).buildSources(), null)
+        this(ConfigLoaderBuilder().apply(block).buildSources(), null, null)
+
+    /** Records that a source had a value, for this optional nested spec and those around it. */
+    private class Presence(private val parent: Presence?) {
+        var found: Boolean = false
+            private set
+
+        fun mark() {
+            found = true
+            parent?.mark()
+        }
+    }
 
     /**
      * Runs [load] and reports, for every field, the value used and which source it came from.
@@ -41,8 +54,27 @@ public class ConfigLoader private constructor(
      */
     public fun <T> explain(load: ConfigLoader.() -> ConfigResult<T>): ConfigReport<T> {
         val entries = mutableListOf<ConfigReport.Entry>()
-        val result = ConfigLoader(sources, entries).load()
+        val result = ConfigLoader(sources, entries, null).load()
         return ConfigReport(result, entries)
+    }
+
+    /**
+     * Loads a nullable nested spec under [prefix]. Returns null, so the field gets its default,
+     * when no source has any of the spec's keys; otherwise the spec loads as usual, and missing
+     * required keys are errors. Called by generated code.
+     */
+    @InternalKonstantApi
+    public fun <T> loadOptional(prefix: String, load: ConfigLoader.(String) -> ConfigResult<T>): ConfigResult<T>? {
+        val presence = Presence(this.presence)
+        val reported = recorder?.size ?: 0
+        val result = ConfigLoader(sources, recorder, presence).load(prefix)
+        if (presence.found) return result
+        if (recorder != null) {
+            // One line for the absent section instead of a missing or default line per field
+            while (recorder.size > reported) recorder.removeAt(recorder.lastIndex)
+            recorder.add(ConfigReport.Entry(prefix.lowercase().replace('_', '.'), null, ConfigReport.DEFAULT))
+        }
+        return null
     }
 
     /** Resolves one field from the sources in priority order. Called by generated code. */
@@ -66,11 +98,13 @@ public class ConfigLoader private constructor(
                 )
                 val raw = source.get(key)
                 if (raw != null) {
+                    presence?.mark()
                     record(field, reportKey, raw, "#${index + 1} ${source.name}", key)
                     return convert(field, key, raw) { field.convert(raw) }
                 }
                 val convertChildren = field.convertChildren ?: continue
                 val children = source.children(key) ?: continue
+                presence?.mark()
                 val shown = children.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}=${it.value}" }
                 record(field, reportKey, shown, "#${index + 1} ${source.name}", key)
                 return convert(field, key, shown) { convertChildren(children) }

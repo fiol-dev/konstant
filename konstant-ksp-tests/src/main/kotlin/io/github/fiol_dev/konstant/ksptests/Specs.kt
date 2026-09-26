@@ -54,3 +54,23 @@ public data class BakedAppConfig(
     val retries: Int,
     val apiUrl: String,
 )
+
+@ConfigSpec
+public data class OidcConfig(
+    val issuer: String,
+    val clientId: String,
+    val scopes: List<String> = listOf("openid"),
+)
+
+@ConfigSpec
+public data class FeatureFlags(
+    val beta: Boolean = false,
+)
+
+/** Optional sections: null (or their default) when none of their keys is set. */
+@ConfigSpec
+public data class AuthConfig(
+    val realm: String = "main",
+    val oidc: OidcConfig?,
+    val flags: FeatureFlags? = FeatureFlags(beta = true),
+)

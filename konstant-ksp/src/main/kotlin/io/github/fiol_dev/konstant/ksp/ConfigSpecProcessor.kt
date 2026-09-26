@@ -46,7 +46,7 @@ class ConfigSpecProcessor(
         private const val SUPPORTED_TYPES_HINT =
             "Supported types: String, Int, Long, Double, Float, Boolean, Duration, enums, " +
                 "List/Set of those, Map<String, T> of those, nullable versions of all of them, " +
-                "and @ConfigSpec data classes."
+                "and @ConfigSpec data classes (nullable for an optional section)."
     }
 
     /** What validation annotations a value type accepts. */
@@ -67,7 +67,8 @@ class ConfigSpecProcessor(
 
     private sealed interface FieldKind {
         data class Value(val type: ValueType, val nullable: Boolean, val validate: String? = null) : FieldKind
-        data class Nested(val decl: KSClassDeclaration) : FieldKind
+        /** A nested spec; a [nullable] one is null when none of its keys is set. */
+        data class Nested(val decl: KSClassDeclaration, val nullable: Boolean = false) : FieldKind
     }
 
     private data class Field(
@@ -151,15 +152,11 @@ class ConfigSpecProcessor(
             }
             if (kind == null) {
                 val shown = type.declaration.qualifiedName?.asString() ?: type.toString()
-                val nullableNested = type.isMarkedNullable && isConfigSpec(type)
-                val reason = if (nullableNested) {
-                    "Nullable @ConfigSpec field '$name' is not supported; make it non-null with a default, " +
-                        "which is used when none of its required keys are set."
-                } else {
+                logger.error(
                     "Unsupported field type '$shown${if (type.isMarkedNullable) "?" else ""}' " +
-                        "for property '$name'. $SUPPORTED_TYPES_HINT"
-                }
-                logger.error(reason, param)
+                        "for property '$name'. $SUPPORTED_TYPES_HINT",
+                    param,
+                )
                 valid = false
                 continue
             }
@@ -305,7 +302,7 @@ class ConfigSpecProcessor(
 
     private fun fieldKind(type: KSType): FieldKind? {
         if (isConfigSpec(type)) {
-            return if (type.isMarkedNullable) null else FieldKind.Nested(type.declaration as KSClassDeclaration)
+            return FieldKind.Nested(type.declaration as KSClassDeclaration, type.isMarkedNullable)
         }
         val value = valueType(type.makeNotNullable()) ?: return null
         return FieldKind.Value(value, type.isMarkedNullable)
@@ -510,7 +507,8 @@ class ConfigSpecProcessor(
         for (field in fields) {
             val kind = field.kind as? FieldKind.Nested ?: continue
             val default = nestedDefault(field, defaultValues) ?: continue
-            appendLine("private fun __default_${names.generated}_${field.name}(): ${kind.decl.qualifiedName!!.asString()} =")
+            val type = kind.decl.qualifiedName!!.asString() + if (kind.nullable) "?" else ""
+            appendLine("private fun __default_${names.generated}_${field.name}(): $type =")
             appendLine("    $default")
             appendLine()
         }
@@ -529,6 +527,23 @@ class ConfigSpecProcessor(
             val result = "__r_$propName"
             val value = "__v_$propName"
             when (val kind = field.kind) {
+                is FieldKind.Nested if kind.nullable -> {
+                    val nestedQualified = kind.decl.qualifiedName!!.asString()
+                    val nestedLoad = "load${generatedName(kind.decl)}"
+                    val absent = if (nestedDefault(field, defaultValues) != null) {
+                        "__default_${names.generated}_$propName()"
+                    } else {
+                        "null"
+                    }
+                    // Absent (no key of the section set) means the default; once any key is set, the
+                    // section must be complete
+                    appendLine("    val $result = loadOptional(KeyUtils.resolvePrefix(\"$propName\", prefix)) { $nestedLoad(it) }")
+                    appendLine("    val $value: $nestedQualified? = when ($result) {")
+                    appendLine("        null -> $absent")
+                    appendLine("        is ConfigResult.Success -> $result.value")
+                    appendLine("        is ConfigResult.Failure -> { __errors += $result.errors; null }")
+                    appendLine("    }")
+                }
                 is FieldKind.Nested -> {
                     val nestedQualified = kind.decl.qualifiedName!!.asString()
                     val nestedLoad = "load${generatedName(kind.decl)}"
@@ -566,7 +581,10 @@ class ConfigSpecProcessor(
         appendLine("    return try {")
         appendLine("        ConfigResult.Success(${names.type}(")
         for (field in fields) {
-            val nullable = (field.kind as? FieldKind.Value)?.nullable == true
+            val nullable = when (val kind = field.kind) {
+                is FieldKind.Value -> kind.nullable
+                is FieldKind.Nested -> kind.nullable
+            }
             // Every non-null field is set once __errors is empty
             appendLine("            ${field.name} = __v_${field.name}${if (nullable) "" else "!!"},")
         }
@@ -588,11 +606,18 @@ class ConfigSpecProcessor(
         appendLine("/** Every nested @ConfigSpec inside this config, at any depth. Used by [Konstant.$initName]. */")
         appendLine("$vis fun ${names.type}.konstantNestedConfigs(): List<Any> = buildList {")
         for (field in fields) {
-            if (field.kind !is FieldKind.Nested) continue
+            val kind = field.kind as? FieldKind.Nested ?: continue
             // Qualified, so a field named like a list member (size, indices) still means the config's
             val ref = "this@konstantNestedConfigs.${field.name}"
-            appendLine("    add($ref)")
-            appendLine("    addAll($ref.konstantNestedConfigs())")
+            if (kind.nullable) {
+                appendLine("    $ref?.let { __nested ->")
+                appendLine("        add(__nested)")
+                appendLine("        addAll(__nested.konstantNestedConfigs())")
+                appendLine("    }")
+            } else {
+                appendLine("    add($ref)")
+                appendLine("    addAll($ref.konstantNestedConfigs())")
+            }
         }
         appendLine("}")
         appendLine()
