@@ -4,6 +4,8 @@ libVersion = "0.1.0-alpha3"
 agp = "9.4.1"
 android-minSdk = "24"
 android-compileSdk = "36"
+# Bytecode version of the JVM and Android artifacts, independent of the JDK that builds them
+jvmTarget = "11"
 kotlin = "2.4.20"
 ksp = "2.3.12"
 kotlinpoet = "2.4.0"

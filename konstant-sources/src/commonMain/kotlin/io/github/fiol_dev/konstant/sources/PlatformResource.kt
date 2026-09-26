@@ -6,8 +6,8 @@ import io.github.fiol_dev.konstant.core.InternalKonstantApi
 
 /**
  * Reads a text file shipped inside the app, or null if there is none at [path]:
- * - Android: `src/main/assets/<path>` (call `initKonstantAndroid` only if the automatic init
- *   is disabled)
+ * - Android: `src/main/assets/<path>` (call `initKonstantAndroid` first, or register
+ *   `KonstantInitProvider`)
  * - iOS/macOS: the main bundle's resources
  * - JVM: the classpath (`src/main/resources/<path>`)
  * - JS and Wasm on Node, and Linux: a file at [path], relative to the working directory

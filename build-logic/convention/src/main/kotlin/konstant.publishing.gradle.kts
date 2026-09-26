@@ -3,20 +3,22 @@ plugins {
     signing
 }
 
-signing {
-    val signingKey = project.findProperty("signingKey") as String?
-    val signingKeyId = project.findProperty("signingKeyId") as String?
-    val signingKeyPassword = project.findProperty("signingKeyPassword") as String?
-    useInMemoryPgpKeys(
-        signingKeyId,
-        signingKey,
-        signingKeyPassword,
-    )
+// Release builds sign with the in-memory key from CI. Without one (publishToMavenLocal on a
+// developer machine) publications are left unsigned instead of failing the build.
+val signingKey = (findProperty("signingKey") as String?)?.takeIf { it.isNotBlank() }
+if (signingKey != null) {
+    signing {
+        useInMemoryPgpKeys(
+            findProperty("signingKeyId") as String?,
+            signingKey,
+            findProperty("signingKeyPassword") as String?,
+        )
+    }
 }
 
 mavenPublishing {
     publishToMavenCentral(false)
-    signAllPublications()
+    if (signingKey != null) signAllPublications()
 
     coordinates(
         groupId = group.toString(),

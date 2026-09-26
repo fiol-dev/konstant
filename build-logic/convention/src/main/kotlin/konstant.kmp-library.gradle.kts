@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
@@ -11,6 +12,9 @@ plugins {
 
 group = libs.version("libGroup")
 version = libs.version("libVersion")
+
+// Pinned so a build on a newer JDK still produces jars that load on older runtimes
+val jvmTargetVersion = libs.version("jvmTarget")
 
 kotlin {
     explicitApi()
@@ -27,8 +31,17 @@ kotlin {
         compileSdk = libs.version("android-compileSdk").toInt()
         minSdk = libs.version("android-minSdk").toInt()
         withHostTest {}
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion))
+        }
     }
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion))
+            // Also checks that only JDK APIs of that version are used
+            freeCompilerArgs.add("-Xjdk-release=$jvmTargetVersion")
+        }
+    }
     js {
         nodejs()
         browser { testTask { useKarma { useChromeHeadless() } } }

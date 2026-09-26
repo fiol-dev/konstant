@@ -385,16 +385,27 @@ val loader = ConfigLoader {
 
 `YamlSource`, `JsonSource`, `PropertiesSource` and `DotEnvSource` have the same `fromResource`.
 
-**Android.** No `Context` is needed: `konstant-sources` merges a small `KonstantInitProvider` into your manifest, and it captures the application context at startup. To drop the provider (for example if you use App Startup), remove it in your manifest and call `initKonstantAndroid(context)` in `Application.onCreate` before loading:
+**Android.** Reading assets needs the application context. Call `initKonstantAndroid(context)` in `Application.onCreate` before loading:
+
+```kotlin
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        initKonstantAndroid(this)
+    }
+}
+```
+
+Or let a content provider do it at app start by declaring it in your manifest:
 
 ```xml
 <provider
     android:name="io.github.fiol_dev.konstant.sources.KonstantInitProvider"
     android:authorities="${applicationId}.konstant-init"
-    tools:node="remove" />
+    android:exported="false" />
 ```
 
-Unit tests on the JVM have no provider either, so call `initKonstantAndroid` there too.
+Konstant adds nothing to your manifest itself, so apps that only use `fromString`, `fromFile` or baked config need neither. Unit tests on the JVM call `initKonstantAndroid` too.
 
 ### Baked config (Gradle plugin)
 
